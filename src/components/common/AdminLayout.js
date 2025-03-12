@@ -36,13 +36,23 @@ import {
   ChevronLeft,
   Building,
 } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
 
 // Ширина бокового меню
 const drawerWidth = 240;
 
 const AdminLayout = () => {
-  const { user, logout } = useAuth();
+  // Get admin data from localStorage
+  const getAdminUser = () => {
+    try {
+      const adminStr = localStorage.getItem('admin');
+      return adminStr ? JSON.parse(adminStr) : null;
+    } catch (error) {
+      console.error('Error parsing admin data:', error);
+      return null;
+    }
+  };
+
+  const admin = getAdminUser();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
@@ -75,7 +85,7 @@ const AdminLayout = () => {
 
   // Обработчик выхода из системы
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('admin');
     navigate('/login');
   };
 
@@ -83,10 +93,10 @@ const AdminLayout = () => {
   const menuItems = [
     { path: '/dashboard', icon: <Home size={20} />, text: 'Главная' },
     { path: '/tickets', icon: <TicketCheck size={20} />, text: 'Заявки' },
-    { path: '/messages', icon: <Inbox size={20} />, text: 'Сообщения', count: 3 },
-    { path: '/clients', icon: <Users size={20} />, text: 'Клиенты' },
-    { path: '/objects', icon: <Building size={20} />, text: 'Объекты' },
-    { path: '/reports', icon: <BarChart2 size={20} />, text: 'Отчеты' },
+    // { path: '/messages', icon: <Inbox size={20} />, text: 'Сообщения', count: 3 },
+    // { path: '/clients', icon: <Users size={20} />, text: 'Клиенты' },
+    // { path: '/objects', icon: <Building size={20} />, text: 'Объекты' },
+    // { path: '/reports', icon: <BarChart2 size={20} />, text: 'Отчеты' },
   ];
 
   // Дополнительные пункты меню
@@ -152,7 +162,7 @@ const AdminLayout = () => {
               onClick={handleProfileMenuOpen}
             >
               <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
-                {user?.name?.charAt(0) || 'U'}
+                {admin?.employee?.name?.charAt(0) || admin?.first_name?.charAt(0) || 'A'}
               </Avatar>
             </IconButton>
           </Tooltip>

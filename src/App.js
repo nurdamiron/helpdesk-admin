@@ -1,67 +1,58 @@
 // src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { CssBaseline, ThemeProvider } from '@mui/material';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+
+// Import theme
 import theme from './theme';
 
-// Контекст авторизации администраторов
-import { AdminAuthProvider, useAdminAuth } from './contexts/AdminAuthContext';
-
-// Компоненты страниц
+// Import pages
 import LoginPage from './pages/LoginPage';
 import TicketsListPage from './pages/TicketsListPage';
 import TicketDetailPage from './pages/TicketDetailPage';
+import DashboardPage from './pages/DashboardPage';
+import NotFoundPage from './pages/NotFoundPage';
+
+// Import layouts
 import AdminLayout from './components/common/AdminLayout';
 
-// Компонент для защищенных маршрутов админ-панели
-const ProtectedAdminRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAdminAuth();
-
-  if (loading) {
-    // Можно добавить компонент загрузки здесь
-    return <div>Loading...</div>;
-  }
-
+// Protected route component
+const ProtectedRoute = ({ children }) => {
+  // Check if admin is logged in
+  const isAuthenticated = localStorage.getItem('admin') !== null;
+  
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
-
+  
   return children;
 };
 
-// Основной компонент приложения
-const App = () => {
+function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AdminAuthProvider>
-        <Router>
-          <Routes>
-            {/* Публичные маршруты */}
-            <Route path="/login" element={<LoginPage />} />
+      <Routes>
+        {/* Public routes */}
+        <Route path="/login" element={<LoginPage />} />
+        
+        {/* Protected admin routes */}
+        <Route path="/" element={
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="tickets" element={<TicketsListPage />} />
+          <Route path="tickets/:id" element={<TicketDetailPage />} />
+        </Route>
 
-            {/* Защищенные маршруты админ-панели */}
-            <Route 
-              path="/" 
-              element={
-                <ProtectedAdminRoute>
-                  <AdminLayout />
-                </ProtectedAdminRoute>
-              }
-            >
-              <Route index element={<Navigate to="/tickets" replace />} />
-              <Route path="tickets" element={<TicketsListPage />} />
-              <Route path="tickets/:id" element={<TicketDetailPage />} />
-              {/* Другие маршруты будут добавлены здесь */}
-            </Route>
-
-            {/* Перенаправление на страницу логина для неизвестных маршрутов */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </Routes>
-        </Router>
-      </AdminAuthProvider>
+        {/* 404 route */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
     </ThemeProvider>
   );
-};
+}
 
 export default App;

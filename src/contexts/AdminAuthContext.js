@@ -1,26 +1,38 @@
 // src/contexts/AdminAuthContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { adminAuthService } from '../api/adminAuthService';
+import adminAuthService from '../api/adminAuthService';
 
-// Создаем контекст админ-авторизации
+// Create the context
 const AdminAuthContext = createContext(null);
 
-// Провайдер контекста
+// Provider component
 export const AdminAuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // При загрузке приложения проверяем, есть ли сохраненный администратор
+  // Check if admin is logged in on component mount
   useEffect(() => {
     const initAuth = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const currentAdmin = adminAuthService.getCurrentAdmin();
-        setAdmin(currentAdmin);
+        if (currentAdmin) {
+          setAdmin(currentAdmin);
+          
+          // Verify admin status with backend
+          try {
+            await adminAuthService.checkAdmin();
+          } catch (err) {
+            // If there's an error with the admin validation, log them out
+            console.error('Admin validation failed:', err);
+            adminAuthService.logout();
+            setAdmin(null);
+          }
+        }
       } catch (err) {
         console.error('Error initializing admin auth:', err);
-        setError('Не удалось инициализировать авторизацию');
+        setError('Failed to initialize authentication');
       } finally {
         setLoading(false);
       }
@@ -29,46 +41,48 @@ export const AdminAuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
-  // Функция для входа в систему
+  // Login function
   const login = async (email, password) => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      setLoading(true);
-      setError(null);
       const data = await adminAuthService.login(email, password);
       setAdmin(data.user);
       return data.user;
     } catch (err) {
-      setError(err.response?.data?.message || 'Ошибка входа');
-      throw err;
+      const errorMessage = err.response?.data?.error || 'Login failed';
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  // Функция для выхода из системы
+  // Logout function
   const logout = () => {
     adminAuthService.logout();
     setAdmin(null);
   };
 
-  // Значение контекста, которое будет доступно потребителям
+  // Context value
   const value = {
     admin,
     loading,
     error,
     login,
     logout,
-    isAuthenticated: !!admin,
+    isAuthenticated: !!admin
   };
 
   return <AdminAuthContext.Provider value={value}>{children}</AdminAuthContext.Provider>;
 };
 
-// Хук для использования контекста в компонентах
+// Custom hook for using the context
 export const useAdminAuth = () => {
   const context = useContext(AdminAuthContext);
   if (!context) {
-    throw new Error('useAdminAuth должен использоваться внутри AdminAuthProvider');
+    throw new Error('useAdminAuth must be used within an AdminAuthProvider');
   }
   return context;
 };
