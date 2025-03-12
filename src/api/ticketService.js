@@ -34,7 +34,7 @@ api.interceptors.request.use(
 
 // Flag to determine if we should use mock data
 // Set to true to always use mock data, or false to only use it when API fails
-const ALWAYS_USE_MOCK = true;
+const ALWAYS_USE_MOCK = false;
 
 export const ticketService = {
   // Get all tickets with optional filtering

@@ -35,10 +35,10 @@ api.interceptors.request.use(
       const userStr = localStorage.getItem('user');
       if (userStr) {
         try {
-          const user = JSON.parse(userStr);
-          if (user.access) {
-            config.headers['Authorization'] = `Bearer ${user.access}`;
-          }
+          // const user = JSON.parse(userStr);
+          // if (user.access) {
+          //   config.headers['Authorization'] = `Bearer ${user.access}`;
+          // }
         } catch (e) {
           console.error('Error parsing user from localStorage', e);
         }
