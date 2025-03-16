@@ -61,7 +61,30 @@ const TicketDetailPage = () => {
   const [activeTab, setActiveTab] = useState('details');
 
   useEffect(() => {
-    loadTicketData();
+    const loadTicketData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const data = await ticketService.getTicketById(id);
+        
+        if (data) {
+          console.log('Полученные данные тикета:', data); // Отладочный вывод
+          setTicket(data);
+        } else {
+          setError('Данные заявки не найдены');
+        }
+      } catch (err) {
+        console.error('Ошибка при загрузке данных заявки:', err);
+        setError('Не удалось загрузить данные заявки');
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    if (id) {
+      loadTicketData();
+    }
   }, [id]);
 
   const loadTicketData = async () => {

@@ -1,37 +1,14 @@
+// src/pages/DashboardPage.js
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Grid,
-  Card,
-  CardContent,
-  CircularProgress,
-  Divider,
-  Chip,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Avatar,
-  useTheme,
-  useMediaQuery,
-  Alert
+  Box, Container, Typography, Paper, Grid, Card, CardContent,
+  CircularProgress, Divider, Chip, Button, List, ListItem,
+  ListItemText, ListItemIcon, Avatar, useTheme, useMediaQuery, Alert
 } from '@mui/material';
 import {
-  TicketCheck,
-  AlertCircle,
-  Clock,
-  CheckCircle,
-  Users,
-  Building,
-  Calendar,
-  TrendingUp,
-  ArrowRight,
-  Plus
+  TicketCheck, AlertCircle, Clock, CheckCircle, Users,
+  Building, Calendar, TrendingUp, ArrowRight, Plus
 } from 'lucide-react';
 import { ticketService } from '../api/ticketService';
 import { formatDate } from '../utils/dateUtils';
@@ -76,22 +53,47 @@ const DashboardPage = () => {
       try {
         setLoading(true);
         
-        // Получаем данные о заявках
+        // Добавляем отладочную информацию
+        console.log('Начинаем загрузку данных для дашборда');
+        
+        // Получаем данные о заявках с сервера
         const response = await ticketService.getTickets({ 
-          limit: 5, 
+          limit: 10,  // Запрашиваем больше для статистики
           sort: 'created_at', 
           order: 'DESC' 
         });
         
-        // Обрабатываем результаты
-        if (response && response.data) {
-          const tickets = response.data;
+        console.log('Получен ответ от API:', response);
+        
+        // Проверяем структуру ответа
+        let tickets = [];
+        
+        if (response.data) {
+          tickets = response.data;
+        } else if (Array.isArray(response)) {
+          tickets = response;
+        } else {
+          console.warn('Неожиданная структура ответа:', response);
+          tickets = [];
+        }
+        
+        if (tickets.length > 0) {
+          console.log('Обрабатываем полученные заявки:', tickets);
+          
+          // Берем 5 последних для отображения
           setRecentTickets(tickets.slice(0, 5));
           
           // Рассчитываем статистику
           const newCount = tickets.filter(ticket => ticket.status === 'new').length;
           const inProgressCount = tickets.filter(ticket => ticket.status === 'in_progress').length;
           const resolvedCount = tickets.filter(ticket => ticket.status === 'resolved').length;
+          
+          console.log('Рассчитанная статистика:', { 
+            total: tickets.length,
+            new: newCount,
+            inProgress: inProgressCount,
+            resolved: resolvedCount 
+          });
           
           // Уникальные клиенты и объекты
           const uniqueClientIds = new Set();
@@ -107,24 +109,19 @@ const DashboardPage = () => {
             newTickets: newCount,
             inProgressTickets: inProgressCount,
             resolvedTickets: resolvedCount,
-            totalClients: uniqueClientIds.size || 8,
-            totalObjects: uniqueObjectAddresses.size || 12
+            totalClients: uniqueClientIds.size || 0,
+            totalObjects: uniqueObjectAddresses.size || 0
           });
         } else {
-          // Используем демо-данные если API вернул пустой результат
-          setRecentTickets([
-            { id: 1, subject: "Проблема с водопроводом", status: "new", category: "plumbing", created_at: "2025-03-15T10:30:00" },
-            { id: 2, subject: "Не работает электричество", status: "in_progress", category: "electrical", created_at: "2025-03-16T09:15:00" },
-            { id: 3, subject: "Консультация по ремонту", status: "resolved", category: "consultation", created_at: "2025-03-17T11:45:00" }
-          ]);
-          
+          console.log('Нет данных о заявках, показываем пустой список');
+          setRecentTickets([]);
           setStats({
-            totalTickets: 10,
-            newTickets: 3,
-            inProgressTickets: 4,
-            resolvedTickets: 2,
-            totalClients: 8,
-            totalObjects: 12
+            totalTickets: 0,
+            newTickets: 0,
+            inProgressTickets: 0,
+            resolvedTickets: 0,
+            totalClients: 0,
+            totalObjects: 0
           });
         }
         
@@ -133,20 +130,15 @@ const DashboardPage = () => {
         console.error('Ошибка загрузки данных для дашборда:', err);
         setError('Не удалось загрузить данные для дашборда. Попробуйте позже.');
         
-        // Используем демо-данные в случае ошибки
-        setRecentTickets([
-          { id: 1, subject: "Проблема с водопроводом", status: "new", category: "plumbing", created_at: "2025-03-15T10:30:00" },
-          { id: 2, subject: "Не работает электричество", status: "in_progress", category: "electrical", created_at: "2025-03-16T09:15:00" },
-          { id: 3, subject: "Консультация по ремонту", status: "resolved", category: "consultation", created_at: "2025-03-17T11:45:00" }
-        ]);
-        
+        // Показываем пустой дашборд при ошибке
+        setRecentTickets([]);
         setStats({
-          totalTickets: 10,
-          newTickets: 3,
-          inProgressTickets: 4,
-          resolvedTickets: 2,
-          totalClients: 8,
-          totalObjects: 12
+          totalTickets: 0,
+          newTickets: 0,
+          inProgressTickets: 0,
+          resolvedTickets: 0,
+          totalClients: 0,
+          totalObjects: 0
         });
       } finally {
         setLoading(false);
@@ -228,7 +220,7 @@ const DashboardPage = () => {
           Панель управления
         </Typography>
         
-        <Button
+        {/* <Button
           variant="contained"
           startIcon={<Plus />}
           component={Link}
@@ -236,7 +228,7 @@ const DashboardPage = () => {
           size={isMobile ? "medium" : "large"}
         >
           Создать заявку
-        </Button>
+        </Button> */}
       </Box>
 
       {error && (

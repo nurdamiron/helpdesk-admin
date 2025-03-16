@@ -38,39 +38,65 @@ const ALWAYS_USE_MOCK = false;
 
 export const ticketService = {
   // Get all tickets with optional filtering
-  getTickets: async (filters = {}) => {
-    // If we should always use mock data, skip the API call
-    if (ALWAYS_USE_MOCK) {
-      console.log('Using mock ticket data');
-      return mockTicketService.getTickets(filters);
-    }
+  // src/api/ticketService.js
+
+// Только часть метода getTickets - обновите его в вашем файле
+getTickets: async (filters = {}) => {
+  try {
+    console.log('Запрос списка тикетов с фильтрами:', filters);
     
-    try {
-      // Try to get real data from API
-      const response = await api.get('/tickets', { params: filters });
+    // Получаем реальные данные из API
+    const response = await api.get('/tickets', { params: filters });
+    
+    console.log('Ответ API для списка тикетов:', response.data);
+    
+    // Обработка различных форматов ответа
+    if (response.data.data) {
+      // Если ответ содержит data.data (некоторые API возвращают данные в таком формате)
       return response.data;
-    } catch (error) {
-      console.error('Error fetching tickets from API, using mock data:', error);
-      // Fallback to mock data
-      return mockTicketService.getTickets(filters);
+    } else if (Array.isArray(response.data)) {
+      // Если ответ - просто массив
+      return { 
+        data: response.data,
+        total: response.data.length,
+        page: filters.page || 1,
+        limit: filters.limit || 10,
+        pages: Math.ceil(response.data.length / (filters.limit || 10))
+      };
+    } else {
+      // Любой другой формат
+      return response.data;
     }
-  },
+  } catch (error) {
+    console.error('Ошибка при получении списка тикетов:', error);
+    // Если нам нужен запасной вариант
+    throw error;
+  }
+},
   
   // Get ticket by ID
-  getTicketById: async (id) => {
-    if (ALWAYS_USE_MOCK) {
-      console.log(`Using mock data for ticket #${id}`);
-      return mockTicketService.getTicketById(id);
-    }
+  // src/api/ticketService.js - метод getTicketById
+getTicketById: async (id) => {
+  try {
+    // Получаем данные тикета из API
+    const response = await api.get(`/tickets/${id}`);
     
-    try {
-      const response = await api.get(`/tickets/${id}`);
+    // Проверяем формат ответа и извлекаем данные тикета
+    if (response.data && response.data.ticket) {
+      return response.data.ticket;
+    } else if (response.data) {
+      // Если данные есть, но нет вложенного объекта 'ticket'
       return response.data;
-    } catch (error) {
-      console.error(`Error fetching ticket #${id}, using mock data:`, error);
-      return mockTicketService.getTicketById(id);
+    } else {
+      throw new Error('Некорректный формат данных от API');
     }
-  },
+  } catch (error) {
+    console.error(`Error fetching ticket #${id}:`, error);
+    
+    // Если нужно, здесь можно вернуть моковые данные как запасной вариант
+    throw error; // Или пробросить ошибку дальше
+  }
+},
   
   // Create a new ticket
   createTicket: async (ticketData) => {

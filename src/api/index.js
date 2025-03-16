@@ -13,20 +13,15 @@ const api = axios.create({
 });
 
 // Добавляем перехватчик запросов для добавления данных авторизации
+
 api.interceptors.request.use(
   (config) => {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        
-        // Добавляем данные пользователя в заголовки
-        config.headers['X-User-Id'] = user.id;
-        config.headers['X-User-Email'] = user.email;
-      } catch (e) {
-        console.error('Error parsing user from localStorage', e);
-      }
-    }
+    console.log('🚀 Отправка запроса:', {
+      method: config.method.toUpperCase(),
+      url: config.url,
+      data: config.data,
+      params: config.params
+    });
     return config;
   },
   (error) => {
@@ -34,17 +29,22 @@ api.interceptors.request.use(
   }
 );
 
-// Обработка ошибок API
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('✅ Получен ответ:', {
+      url: response.config.url,
+      status: response.status,
+      data: response.data
+    });
+    return response;
+  },
   (error) => {
-    // Обрабатываем ошибки авторизации
-    if (error.response && error.response.status === 401) {
-      // Очищаем данные пользователя
-      localStorage.removeItem('user');
-      // Перенаправляем на страницу входа
-      window.location.href = '/login';
-    }
+    console.error('❌ Ошибка API:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
     return Promise.reject(error);
   }
 );

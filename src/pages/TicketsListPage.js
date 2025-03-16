@@ -357,7 +357,7 @@ const TicketsListPage = () => {
         <Typography variant="h5" component="h1" sx={{ mb: isMobile ? 1 : 0 }}>
           Список заявок
         </Typography>
-        <Button
+        {/* <Button
           variant="contained"
           startIcon={<Plus />}
           component={Link}
@@ -365,7 +365,7 @@ const TicketsListPage = () => {
           fullWidth={isMobile}
         >
           Создать заявку
-        </Button>
+        </Button> */}
       </Box>
 
       {/* Filters */}
