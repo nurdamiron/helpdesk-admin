@@ -1,10 +1,10 @@
-// src/pages/TicketDetailPage.js
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Box, Grid, Paper, Typography, Chip, Divider, Button, TextField, 
   CircularProgress, Alert, Card, CardContent, Tooltip, 
-  Table, TableBody, TableCell, TableContainer, TableRow, MenuItem
+  Table, TableBody, TableCell, TableContainer, TableRow, MenuItem,
+  useTheme, useMediaQuery
 } from '@mui/material';
 import { 
   Clock, CheckCircle, AlertCircle, MoreHorizontal, 
@@ -49,6 +49,10 @@ const PROPERTY_TYPES = [
 const TicketDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -87,7 +91,9 @@ const TicketDetailPage = () => {
       setSaving(true);
       await ticketService.updateTicket(id, {
         status: ticket.status,
-        assignedTo: ticket.assignedTo
+        assignedTo: ticket.assignedTo,
+        priority: ticket.priority,
+        deadline: ticket.deadline
       });
       setSavingSuccess(true);
       setTimeout(() => setSavingSuccess(false), 3000);
@@ -133,7 +139,7 @@ const TicketDetailPage = () => {
   if (error) {
     return (
       <Box m={3}>
-        <Alert severity="error">{error}</Alert>
+        <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
         <Button 
           variant="outlined" 
           startIcon={<ArrowLeft />} 
@@ -154,33 +160,68 @@ const TicketDetailPage = () => {
   const additionalInfo = ticket.metadata?.additional || {};
 
   return (
-    <Box p={3}>
-      <Box display="flex" alignItems="center" mb={3}>
+    <Box p={isMobile ? 2 : 3}>
+      {/* Header */}
+      <Box 
+        sx={{ 
+          mb: 3, 
+          display: 'flex', 
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: isMobile ? 'flex-start' : 'center',
+          gap: isMobile ? 2 : 0
+        }}
+      >
         <Button 
           variant="outlined" 
           startIcon={<ArrowLeft />} 
           onClick={() => navigate('/tickets')}
-          sx={{ mr: 2 }}
+          sx={{ mr: isMobile ? 0 : 2 }}
+          fullWidth={isMobile}
         >
           Назад
         </Button>
-        <Typography variant="h5" component="h1">
+        <Typography 
+          variant={isMobile ? "h6" : "h5"} 
+          component="h1"
+          sx={{ 
+            whiteSpace: 'normal', 
+            wordBreak: 'break-word' 
+          }}
+        >
           Заявка #{ticket.id}: {ticket.subject}
         </Typography>
       </Box>
 
+      {/* Success message */}
       {savingSuccess && (
         <Alert severity="success" sx={{ mb: 2 }}>
           Изменения успешно сохранены
         </Alert>
       )}
 
-      <Grid container spacing={3}>
-        {/* Left column - Ticket details */}
-        <Grid item xs={12} md={8}>
-          <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-            <Box display="flex" justifyContent="space-between" mb={2}>
-              <Box display="flex" alignItems="center">
+      <Grid container spacing={isMobile ? 2 : 3}>
+        {/* Main content column */}
+        <Grid item xs={12} md={8} order={isMobile ? 2 : 1}>
+          {/* Ticket details */}
+          <Paper elevation={2} sx={{ p: isMobile ? 2 : 3, mb: isMobile ? 2 : 3 }}>
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                flexDirection: isMobile ? 'column' : 'row',
+                justifyContent: 'space-between', 
+                alignItems: isMobile ? 'flex-start' : 'center',
+                mb: 2, 
+                gap: isMobile ? 2 : 0
+              }}
+            >
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  gap: 1
+                }}
+              >
                 {getStatusIcon(ticket.status)}
                 <Chip 
                   label={ticket.priority === 'urgent' ? 'Срочный' : 
@@ -190,41 +231,38 @@ const TicketDetailPage = () => {
                          ticket.priority === 'high' ? 'warning' : 
                          ticket.priority === 'medium' ? 'primary' : 'default'}
                   size="small"
-                  sx={{ ml: 1 }}
                 />
                 <Chip 
                   label={getCategoryLabel(ticket.category)} 
                   variant="outlined"
                   size="small"
-                  sx={{ ml: 1 }}
                 />
               </Box>
-              <Box>
-                <Button 
-                  variant="contained" 
-                  color="primary" 
-                  startIcon={<Save />}
-                  onClick={handleSave}
-                  disabled={saving}
-                >
-                  {saving ? 'Сохранение...' : 'Сохранить'}
-                </Button>
-              </Box>
+              <Button 
+                variant="contained" 
+                color="primary" 
+                startIcon={<Save />}
+                onClick={handleSave}
+                disabled={saving}
+                fullWidth={isMobile}
+              >
+                {saving ? 'Сохранение...' : 'Сохранить'}
+              </Button>
             </Box>
 
             <Typography variant="h6" gutterBottom>
               {ticket.subject}
             </Typography>
             
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-wrap' }}>
               {ticket.description}
             </Typography>
 
             <Divider sx={{ my: 2 }} />
 
-            {/* Информация о клиенте и объекте */}
+            {/* Client and Property info - adaptive grid */}
             <Grid container spacing={2}>
-              {/* Информация о клиенте */}
+              {/* Client info card */}
               <Grid item xs={12} sm={6}>
                 <Card variant="outlined" sx={{ height: '100%' }}>
                   <CardContent>
@@ -234,8 +272,15 @@ const TicketDetailPage = () => {
                     </Typography>
                     
                     <Box sx={{ mt: 2 }}>
-                      <Box display="flex" alignItems="center" mb={1}>
-                        <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1 }}>
+                      <Box 
+                        sx={{ 
+                          display: 'flex', 
+                          mb: 1,
+                          flexDirection: isMobile ? 'column' : 'row',
+                          alignItems: isMobile ? 'flex-start' : 'center' 
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
                           ФИО:
                         </Typography>
                         <Typography variant="body2">
@@ -243,17 +288,31 @@ const TicketDetailPage = () => {
                         </Typography>
                       </Box>
                       
-                      <Box display="flex" alignItems="center" mb={1}>
-                        <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1 }}>
+                      <Box 
+                        sx={{ 
+                          display: 'flex', 
+                          mb: 1,
+                          flexDirection: isMobile ? 'column' : 'row',
+                          alignItems: isMobile ? 'flex-start' : 'center' 
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
                           Email:
                         </Typography>
-                        <Typography variant="body2">
+                        <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
                           <a href={`mailto:${requesterInfo.email}`}>{requesterInfo.email || 'Не указан'}</a>
                         </Typography>
                       </Box>
                       
-                      <Box display="flex" alignItems="center" mb={1}>
-                        <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1 }}>
+                      <Box 
+                        sx={{ 
+                          display: 'flex', 
+                          mb: 1,
+                          flexDirection: isMobile ? 'column' : 'row',
+                          alignItems: isMobile ? 'flex-start' : 'center' 
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
                           Телефон:
                         </Typography>
                         <Typography variant="body2">
@@ -261,8 +320,15 @@ const TicketDetailPage = () => {
                         </Typography>
                       </Box>
                       
-                      <Box display="flex" alignItems="center" mb={1}>
-                        <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1 }}>
+                      <Box 
+                        sx={{ 
+                          display: 'flex', 
+                          mb: 1,
+                          flexDirection: isMobile ? 'column' : 'row',
+                          alignItems: isMobile ? 'flex-start' : 'center' 
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
                           Предпочт. способ связи:
                         </Typography>
                         <Typography variant="body2">
@@ -276,7 +342,7 @@ const TicketDetailPage = () => {
                 </Card>
               </Grid>
               
-              {/* Информация об объекте */}
+              {/* Property info card */}
               <Grid item xs={12} sm={6}>
                 <Card variant="outlined" sx={{ height: '100%' }}>
                   <CardContent>
@@ -286,8 +352,15 @@ const TicketDetailPage = () => {
                     </Typography>
                     
                     <Box sx={{ mt: 2 }}>
-                      <Box display="flex" alignItems="center" mb={1}>
-                        <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1 }}>
+                      <Box 
+                        sx={{ 
+                          display: 'flex', 
+                          mb: 1,
+                          flexDirection: isMobile ? 'column' : 'row',
+                          alignItems: isMobile ? 'flex-start' : 'center' 
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
                           Тип объекта:
                         </Typography>
                         <Typography variant="body2">
@@ -295,18 +368,32 @@ const TicketDetailPage = () => {
                         </Typography>
                       </Box>
                       
-                      <Box display="flex" alignItems="center" mb={1}>
-                        <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1 }}>
+                      <Box 
+                        sx={{ 
+                          display: 'flex', 
+                          mb: 1,
+                          flexDirection: isMobile ? 'column' : 'row',
+                          alignItems: isMobile ? 'flex-start' : 'center' 
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
                           Адрес:
                         </Typography>
-                        <Typography variant="body2">
+                        <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
                           {propertyInfo.address || 'Не указан'}
                         </Typography>
                       </Box>
                       
                       {propertyInfo.area && (
-                        <Box display="flex" alignItems="center" mb={1}>
-                          <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1 }}>
+                        <Box 
+                          sx={{ 
+                            display: 'flex', 
+                            mb: 1,
+                            flexDirection: isMobile ? 'column' : 'row',
+                            alignItems: isMobile ? 'flex-start' : 'center' 
+                          }}
+                        >
+                          <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
                             Площадь:
                           </Typography>
                           <Typography variant="body2">
@@ -319,7 +406,7 @@ const TicketDetailPage = () => {
                 </Card>
               </Grid>
               
-              {/* Дополнительная информация */}
+              {/* Additional info card */}
               {(additionalInfo.desired_date || additionalInfo.budget || additionalInfo.service_type) && (
                 <Grid item xs={12} sx={{ mt: 1 }}>
                   <Card variant="outlined">
@@ -331,7 +418,7 @@ const TicketDetailPage = () => {
                       
                       <Grid container spacing={2} sx={{ mt: 1 }}>
                         {additionalInfo.desired_date && (
-                          <Grid item xs={12} sm={4}>
+                          <Grid item xs={12} sm={isMobile ? 12 : 4}>
                             <Box display="flex" alignItems="center">
                               <CalendarDays size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
                               <Typography variant="body2">
@@ -342,7 +429,7 @@ const TicketDetailPage = () => {
                         )}
                         
                         {additionalInfo.budget && (
-                          <Grid item xs={12} sm={4}>
+                          <Grid item xs={12} sm={isMobile ? 12 : 4}>
                             <Box display="flex" alignItems="center">
                               <DollarSign size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
                               <Typography variant="body2">
@@ -353,7 +440,7 @@ const TicketDetailPage = () => {
                         )}
                         
                         {additionalInfo.service_type && (
-                          <Grid item xs={12} sm={4}>
+                          <Grid item xs={12} sm={isMobile ? 12 : 4}>
                             <Box display="flex" alignItems="center">
                               <Briefcase size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
                               <Typography variant="body2">
@@ -376,7 +463,7 @@ const TicketDetailPage = () => {
               )}
             </Grid>
 
-            {/* Основная информация о заявке */}
+            {/* Ticket metadata */}
             <Box sx={{ mt: 3 }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6} md={3}>
@@ -420,27 +507,44 @@ const TicketDetailPage = () => {
             </Box>
           </Paper>
 
-          {/* Chat and Files Tabs */}
-          <Paper elevation={2} sx={{ p: 3 }}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-              <Box display="flex">
+          {/* Tabs section - Chat, Files, History */}
+          <Paper elevation={2} sx={{ p: isMobile ? 2 : 3 }}>
+            <Box 
+              sx={{ 
+                borderBottom: 1, 
+                borderColor: 'divider', 
+                mb: 2,
+                overflow: 'auto'
+              }}
+            >
+              <Box 
+                display="flex" 
+                sx={{
+                  flexWrap: isMobile ? 'nowrap' : 'wrap',
+                  minWidth: isMobile ? 350 : 'auto'
+                }}
+              >
                 <Button 
                   variant={activeTab === 'details' ? 'contained' : 'text'} 
                   onClick={() => setActiveTab('details')}
-                  sx={{ mr: 1 }}
+                  sx={{ mr: 1, whiteSpace: 'nowrap' }}
+                  size={isMobile ? "small" : "medium"}
                 >
                   Обсуждение
                 </Button>
                 <Button 
                   variant={activeTab === 'files' ? 'contained' : 'text'} 
                   onClick={() => setActiveTab('files')}
-                  sx={{ mr: 1 }}
+                  sx={{ mr: 1, whiteSpace: 'nowrap' }}
+                  size={isMobile ? "small" : "medium"}
                 >
                   Файлы
                 </Button>
                 <Button 
                   variant={activeTab === 'history' ? 'contained' : 'text'} 
                   onClick={() => setActiveTab('history')}
+                  sx={{ whiteSpace: 'nowrap' }}
+                  size={isMobile ? "small" : "medium"}
                 >
                   История
                 </Button>
@@ -461,9 +565,9 @@ const TicketDetailPage = () => {
           </Paper>
         </Grid>
 
-        {/* Right column - Status, Assignment, Notes */}
-        <Grid item xs={12} md={4}>
-          <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+        {/* Right sidebar - Settings */}
+        <Grid item xs={12} md={4} order={isMobile ? 1 : 2}>
+          <Paper elevation={2} sx={{ p: isMobile ? 2 : 3, mb: isMobile ? 2 : 3 }}>
             <Typography variant="h6" gutterBottom>
               Управление заявкой
             </Typography>
@@ -500,6 +604,7 @@ const TicketDetailPage = () => {
                 size="small"
                 value={ticket.deadline ? new Date(ticket.deadline).toISOString().slice(0, 16) : ''}
                 onChange={(e) => setTicket({ ...ticket, deadline: e.target.value })}
+                InputLabelProps={{ shrink: true }}
               />
             </Box>
             
@@ -522,9 +627,22 @@ const TicketDetailPage = () => {
                 <MenuItem value="urgent">Срочный</MenuItem>
               </TextField>
             </Box>
+            
+            <Box sx={{ mt: 3 }}>
+              <Button 
+                variant="contained" 
+                color="primary"
+                startIcon={<Save />}
+                onClick={handleSave}
+                disabled={saving}
+                fullWidth
+              >
+                {saving ? 'Сохранение...' : 'Сохранить изменения'}
+              </Button>
+            </Box>
           </Paper>
 
-          <Paper elevation={2} sx={{ p: 3 }}>
+          <Paper elevation={2} sx={{ p: isMobile ? 2 : 3 }}>
             <Typography variant="h6" gutterBottom>
               Внутренние заметки
             </Typography>

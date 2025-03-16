@@ -15,10 +15,11 @@ import {
   CardContent
 } from '@mui/material';
 import { Lock, Mail, Eye, EyeOff, Construction } from 'lucide-react';
-import { authService } from '../api/authService';
+import { useAuth } from '../contexts/AuthContext'; // Используем контекст авторизации
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { login, isAuthenticated, loading: authLoading } = useAuth(); // Используем hook useAuth
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -27,11 +28,10 @@ const LoginPage = () => {
 
   useEffect(() => {
     // Если пользователь уже залогинен — уходим на /dashboard
-    const currentUser = authService.getCurrentUser();
-    if (currentUser) {
+    if (isAuthenticated) {
       navigate('/dashboard');
     }
-  }, [navigate]);
+  }, [isAuthenticated, navigate]); // Добавлен isAuthenticated в зависимости
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,8 +49,8 @@ const LoginPage = () => {
     setLoading(true);
     
     try {
-      await authService.login(email, password);
-      navigate('/dashboard');
+      await login(email, password); // Используем метод login из контекста
+      // Не используем navigate здесь - это будет сделано в useEffect
     } catch (err) {
       console.error('Login error:', err);
       
@@ -59,7 +59,6 @@ const LoginPage = () => {
       } else {
         setError('Ошибка авторизации. Пожалуйста, попробуйте снова.');
       }
-    } finally {
       setLoading(false);
     }
   };
@@ -162,10 +161,10 @@ const LoginPage = () => {
                 variant="contained"
                 color="primary"
                 size="large"
-                disabled={loading}
+                disabled={loading || authLoading}
                 sx={{ mt: 3, mb: 2, py: 1.5 }}
               >
-                {loading ? <CircularProgress size={24} /> : 'Войти'}
+                {loading || authLoading ? <CircularProgress size={24} /> : 'Войти'}
               </Button>
             </form>
 

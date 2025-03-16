@@ -25,7 +25,12 @@ import {
   IconButton,
   CircularProgress,
   Alert,
-  Tooltip
+  Tooltip,
+  useTheme,
+  useMediaQuery,
+  Card,
+  CardContent,
+  Divider
 } from '@mui/material';
 import {
   Search,
@@ -37,7 +42,11 @@ import {
   AlertCircle,
   Clock,
   CheckCircle,
-  Archive
+  Archive,
+  ArrowRight,
+  Calendar,
+  Tag,
+  Flag
 } from 'lucide-react';
 import { ticketService } from '../api/ticketService';
 
@@ -64,6 +73,10 @@ const TICKET_PRIORITIES = [
 ];
 
 const TicketsListPage = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  
   // State for tickets data
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -241,10 +254,107 @@ const TicketsListPage = () => {
     }
   };
 
+  // Render mobile card view for tickets
+  const renderMobileTicketList = () => {
+    if (tickets.length === 0) {
+      return (
+        <Box sx={{ p: 4, textAlign: 'center' }}>
+          <Typography variant="body1">
+            Заявок не найдено
+          </Typography>
+          <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+            Попробуйте изменить параметры фильтрации или создайте новую заявку
+          </Typography>
+        </Box>
+      );
+    }
+
+    return (
+      <Box sx={{ mb: 2 }}>
+        {tickets.map(ticket => (
+          <Card key={ticket.id} sx={{ mb: 2 }}>
+            <CardContent sx={{ pb: 1 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  #{ticket.id}
+                </Typography>
+                <Box>
+                  {renderStatus(ticket.status)}
+                </Box>
+              </Box>
+              
+              <Typography variant="h6" sx={{ mb: 1, fontSize: '1rem' }}>
+                {ticket.subject}
+              </Typography>
+              
+              {ticket.metadata?.requester?.full_name && (
+                <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                  Клиент: {ticket.metadata.requester.full_name}
+                </Typography>
+              )}
+              
+              <Divider sx={{ my: 1 }} />
+              
+              <Grid container spacing={1} sx={{ mt: 1 }}>
+                <Grid item xs={6}>
+                  <Box display="flex" alignItems="center">
+                    <Tag size={14} style={{ marginRight: '4px', opacity: 0.7 }} />
+                    <Typography variant="body2" color="textSecondary">
+                      {getCategoryLabel(ticket.category)}
+                    </Typography>
+                  </Box>
+                </Grid>
+                
+                <Grid item xs={6}>
+                  <Box display="flex" alignItems="center">
+                    <Flag size={14} style={{ marginRight: '4px', opacity: 0.7 }} />
+                    <Typography variant="body2" color="textSecondary">
+                      {renderPriority(ticket.priority)}
+                    </Typography>
+                  </Box>
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <Box display="flex" alignItems="center">
+                    <Calendar size={14} style={{ marginRight: '4px', opacity: 0.7 }} />
+                    <Typography variant="body2" color="textSecondary">
+                      {formatDate(ticket.created_at)}
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </CardContent>
+            
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
+              <Button
+                component={Link}
+                to={`/tickets/${ticket.id}`}
+                size="small"
+                endIcon={<ArrowRight size={16} />}
+                sx={{ textTransform: 'none' }}
+              >
+                Подробнее
+              </Button>
+            </Box>
+          </Card>
+        ))}
+      </Box>
+    );
+  };
+
   return (
-    <Container maxWidth="xl" sx={{ py: 3 }}>
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5" component="h1">
+    <Container maxWidth="xl" sx={{ py: isMobile ? 2 : 3 }}>
+      <Box 
+        sx={{ 
+          mb: 3, 
+          display: 'flex', 
+          flexDirection: isMobile ? 'column' : 'row',
+          justifyContent: 'space-between', 
+          alignItems: isMobile ? 'stretch' : 'center',
+          gap: isMobile ? 2 : 0
+        }}
+      >
+        <Typography variant="h5" component="h1" sx={{ mb: isMobile ? 1 : 0 }}>
           Список заявок
         </Typography>
         <Button
@@ -252,13 +362,14 @@ const TicketsListPage = () => {
           startIcon={<Plus />}
           component={Link}
           to="/tickets/new"
+          fullWidth={isMobile}
         >
           Создать заявку
         </Button>
       </Box>
 
       {/* Filters */}
-      <Paper sx={{ p: 2, mb: 3 }}>
+      <Paper sx={{ p: isMobile ? 2 : 3, mb: 3 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
             <TextField
@@ -280,11 +391,19 @@ const TicketsListPage = () => {
           </Grid>
           
           <Grid item xs={12} md={6}>
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                gap: 2,
+                flexWrap: isMobile ? 'wrap' : 'nowrap'
+              }}
+            >
               <Button
                 variant="outlined"
                 startIcon={<Filter />}
                 onClick={() => setShowFilters(!showFilters)}
+                fullWidth={isMobile}
+                sx={{ flex: isMobile ? '1 0 100%' : '1 0 auto' }}
               >
                 {showFilters ? 'Скрыть фильтры' : 'Показать фильтры'}
               </Button>
@@ -292,11 +411,20 @@ const TicketsListPage = () => {
               <Button
                 variant="contained"
                 onClick={applyFilters}
+                fullWidth={isMobile}
+                sx={{ flex: isMobile ? '1 0 calc(50% - 8px)' : '1 0 auto' }}
               >
                 Применить
               </Button>
               
-              <IconButton onClick={resetFilters} title="Сбросить фильтры">
+              <IconButton 
+                onClick={resetFilters} 
+                title="Сбросить фильтры"
+                sx={{ 
+                  flex: isMobile ? '0 0 auto' : '0 0 auto',
+                  ml: isMobile ? 'auto' : 0
+                }}
+              >
                 <RefreshCw size={20} />
               </IconButton>
             </Box>
@@ -304,7 +432,7 @@ const TicketsListPage = () => {
           
           {showFilters && (
             <>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth size="small">
                   <InputLabel>Статус</InputLabel>
                   <Select
@@ -322,7 +450,7 @@ const TicketsListPage = () => {
                 </FormControl>
               </Grid>
               
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth size="small">
                   <InputLabel>Приоритет</InputLabel>
                   <Select
@@ -341,7 +469,7 @@ const TicketsListPage = () => {
                 </FormControl>
               </Grid>
               
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth size="small">
                   <InputLabel>Категория</InputLabel>
                   <Select
@@ -371,87 +499,105 @@ const TicketsListPage = () => {
         </Alert>
       )}
 
-      {/* Ticket list */}
+      {/* Ticket list - responsive view */}
       <Paper>
-        <TableContainer>
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : tickets.length === 0 ? (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-              <Typography variant="body1">
-                Заявок не найдено
-              </Typography>
-              <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                Попробуйте изменить параметры фильтрации или создайте новую заявку
-              </Typography>
-            </Box>
-          ) : (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Заявка</TableCell>
-                  <TableCell>Категория</TableCell>
-                  <TableCell>Статус</TableCell>
-                  <TableCell>Приоритет</TableCell>
-                  <TableCell>Дата создания</TableCell>
-                  <TableCell align="right">Действия</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {tickets.map(ticket => (
-                  <TableRow key={ticket.id} hover>
-                    <TableCell>#{ticket.id}</TableCell>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight="medium">
-                        {ticket.subject}
-                      </Typography>
-                      {ticket.metadata?.requester?.full_name && (
-                        <Typography variant="caption" color="textSecondary" display="block">
-                          {ticket.metadata.requester.full_name}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>{getCategoryLabel(ticket.category)}</TableCell>
-                    <TableCell>{renderStatus(ticket.status)}</TableCell>
-                    <TableCell>{renderPriority(ticket.priority)}</TableCell>
-                    <TableCell>{formatDate(ticket.created_at)}</TableCell>
-                    <TableCell align="right">
-                      <Tooltip title="Просмотреть заявку">
-                        <IconButton
-                          component={Link}
-                          to={`/tickets/${ticket.id}`}
-                          size="small"
-                        >
-                          <Eye size={18} />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Ещё">
-                        <IconButton size="small">
-                          <MoreHorizontal size={18} />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : isMobile ? (
+          // Mobile card view
+          <Box sx={{ p: 2 }}>
+            {renderMobileTicketList()}
+            <TablePagination
+              component="div"
+              count={totalTickets}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[5, 10, 25]}
+              labelRowsPerPage="Строк:"
+              labelDisplayedRows={({ from, to, count }) => `${from}-${to} из ${count}`}
+            />
+          </Box>
+        ) : (
+          // Desktop table view
+          <TableContainer>
+            {tickets.length === 0 ? (
+              <Box sx={{ p: 4, textAlign: 'center' }}>
+                <Typography variant="body1">
+                  Заявок не найдено
+                </Typography>
+                <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                  Попробуйте изменить параметры фильтрации или создайте новую заявку
+                </Typography>
+              </Box>
+            ) : (
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>ID</TableCell>
+                    <TableCell>Заявка</TableCell>
+                    {!isTablet && <TableCell>Категория</TableCell>}
+                    <TableCell>Статус</TableCell>
+                    {!isTablet && <TableCell>Приоритет</TableCell>}
+                    <TableCell>Дата создания</TableCell>
+                    <TableCell align="right">Действия</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </TableContainer>
-        
-        <TablePagination
-          component="div"
-          count={totalTickets}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[5, 10, 25, 50]}
-          labelRowsPerPage="Строк на странице:"
-          labelDisplayedRows={({ from, to, count }) => `${from}-${to} из ${count}`}
-        />
+                </TableHead>
+                <TableBody>
+                  {tickets.map(ticket => (
+                    <TableRow key={ticket.id} hover>
+                      <TableCell>#{ticket.id}</TableCell>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight="medium">
+                          {ticket.subject}
+                        </Typography>
+                        {ticket.metadata?.requester?.full_name && (
+                          <Typography variant="caption" color="textSecondary" display="block">
+                            {ticket.metadata.requester.full_name}
+                          </Typography>
+                        )}
+                      </TableCell>
+                      {!isTablet && <TableCell>{getCategoryLabel(ticket.category)}</TableCell>}
+                      <TableCell>{renderStatus(ticket.status)}</TableCell>
+                      {!isTablet && <TableCell>{renderPriority(ticket.priority)}</TableCell>}
+                      <TableCell>{formatDate(ticket.created_at)}</TableCell>
+                      <TableCell align="right">
+                        <Tooltip title="Просмотреть заявку">
+                          <IconButton
+                            component={Link}
+                            to={`/tickets/${ticket.id}`}
+                            size="small"
+                          >
+                            <Eye size={18} />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Ещё">
+                          <IconButton size="small">
+                            <MoreHorizontal size={18} />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+            <TablePagination
+              component="div"
+              count={totalTickets}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[5, 10, 25, 50]}
+              labelRowsPerPage="Строк на странице:"
+              labelDisplayedRows={({ from, to, count }) => `${from}-${to} из ${count}`}
+            />
+          </TableContainer>
+        )}
       </Paper>
     </Container>
   );
