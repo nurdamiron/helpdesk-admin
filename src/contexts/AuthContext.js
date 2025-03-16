@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       return data.user;
     } catch (err) {
-      setError(err.response?.data?.message || 'Ошибка входа');
+      setError(err.response?.data?.error || 'Ошибка входа');
       throw err;
     } finally {
       setLoading(false);
@@ -51,6 +51,44 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // Функция для регистрации пользователя
+  const register = async (userData) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await authService.register(userData);
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.error || 'Ошибка регистрации');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Функция для обновления данных пользователя
+  const updateProfile = async (userData) => {
+    try {
+      setLoading(true);
+      setError(null);
+      if (!user) throw new Error('Пользователь не авторизован');
+      
+      const data = await authService.updateUser(user.id, userData);
+      
+      // Обновляем данные в localStorage
+      const updatedUser = { ...user, ...userData };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      setUser(updatedUser);
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.error || 'Ошибка обновления профиля');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Значение контекста, которое будет доступно потребителям
   const value = {
     user,
@@ -58,6 +96,8 @@ export const AuthProvider = ({ children }) => {
     error,
     login,
     logout,
+    register,
+    updateProfile,
     isAuthenticated: !!user,
   };
 

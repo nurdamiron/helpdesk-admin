@@ -2,7 +2,7 @@
 import api from './index';
 
 export const authService = {
-  // Простая авторизация по email и паролю
+  // Авторизация по email и паролю
   login: async (email, password) => {
     try {
       const response = await api.post('/auth/login', { email, password });
@@ -37,7 +37,18 @@ export const authService = {
     }
   },
 
-  // Получение списка пользователей для назначения ответственных
+  // Регистрация нового пользователя
+  register: async (userData) => {
+    try {
+      const response = await api.post('/auth/register', userData);
+      return response.data;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
+  },
+
+  // Получение списка пользователей
   getUsers: async () => {
     try {
       const response = await api.get('/users');
@@ -46,5 +57,40 @@ export const authService = {
       console.error('Error fetching users:', error);
       throw error;
     }
+  },
+
+  // Получение данных пользователя по ID
+  getUserById: async (id) => {
+    try {
+      const response = await api.get(`/users/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching user ${id}:`, error);
+      throw error;
+    }
+  },
+
+  // Обновление данных пользователя
+  updateUser: async (id, userData) => {
+    try {
+      const response = await api.put(`/users/${id}`, userData);
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating user ${id}:`, error);
+      throw error;
+    }
+  },
+
+  // Удаление пользователя
+  deleteUser: async (id) => {
+    try {
+      const response = await api.delete(`/users/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error deleting user ${id}:`, error);
+      throw error;
+    }
   }
 };
+
+export default authService;

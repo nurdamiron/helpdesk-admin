@@ -1,5 +1,4 @@
-// src/pages/LoginPage.js (пример)
-
+// src/pages/LoginPage.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -16,6 +15,7 @@ import {
   CardContent
 } from '@mui/material';
 import { Lock, Mail, Eye, EyeOff, Construction } from 'lucide-react';
+import { authService } from '../api/authService';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -24,27 +24,18 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [debugInfo, setDebugInfo] = useState('');
 
   useEffect(() => {
-    // Если админ уже залогинен — уходим на /dashboard
-    const adminStr = localStorage.getItem('admin');
-    if (adminStr) {
-      try {
-        const admin = JSON.parse(adminStr);
-        if (admin && admin.id) {
-          navigate('/dashboard');
-        }
-      } catch {
-        localStorage.removeItem('admin');
-      }
+    // Если пользователь уже залогинен — уходим на /dashboard
+    const currentUser = authService.getCurrentUser();
+    if (currentUser) {
+      navigate('/dashboard');
     }
   }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setDebugInfo('');
 
     if (!email.trim()) {
       setError('Введите email');
@@ -58,32 +49,16 @@ const LoginPage = () => {
     setLoading(true);
     
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      
-      // Проверяем статус
-      if (!response.ok) {
-        // Напр., 401 — неверный пароль
-        const errText = await response.text();
-        throw new Error(`Server returned ${response.status}: ${errText}`);
-      }
-
-      // Парсим json
-      const data = await response.json();
-      // Ожидаем, что data.user есть
-      if (data && data.user) {
-        localStorage.setItem('admin', JSON.stringify(data.user));
-        navigate('/dashboard');
-      } else {
-        throw new Error('Неверный формат ответа сервера');
-      }
+      await authService.login(email, password);
+      navigate('/dashboard');
     } catch (err) {
       console.error('Login error:', err);
-      setError('Неправильный логин или пароль');
-      setDebugInfo(err.message);
+      
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Ошибка авторизации. Пожалуйста, попробуйте снова.');
+      }
     } finally {
       setLoading(false);
     }
@@ -122,7 +97,7 @@ const LoginPage = () => {
                 <Construction size={40} color="#1e88e5" />
               </Box>
               <Typography variant="h4" component="h1" sx={{ mb: 1, fontWeight: 500 }}>
-                Панель Администратора
+                Вход в систему
               </Typography>
               <Typography variant="body1" color="textSecondary">
                 Строительная Помощь HelpDesk
@@ -193,15 +168,6 @@ const LoginPage = () => {
                 {loading ? <CircularProgress size={24} /> : 'Войти'}
               </Button>
             </form>
-
-            {/* Debug info (необязательно) */}
-            {debugInfo && (
-              <Alert severity="info" sx={{ mt: 2 }}>
-                <Typography variant="body2" component="pre" style={{ whiteSpace: 'pre-wrap' }}>
-                  {debugInfo}
-                </Typography>
-              </Alert>
-            )}
 
             <Box mt={3} textAlign="center">
               <Typography variant="body2" color="textSecondary">

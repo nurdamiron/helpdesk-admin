@@ -1,5 +1,5 @@
 // src/components/common/AdminLayout.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
@@ -20,6 +20,7 @@ import {
   useMediaQuery,
   useTheme,
   Badge,
+  CircularProgress
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -36,23 +37,13 @@ import {
   ChevronLeft,
   Building,
 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Ширина бокового меню
 const drawerWidth = 240;
 
 const AdminLayout = () => {
-  // Get admin data from localStorage
-  const getAdminUser = () => {
-    try {
-      const adminStr = localStorage.getItem('admin');
-      return adminStr ? JSON.parse(adminStr) : null;
-    } catch (error) {
-      console.error('Error parsing admin data:', error);
-      return null;
-    }
-  };
-
-  const admin = getAdminUser();
+  const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
@@ -64,6 +55,13 @@ const AdminLayout = () => {
   // Состояние для меню профиля
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationsAnchorEl, setNotificationsAnchorEl] = useState(null);
+
+  // Убедимся, что у нас есть пользователь, иначе перенаправим на страницу входа
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/login');
+    }
+  }, [user, loading, navigate]);
 
   // Обработчики открытия/закрытия меню профиля
   const handleProfileMenuOpen = (event) => {
@@ -85,7 +83,7 @@ const AdminLayout = () => {
 
   // Обработчик выхода из системы
   const handleLogout = () => {
-    localStorage.removeItem('admin');
+    logout();
     navigate('/login');
   };
 
@@ -111,6 +109,20 @@ const AdminLayout = () => {
     { id: 2, text: 'Сообщение от клиента Иванов И.И.', time: '15 минут назад' },
     { id: 3, text: 'Напоминание: Встреча через 1 час', time: '30 минут назад' },
   ];
+
+  // Если данные все еще загружаются, показываем индикатор загрузки
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // Если пользователь не авторизован, будет редирект из useEffect
+  if (!user) {
+    return null;
+  }
 
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
@@ -162,7 +174,7 @@ const AdminLayout = () => {
               onClick={handleProfileMenuOpen}
             >
               <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
-                {admin?.employee?.name?.charAt(0) || admin?.first_name?.charAt(0) || 'A'}
+                {user?.first_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
               </Avatar>
             </IconButton>
           </Tooltip>
@@ -186,7 +198,7 @@ const AdminLayout = () => {
       >
         <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Typography variant="h6" color="primary">
-            HelpDesk Admin
+            HelpDesk
           </Typography>
         </Box>
         <Divider />
