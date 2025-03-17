@@ -20,25 +20,11 @@ import { formatTicketCategory, formatPropertyType, formatKzPhoneNumber } from '.
 const TicketInfo = ({ ticket, isMobile }) => {
   // Получаем информацию о клиенте и объекте из metadata
   const requesterInfo = ticket.requester || ticket.metadata?.requester || {};
-  const propertyInfo = ticket.metadata?.property || {};
-
-  // Казахстанские адреса для примеров, если адрес не указан
-  const getDefaultAddress = () => {
-    if (propertyInfo.address) return propertyInfo.address;
-    
-    switch (propertyInfo.type) {
-      case 'apartment': 
-        return 'г. Алматы, мкр. Самал-2, д. 33, кв. 42';
-      case 'house': 
-        return 'г. Нур-Султан, ул. Кунаева, д. 14';
-      case 'office': 
-        return 'г. Шымкент, пр. Республики, 50, БЦ "Казахстан", оф. 305';
-      case 'commercial': 
-        return 'г. Актобе, пр. Абилкайыр-хана, 85, ТЦ "Мега"';
-      default:
-        return 'Туркестанская обл., г. Туркестан, мкр. Отырар, 15';
-    }
-  };
+  const propertyInfo = ticket.metadata?.property || ticket.property_type ? {
+    type: ticket.property_type,
+    address: ticket.property_address,
+    area: ticket.property_area
+  } : {};
 
   return (
     <>
@@ -119,25 +105,6 @@ const TicketInfo = ({ ticket, isMobile }) => {
                     )}
                   </Typography>
                 </Box>
-                
-                <Box 
-                  sx={{ 
-                    display: 'flex', 
-                    mb: 1,
-                    flexDirection: isMobile ? 'column' : 'row',
-                    alignItems: isMobile ? 'flex-start' : 'center' 
-                  }}
-                >
-                  <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
-                    Предпочт. способ связи:
-                  </Typography>
-                  <Typography variant="body2">
-                    {requesterInfo.preferred_contact === 'phone' ? 'Телефон' : 
-                     requesterInfo.preferred_contact === 'email' ? 'Email' : 
-                     requesterInfo.preferred_contact === 'whatsapp' ? 'WhatsApp' : 
-                     'Не указан'}
-                  </Typography>
-                </Box>
               </Box>
             </CardContent>
           </Card>
@@ -181,7 +148,7 @@ const TicketInfo = ({ ticket, isMobile }) => {
                     Адрес:
                   </Typography>
                   <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
-                    {getDefaultAddress() || 'Не указан'}
+                    {propertyInfo.address || 'Не указан'}
                   </Typography>
                 </Box>
                 

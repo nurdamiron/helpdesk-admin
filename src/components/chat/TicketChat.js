@@ -23,8 +23,8 @@ import {
   X as XIcon
 } from 'lucide-react';
 
-// Импортируем обновленные сервисы и утилиты
-import { chatService } from '../../api/chatService';
+// Импортируем api вместо кастомного сервиса
+import api from '../../api/index';
 import { formatDate } from '../../utils/dateUtils';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -36,7 +36,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
   const [newMessage, setNewMessage] = useState('');
   const [error, setError] = useState(null);
   const [attachments, setAttachments] = useState([]);
-  const [sendToEmail, setSendToEmail] = useState(true);
+  const [sendToEmail, setSendToEmail] = useState(true); // По умолчанию включено
   const [sendSuccess, setSendSuccess] = useState(false);
   
   const messagesEndRef = useRef(null);
@@ -45,33 +45,40 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
   // Загрузка сообщений при монтировании компонента
   useEffect(() => {
     const fetchMessages = async () => {
+      if (!ticketId) return;
+      
       try {
         setLoading(true);
-        const data = await chatService.getMessages(ticketId);
+        const response = await api.get(`/tickets/${ticketId}/messages`);
+        console.log('Ответ API при получении сообщений:', response.data);
         
-        if (Array.isArray(data)) {
-          setMessages(data);
-        } else if (data.messages) {
-          setMessages(data.messages);
+        if (response.data && response.data.messages) {
+          setMessages(response.data.messages);
+        } else if (Array.isArray(response.data)) {
+          setMessages(response.data);
         } else {
-          console.warn("Неожиданный формат данных от API:", data);
+          console.warn("Неожиданный формат данных от API:", response.data);
           setMessages([]);
         }
         
         // Отмечаем сообщения как прочитанные
-        await chatService.markMessagesAsRead(ticketId);
+        try {
+          await api.put(`/tickets/${ticketId}/messages/read`);
+        } catch (readError) {
+          console.error('Ошибка при отметке сообщений как прочитанные:', readError);
+          // Не прерываем работу из-за этой ошибки
+        }
+        
         setError(null);
       } catch (err) {
         console.error('Ошибка при загрузке сообщений:', err);
-        setError('Не удалось загрузить сообщения');
+        setError('Не удалось загрузить сообщения. Проверьте подключение к серверу.');
       } finally {
         setLoading(false);
       }
     };
 
-    if (ticketId) {
-      fetchMessages();
-    }
+    fetchMessages();
   }, [ticketId]);
 
   // Прокрутка чата вниз при получении новых сообщений
@@ -88,35 +95,77 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     
-    if (!newMessage.trim() && attachments.length === 0) return;
+    // Проверяем, есть ли текст или вложения
+    if (!newMessage.trim() && attachments.length === 0) {
+      setError('Добавьте текст сообщения или вложение');
+      return;
+    }
 
     try {
       setSending(true);
+      setError(null);
       
-      // Загрузка вложений
+      // Загрузка вложений, если они есть
       const uploadedAttachments = [];
-      for (const file of attachments) {
-        const attachment = await chatService.uploadAttachment(ticketId, file);
-        uploadedAttachments.push(attachment);
+      if (attachments.length > 0) {
+        for (const file of attachments) {
+          const formData = new FormData();
+          formData.append('file', file);
+          
+          const uploadResponse = await api.post(
+            `/tickets/${ticketId}/attachments`, 
+            formData, 
+            {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            }
+          );
+          
+          console.log('Ответ API при загрузке вложения:', uploadResponse.data);
+          
+          if (uploadResponse.data && uploadResponse.data.attachment) {
+            uploadedAttachments.push(uploadResponse.data.attachment.id);
+          } else if (uploadResponse.data && uploadResponse.data.id) {
+            uploadedAttachments.push(uploadResponse.data.id);
+          }
+        }
       }
 
       // Подготовка данных сообщения
       const messageData = {
         body: newMessage.trim(),
-        attachments: uploadedAttachments.map(a => a.id),
-        sendToEmail: sendToEmail && requesterEmail ? true : false
+        attachments: uploadedAttachments,
+        notify_email: sendToEmail && requesterEmail ? true : false
       };
 
       // Отправка сообщения
-      const response = await chatService.sendMessage(ticketId, messageData);
+      console.log('Отправка сообщения с данными:', messageData);
+      const messageResponse = await api.post(`/tickets/${ticketId}/messages`, messageData);
+      console.log('Ответ API при отправке сообщения:', messageResponse.data);
       
       // Обновление списка сообщений
-      if (response) {
-        if (Array.isArray(response)) {
-          setMessages([...messages, ...response]);
+      if (messageResponse.data) {
+        let newMessageObject;
+        
+        if (messageResponse.data.message) {
+          newMessageObject = messageResponse.data.message;
         } else {
-          setMessages([...messages, response]);
+          newMessageObject = {
+            id: Date.now(), // Временный ID
+            content: newMessage.trim(),
+            body: newMessage.trim(),
+            sender_type: 'staff',
+            sender_id: user?.id,
+            created_at: new Date().toISOString(),
+            attachments: uploadedAttachments.map(id => ({ id })),
+            sender: {
+              name: user?.first_name || 'Сотрудник',
+              type: 'staff',
+              id: user?.id
+            }
+          };
         }
+        
+        setMessages(prev => [...prev, newMessageObject]);
         
         // Показываем уведомление об успешной отправке на email
         if (sendToEmail && requesterEmail) {
@@ -130,7 +179,12 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
       setError(null);
     } catch (err) {
       console.error('Ошибка при отправке сообщения:', err);
-      setError('Не удалось отправить сообщение');
+      
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(`Не удалось отправить сообщение: ${err.response.data.error}`);
+      } else {
+        setError('Не удалось отправить сообщение. Проверьте подключение к серверу.');
+      }
     } finally {
       setSending(false);
     }
@@ -143,8 +197,11 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
 
   // Обработка выбранных файлов
   const handleFileChange = (e) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
     const files = Array.from(e.target.files);
     setAttachments([...attachments, ...files]);
+    
     // Сброс значения input, чтобы можно было выбрать тот же файл снова
     e.target.value = null;
   };
@@ -171,6 +228,9 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
     const isImage = attachment.contentType?.startsWith('image/') || 
                     attachment.file_type?.startsWith('image/');
     
+    const attachmentName = attachment.fileName || attachment.file_name;
+    const attachmentUrl = attachment.url || `/uploads/${attachment.file_path}`;
+    
     return (
       <Box 
         key={attachment.id} 
@@ -192,12 +252,12 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
           <FileIcon size={20} />
         )}
         <Typography variant="body2" sx={{ ml: 1, flexGrow: 1 }}>
-          {attachment.fileName || attachment.file_name}
+          {attachmentName || 'Файл'}
         </Typography>
         <IconButton 
           size="small" 
-          href={attachment.url || `/uploads/${attachment.file_path}`} 
-          download={attachment.fileName || attachment.file_name}
+          href={attachmentUrl} 
+          download={attachmentName}
           target="_blank"
         >
           <DownloadIcon size={16} />
@@ -249,7 +309,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
             </Typography>
           </Box>
         ) : (
-          messages.map((message) => {
+          messages.map((message, index) => {
             // Определяем тип отправителя
             const isCurrentUser = isMessageFromCurrentUser(
               message.sender?.id || message.sender_id,
@@ -261,9 +321,12 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
                               message.sender_name || 
                               (isCurrentUser ? 'Вы' : 'Клиент');
             
+            // Текст сообщения может быть в разных полях в зависимости от API
+            const messageText = message.content || message.body || '';
+            
             return (
               <Box
-                key={message.id}
+                key={message.id || index}
                 sx={{
                   display: 'flex',
                   flexDirection: isCurrentUser ? 'row-reverse' : 'row',
@@ -293,9 +356,9 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
                     {senderName}
                   </Typography>
                   
-                  {(message.body || message.content) && (
+                  {messageText && (
                     <Typography variant="body1" sx={{ wordBreak: 'break-word' }}>
-                      {message.body || message.content}
+                      {messageText}
                     </Typography>
                   )}
                   

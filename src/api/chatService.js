@@ -17,17 +17,20 @@ export const chatService = {
   // Отправить новое сообщение
   sendMessage: async (ticketId, messageData) => {
     try {
-      // Добавляем флаг для отправки на email, если он указан
+      // Подготовка данных для отправки
       const payload = {
-        ...messageData,
+        body: messageData.body || '',  // Убедимся, что body всегда строка
+        attachments: messageData.attachments || [],
+        // Добавляем флаг для отправки на email
         notify_email: messageData.sendToEmail || false
       };
       
-      // Удаляем вспомогательный флаг
-      if (payload.sendToEmail) {
-        delete payload.sendToEmail;
+      // Проверка, если сообщение пустое и нет вложений
+      if (!payload.body.trim() && (!payload.attachments || payload.attachments.length === 0)) {
+        throw new Error('Сообщение должно содержать текст или вложения');
       }
       
+      // Отправляем запрос
       const response = await api.post(`/tickets/${ticketId}/messages`, payload);
       return response.data.message || response.data;
     } catch (error) {
@@ -42,7 +45,7 @@ export const chatService = {
       const formData = new FormData();
       formData.append('file', file);
       
-      const response = await api.post(`/tickets/${ticketId}/messages/attachments`, formData, {
+      const response = await api.post(`/tickets/${ticketId}/attachments`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -73,7 +76,8 @@ export const chatService = {
       return response.data;
     } catch (error) {
       console.error(`Error marking messages as read for ticket ${ticketId}:`, error);
-      throw error;
+      // Не выбрасываем ошибку, чтобы не блокировать основной функционал
+      return { success: false };
     }
   }
 };
