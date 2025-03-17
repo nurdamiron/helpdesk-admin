@@ -5,10 +5,9 @@ export const chatService = {
   // Получить сообщения для тикета
   getMessages: async (ticketId) => {
     try {
-      // Судя по вашей схеме БД, нам нужно сначала найти conversation_id
-      // связанный с этим тикетом, а затем запросить сообщения
+      // Получаем сообщения заявки
       const response = await api.get(`/tickets/${ticketId}/messages`);
-      return response.data;
+      return response.data.messages || response.data;
     } catch (error) {
       console.error(`Error fetching messages for ticket ${ticketId}:`, error);
       throw error;
@@ -18,8 +17,19 @@ export const chatService = {
   // Отправить новое сообщение
   sendMessage: async (ticketId, messageData) => {
     try {
-      const response = await api.post(`/tickets/${ticketId}/messages`, messageData);
-      return response.data;
+      // Добавляем флаг для отправки на email, если он указан
+      const payload = {
+        ...messageData,
+        notify_email: messageData.sendToEmail || false
+      };
+      
+      // Удаляем вспомогательный флаг
+      if (payload.sendToEmail) {
+        delete payload.sendToEmail;
+      }
+      
+      const response = await api.post(`/tickets/${ticketId}/messages`, payload);
+      return response.data.message || response.data;
     } catch (error) {
       console.error(`Error sending message for ticket ${ticketId}:`, error);
       throw error;
@@ -38,7 +48,7 @@ export const chatService = {
         }
       });
       
-      return response.data;
+      return response.data.attachment || response.data;
     } catch (error) {
       console.error(`Error uploading attachment for ticket ${ticketId}:`, error);
       throw error;
@@ -49,7 +59,7 @@ export const chatService = {
   getRequesterInfo: async (requesterId) => {
     try {
       const response = await api.get(`/requesters/${requesterId}`);
-      return response.data;
+      return response.data.requester || response.data;
     } catch (error) {
       console.error(`Error fetching requester info ${requesterId}:`, error);
       throw error;

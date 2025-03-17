@@ -30,10 +30,10 @@ import {
 } from 'lucide-react';
 
 import { ticketService } from '../../api/ticketService';
-import { formatDate, formatRelativeDate } from '../../utils/dateUtils';
+import { formatDate, formatRelativeTime } from '../../utils/dateUtils'; // Исправлен импорт
 import { formatTicketStatus, formatTicketPriority } from '../../utils/formatters';
 
-const TicketHistory = ({ ticketId }) => {
+const TicketHistory = ({ ticketId, language = 'ru' }) => {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -92,7 +92,7 @@ const TicketHistory = ({ ticketId }) => {
   const getEventTitle = (event) => {
     switch (event.type) {
       case 'status_change':
-        return `Статус изменен на "${formatTicketStatus(event.data.newStatus)}"`;
+        return `Статус изменен на "${formatTicketStatus(event.data.newStatus, language)}"`;
       case 'assigned':
         return `Назначен ответственный: ${event.data.assignedTo?.name || 'Неизвестно'}`;
       case 'comment':
@@ -108,7 +108,7 @@ const TicketHistory = ({ ticketId }) => {
       case 'edited':
         return `Заявка отредактирована`;
       case 'priority_change':
-        return `Приоритет изменен на "${formatTicketPriority(event.data.newPriority)}"`;
+        return `Приоритет изменен на "${formatTicketPriority(event.data.newPriority, language)}"`;
       case 'deadline_change':
         return event.data.newDeadline 
           ? `Установлен дедлайн: ${formatDate(event.data.newDeadline)}` 
@@ -164,17 +164,17 @@ const TicketHistory = ({ ticketId }) => {
                 </Typography>
                 
                 {event.data?.description && (
-                  <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                     {event.data.description}
                   </Typography>
                 )}
                 
                 <Box display="flex" justifyContent="space-between" mt={0.5}>
-                  <Typography variant="caption" color="textSecondary">
+                  <Typography variant="caption" color="text.secondary">
                     {event.user ? `${event.user.name}` : 'Система'}
                   </Typography>
-                  <Typography variant="caption" color="textSecondary">
-                    {formatRelativeDate(event.timestamp)}
+                  <Typography variant="caption" color="text.secondary">
+                    {formatRelativeTime(event.timestamp, language)}
                   </Typography>
                 </Box>
               </Paper>

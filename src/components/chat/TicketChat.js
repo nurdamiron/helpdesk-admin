@@ -2,29 +2,33 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
-  Paper,
   Typography,
   TextField,
   Button,
   CircularProgress,
   Avatar,
   IconButton,
-  Badge,
+  FormControlLabel,
+  Checkbox,
+  Paper,
   Alert,
+  Snackbar
 } from '@mui/material';
 import {
-  Send,
-  Paperclip,
-  Image,
-  File,
-  Download,
-  X,
+  Send as SendIcon,
+  Paperclip as PaperclipIcon,
+  Image as ImageIcon,
+  File as FileIcon,
+  Download as DownloadIcon,
+  X as XIcon
 } from 'lucide-react';
-import { formatDate } from '../../utils/dateUtils';
+
+// Импортируем обновленные сервисы и утилиты
 import { chatService } from '../../api/chatService';
+import { formatDate } from '../../utils/dateUtils';
 import { useAuth } from '../../contexts/AuthContext';
 
-const TicketChat = ({ ticketId }) => {
+const TicketChat = ({ ticketId, requesterEmail }) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,28 +36,42 @@ const TicketChat = ({ ticketId }) => {
   const [newMessage, setNewMessage] = useState('');
   const [error, setError] = useState(null);
   const [attachments, setAttachments] = useState([]);
+  const [sendToEmail, setSendToEmail] = useState(true);
+  const [sendSuccess, setSendSuccess] = useState(false);
+  
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // Загрузка сообщений
+  // Загрузка сообщений при монтировании компонента
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         setLoading(true);
         const data = await chatService.getMessages(ticketId);
-        setMessages(data);
+        
+        if (Array.isArray(data)) {
+          setMessages(data);
+        } else if (data.messages) {
+          setMessages(data.messages);
+        } else {
+          console.warn("Неожиданный формат данных от API:", data);
+          setMessages([]);
+        }
+        
         // Отмечаем сообщения как прочитанные
         await chatService.markMessagesAsRead(ticketId);
         setError(null);
       } catch (err) {
-        console.error('Error fetching messages:', err);
+        console.error('Ошибка при загрузке сообщений:', err);
         setError('Не удалось загрузить сообщения');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMessages();
+    if (ticketId) {
+      fetchMessages();
+    }
   }, [ticketId]);
 
   // Прокрутка чата вниз при получении новых сообщений
@@ -61,49 +79,69 @@ const TicketChat = ({ ticketId }) => {
     scrollToBottom();
   }, [messages]);
 
+  // Прокрутка чата вниз
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Отправка сообщения
   const handleSendMessage = async (e) => {
     e.preventDefault();
+    
     if (!newMessage.trim() && attachments.length === 0) return;
 
     try {
       setSending(true);
       
-      // Отправка вложений, если они есть
+      // Загрузка вложений
       const uploadedAttachments = [];
       for (const file of attachments) {
-        const response = await chatService.uploadAttachment(ticketId, file);
-        uploadedAttachments.push(response);
+        const attachment = await chatService.uploadAttachment(ticketId, file);
+        uploadedAttachments.push(attachment);
       }
 
-      // Отправка сообщения
+      // Подготовка данных сообщения
       const messageData = {
         body: newMessage.trim(),
         attachments: uploadedAttachments.map(a => a.id),
+        sendToEmail: sendToEmail && requesterEmail ? true : false
       };
 
+      // Отправка сообщения
       const response = await chatService.sendMessage(ticketId, messageData);
       
-      // Обновляем список сообщений
-      setMessages([...messages, response]);
+      // Обновление списка сообщений
+      if (response) {
+        if (Array.isArray(response)) {
+          setMessages([...messages, ...response]);
+        } else {
+          setMessages([...messages, response]);
+        }
+        
+        // Показываем уведомление об успешной отправке на email
+        if (sendToEmail && requesterEmail) {
+          setSendSuccess(true);
+        }
+      }
+      
+      // Очистка формы
       setNewMessage('');
       setAttachments([]);
       setError(null);
     } catch (err) {
-      console.error('Error sending message:', err);
+      console.error('Ошибка при отправке сообщения:', err);
       setError('Не удалось отправить сообщение');
     } finally {
       setSending(false);
     }
   };
 
+  // Вызов диалога выбора файла
   const handleAttachmentClick = () => {
     fileInputRef.current.click();
   };
 
+  // Обработка выбранных файлов
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setAttachments([...attachments, ...files]);
@@ -111,18 +149,27 @@ const TicketChat = ({ ticketId }) => {
     e.target.value = null;
   };
 
+  // Удаление вложения
   const removeAttachment = (index) => {
     setAttachments(attachments.filter((_, i) => i !== index));
   };
 
-  // Определяем, является ли сообщение от текущего пользователя
-  const isMessageFromCurrentUser = (senderId) => {
-    return user && user.id === senderId;
+  // Закрытие уведомления об успешной отправке
+  const handleCloseSuccess = () => {
+    setSendSuccess(false);
+  };
+
+  // Определение, является ли сообщение от текущего пользователя
+  const isMessageFromCurrentUser = (senderId, senderType) => {
+    if (senderType === 'staff') return true;
+    if (user && user.id === senderId) return true;
+    return false;
   };
 
   // Отображение вложений
   const renderAttachment = (attachment) => {
-    const isImage = attachment.contentType?.startsWith('image/');
+    const isImage = attachment.contentType?.startsWith('image/') || 
+                    attachment.file_type?.startsWith('image/');
     
     return (
       <Box 
@@ -140,25 +187,26 @@ const TicketChat = ({ ticketId }) => {
         }}
       >
         {isImage ? (
-          <Image size={20} />
+          <ImageIcon size={20} />
         ) : (
-          <File size={20} />
+          <FileIcon size={20} />
         )}
         <Typography variant="body2" sx={{ ml: 1, flexGrow: 1 }}>
-          {attachment.fileName}
+          {attachment.fileName || attachment.file_name}
         </Typography>
         <IconButton 
           size="small" 
-          href={attachment.url} 
-          download={attachment.fileName}
+          href={attachment.url || `/uploads/${attachment.file_path}`} 
+          download={attachment.fileName || attachment.file_name}
           target="_blank"
         >
-          <Download size={16} />
+          <DownloadIcon size={16} />
         </IconButton>
       </Box>
     );
   };
 
+  // Отображение загрузки
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" p={3}>
@@ -169,6 +217,7 @@ const TicketChat = ({ ticketId }) => {
 
   return (
     <Box>
+      {/* Сообщение об ошибке */}
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
@@ -195,13 +244,22 @@ const TicketChat = ({ ticketId }) => {
             justifyContent="center"
             height="100%"
           >
-            <Typography color="textSecondary">
+            <Typography color="textSecondary" align="center">
               Сообщений пока нет. Начните общение с клиентом!
             </Typography>
           </Box>
         ) : (
           messages.map((message) => {
-            const isCurrentUser = isMessageFromCurrentUser(message.sender.id);
+            // Определяем тип отправителя
+            const isCurrentUser = isMessageFromCurrentUser(
+              message.sender?.id || message.sender_id,
+              message.sender?.type || message.sender_type
+            );
+            
+            // Данные отправителя
+            const senderName = message.sender?.name || 
+                              message.sender_name || 
+                              (isCurrentUser ? 'Вы' : 'Клиент');
             
             return (
               <Box
@@ -213,14 +271,13 @@ const TicketChat = ({ ticketId }) => {
                 }}
               >
                 <Avatar
-                  src={message.sender.avatar}
                   sx={{ 
                     bgcolor: isCurrentUser ? 'primary.main' : 'secondary.main',
                     mr: isCurrentUser ? 0 : 1,
                     ml: isCurrentUser ? 1 : 0,
                   }}
                 >
-                  {message.sender.name?.charAt(0) || 'U'}
+                  {senderName.charAt(0)}
                 </Avatar>
                 
                 <Box
@@ -233,16 +290,16 @@ const TicketChat = ({ ticketId }) => {
                   }}
                 >
                   <Typography variant="subtitle2" color={isCurrentUser ? 'primary.contrastText' : 'textPrimary'}>
-                    {message.sender.name || 'Неизвестный пользователь'}
+                    {senderName}
                   </Typography>
                   
-                  {message.body && (
+                  {(message.body || message.content) && (
                     <Typography variant="body1" sx={{ wordBreak: 'break-word' }}>
-                      {message.body}
+                      {message.body || message.content}
                     </Typography>
                   )}
                   
-                  {message.attachments && message.attachments.length > 0 && (
+                  {(message.attachments && message.attachments.length > 0) && (
                     <Box sx={{ mt: 1 }}>
                       {message.attachments.map(attachment => renderAttachment(attachment))}
                     </Box>
@@ -257,7 +314,7 @@ const TicketChat = ({ ticketId }) => {
                       mt: 0.5,
                     }}
                   >
-                    {formatDate(message.createdAt)}
+                    {formatDate(message.createdAt || message.created_at)}
                   </Typography>
                 </Box>
               </Box>
@@ -289,15 +346,15 @@ const TicketChat = ({ ticketId }) => {
                   }}
                 >
                   {file.type.startsWith('image/') ? (
-                    <Image size={16} />
+                    <ImageIcon size={16} />
                   ) : (
-                    <File size={16} />
+                    <FileIcon size={16} />
                   )}
                   <Typography variant="caption" sx={{ ml: 0.5, maxWidth: '120px' }} noWrap>
                     {file.name}
                   </Typography>
                   <IconButton size="small" onClick={() => removeAttachment(index)}>
-                    <X size={16} />
+                    <XIcon size={16} />
                   </IconButton>
                 </Box>
               ))}
@@ -306,45 +363,80 @@ const TicketChat = ({ ticketId }) => {
         )}
 
         <form onSubmit={handleSendMessage}>
-          <Box sx={{ display: 'flex' }}>
+          <Box sx={{ mb: 2 }}>
             <TextField
               fullWidth
               variant="outlined"
               placeholder="Введите сообщение..."
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              sx={{ mr: 1 }}
               multiline
               maxRows={4}
               disabled={sending}
             />
-            <input
-              type="file"
-              ref={fileInputRef}
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-              multiple
-            />
-            <IconButton 
-              color="primary" 
-              onClick={handleAttachmentClick}
-              disabled={sending}
-            >
-              <Paperclip />
-            </IconButton>
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              {/* Скрытый input для загрузки файлов */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+                multiple
+              />
+              <IconButton 
+                color="primary" 
+                onClick={handleAttachmentClick}
+                disabled={sending}
+                title="Прикрепить файл"
+              >
+                <PaperclipIcon />
+              </IconButton>
+              
+              {requesterEmail && (
+                <FormControlLabel
+                  control={
+                    <Checkbox 
+                      checked={sendToEmail} 
+                      onChange={(e) => setSendToEmail(e.target.checked)}
+                      size="small"
+                    />
+                  }
+                  label={
+                    <Typography variant="body2">
+                      Отправить копию на Email клиента
+                    </Typography>
+                  }
+                />
+              )}
+            </Box>
+            
             <Button
               variant="contained"
               color="primary"
               type="submit"
               disabled={sending || (!newMessage.trim() && attachments.length === 0)}
-              startIcon={sending ? <CircularProgress size={20} /> : <Send />}
-              sx={{ ml: 1 }}
+              startIcon={sending ? <CircularProgress size={20} /> : <SendIcon />}
             >
               {sending ? 'Отправка...' : 'Отправить'}
             </Button>
           </Box>
         </form>
       </Paper>
+      
+      {/* Уведомление об успешной отправке на email */}
+      <Snackbar
+        open={sendSuccess}
+        autoHideDuration={5000}
+        onClose={handleCloseSuccess}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSuccess} severity="success" variant="filled">
+          Сообщение успешно отправлено на Email клиента
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
