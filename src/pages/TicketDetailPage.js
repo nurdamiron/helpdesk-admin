@@ -7,7 +7,8 @@ import {
 } from '@mui/material';
 import { 
   Clock, CheckCircle, AlertCircle, MoreHorizontal, 
-  ArrowLeft, Save
+  ArrowLeft, Save, Calendar, Flag, MessageCircle, Edit, User, Send,
+  Building, Briefcase, Tag, Mail, Phone, MessageSquare, PenTool
 } from 'lucide-react';
 
 // Импортируем обновленные сервисы и утилиты
@@ -22,6 +23,41 @@ import TicketChat from '../components/chat/TicketChat';
 import TicketFiles from '../components/tickets/TicketFiles';
 import TicketInternalNotes from '../components/tickets/TicketInternalNotes';
 
+// Константы для выпадающих списков
+const TICKET_STATUSES = [
+  { value: 'new', label: 'Новая' },
+  { value: 'in_review', label: 'На рассмотрении' },
+  { value: 'in_progress', label: 'В работе' },
+  { value: 'pending', label: 'Ожидает' },
+  { value: 'resolved', label: 'Решена' },
+  { value: 'closed', label: 'Закрыта' }
+];
+
+const TICKET_PRIORITIES = [
+  { value: 'low', label: 'Низкий' },
+  { value: 'medium', label: 'Средний' },
+  { value: 'high', label: 'Высокий' },
+  { value: 'urgent', label: 'Срочный' }
+];
+
+const TICKET_TYPES = [
+  { value: 'request', label: 'Запрос' },
+  { value: 'complaint', label: 'Жалоба' },
+  { value: 'suggestion', label: 'Предложение' },
+  { value: 'other', label: 'Другое' }
+];
+
+const TICKET_CATEGORIES = [
+  { value: 'it', label: 'ИТ поддержка' },
+  { value: 'hr', label: 'Кадровые вопросы' },
+  { value: 'facilities', label: 'Инфраструктура' },
+  { value: 'finance', label: 'Финансы' },
+  { value: 'legal', label: 'Юридические вопросы' },
+  { value: 'security', label: 'Безопасность' },
+  { value: 'management', label: 'Руководство' },
+  { value: 'other', label: 'Другое' }
+];
+
 const TicketDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -34,6 +70,12 @@ const TicketDetailPage = () => {
   const [saving, setSaving] = useState(false);
   const [savingSuccess, setSavingSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const [messages, setMessages] = useState([]);
+  const [replyText, setReplyText] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [updatedFields, setUpdatedFields] = useState({});
+  const [sendingReply, setSendingReply] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   // Получение данных заявки при загрузке компонента
   useEffect(() => {
@@ -48,6 +90,7 @@ const TicketDetailPage = () => {
         // Обработка ответа API
         if (response.ticket) {
           setTicket(response.ticket);
+          setMessages(response.messages || []);
         } else if (response.data) {
           setTicket(response.data);
         } else {
@@ -121,6 +164,83 @@ const TicketDetailPage = () => {
   // Обработчик смены вкладки
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+  };
+
+  // Handle reply text change
+  const handleReplyChange = (e) => {
+    setReplyText(e.target.value);
+  };
+  
+  // Submit reply
+  const handleSubmitReply = async () => {
+    if (!replyText.trim()) return;
+    
+    setSendingReply(true);
+    try {
+      await ticketService.addMessage(id, {
+        content: replyText,
+        sender_type: 'staff'
+      });
+      
+      // Refresh messages
+      const result = await ticketService.getTicket(id);
+      setMessages(result.messages || []);
+      setReplyText('');
+      
+    } catch (err) {
+      console.error('Error sending reply:', err);
+      alert('Не удалось отправить сообщение. Попробуйте позже.');
+    } finally {
+      setSendingReply(false);
+    }
+  };
+  
+  // Toggle edit mode
+  const toggleEditMode = () => {
+    if (editMode) {
+      // Discard changes
+      setUpdatedFields({});
+    } else {
+      // Initialize form with current values
+      setUpdatedFields({
+        status: ticket.status,
+        priority: ticket.priority,
+        category: ticket.category,
+        type: ticket.type,
+        assigned_to: ticket.assigned_to || ''
+      });
+    }
+    setEditMode(!editMode);
+  };
+  
+  // Handle field change in edit mode
+  const handleFieldChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedFields(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  // Update ticket
+  const handleUpdateTicket = async () => {
+    setUpdating(true);
+    try {
+      await ticketService.updateTicket(id, updatedFields);
+      
+      // Refresh ticket details
+      const result = await ticketService.getTicket(id);
+      setTicket(result.ticket);
+      setMessages(result.messages || []);
+      setEditMode(false);
+      setUpdatedFields({});
+      
+    } catch (err) {
+      console.error('Error updating ticket:', err);
+      alert('Не удалось обновить информацию об обращении. Попробуйте позже.');
+    } finally {
+      setUpdating(false);
+    }
   };
 
   // Отображение загрузки
@@ -361,6 +481,96 @@ const TicketDetailPage = () => {
           </Paper>
         </Grid>
       </Grid>
+
+      {/* Messages/communication */}
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+          <MessageCircle size={20} style={{ marginRight: 8 }} />
+          Переписка
+        </Typography>
+        
+        <Box sx={{ mb: 3 }}>
+          {messages.length > 0 ? (
+            <List>
+              {messages.map((message, index) => (
+                <React.Fragment key={message.id || index}>
+                  <ListItem alignItems="flex-start">
+                    <ListItemAvatar>
+                      <Avatar>
+                        {message.sender_type === 'requester' ? 
+                          'С' : message.sender_type === 'staff' ? 'A' : 'S'}
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <Typography
+                          sx={{ display: 'flex', justifyContent: 'space-between' }}
+                          component="div"
+                        >
+                          <span>
+                            {message.sender_type === 'requester' ? 'Сотрудник' : 
+                             message.sender_type === 'staff' ? 'Администратор' : 'Система'}
+                            {message.sender_name && ` - ${message.sender_name}`}
+                          </span>
+                          <Typography variant="body2" color="text.secondary">
+                            {formatDate(message.created_at)}
+                          </Typography>
+                        </Typography>
+                      }
+                      secondary={
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          color="text.primary"
+                          sx={{ 
+                            display: 'inline',
+                            whiteSpace: 'pre-wrap'
+                          }}
+                        >
+                          {message.content}
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                  {index < messages.length - 1 && <Divider variant="inset" component="li" />}
+                </React.Fragment>
+              ))}
+            </List>
+          ) : (
+            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+              Пока нет сообщений
+            </Typography>
+          )}
+        </Box>
+        
+        {/* Reply form */}
+        <Box>
+          <Typography variant="subtitle1" gutterBottom>
+            Ответить
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
+            placeholder="Введите ваше сообщение..."
+            value={replyText}
+            onChange={handleReplyChange}
+            variant="outlined"
+            sx={{ mb: 2 }}
+          />
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              endIcon={<Send size={16} />}
+              disabled={!replyText.trim() || sendingReply}
+              onClick={handleSubmitReply}
+            >
+              {sendingReply ? 'Отправка...' : 'Отправить'}
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
     </Box>
   );
 };

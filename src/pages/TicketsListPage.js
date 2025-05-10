@@ -46,21 +46,28 @@ import {
   ArrowRight,
   Calendar,
   Tag,
-  Flag
+  Flag,
+  MessageSquare
 } from 'lucide-react';
 import { ticketService } from '../api/ticketService';
 
-// Категории заявок для строительной компании
+// Типы обращений
+const TICKET_TYPES = [
+  { value: 'request', label: 'Запрос' },
+  { value: 'complaint', label: 'Жалоба' },
+  { value: 'suggestion', label: 'Предложение' },
+  { value: 'other', label: 'Другое' }
+];
+
+// Категории обращений для внутреннего портала
 const TICKET_CATEGORIES = [
-  { value: 'repair', label: 'Ремонтные работы' },
-  { value: 'plumbing', label: 'Сантехника' },
-  { value: 'electrical', label: 'Электрика' },
-  { value: 'construction', label: 'Строительство' },
-  { value: 'design', label: 'Проектирование' },
-  { value: 'consultation', label: 'Консультация' },
-  { value: 'estimate', label: 'Смета и расчеты' },
-  { value: 'materials', label: 'Материалы' },
-  { value: 'warranty', label: 'Гарантийный случай' },
+  { value: 'it', label: 'ИТ поддержка' },
+  { value: 'hr', label: 'Кадровые вопросы' },
+  { value: 'facilities', label: 'Инфраструктура' },
+  { value: 'finance', label: 'Финансы' },
+  { value: 'legal', label: 'Юридические вопросы' },
+  { value: 'security', label: 'Безопасность' },
+  { value: 'management', label: 'Руководство' },
   { value: 'other', label: 'Другое' }
 ];
 
@@ -91,6 +98,7 @@ const TicketsListPage = () => {
   const [filters, setFilters] = useState({
     search: '',
     status: '',
+    type: '',
     priority: '',
     category: ''
   });
@@ -123,7 +131,7 @@ const TicketsListPage = () => {
       setTotalTickets(result.total || 0);
     } catch (err) {
       console.error('Error fetching tickets:', err);
-      setError('Не удалось загрузить список заявок. Попробуйте позже.');
+      setError('Не удалось загрузить список обращений. Попробуйте позже.');
       setTickets([]);
     } finally {
       setLoading(false);
@@ -163,6 +171,7 @@ const TicketsListPage = () => {
     setFilters({
       search: '',
       status: '',
+      type: '',
       priority: '',
       category: ''
     });
@@ -174,6 +183,12 @@ const TicketsListPage = () => {
   const getCategoryLabel = (categoryValue) => {
     const category = TICKET_CATEGORIES.find(c => c.value === categoryValue);
     return category ? category.label : categoryValue;
+  };
+
+  // Get type label
+  const getTypeLabel = (typeValue) => {
+    const type = TICKET_TYPES.find(t => t.value === typeValue);
+    return type ? type.label : typeValue;
   };
 
   // Format date
@@ -199,6 +214,17 @@ const TicketsListPage = () => {
             icon={<AlertCircle size={14} />}
             label="Новая"
             color="info"
+            variant="outlined"
+          />
+        );
+      case 'in_review':
+        return (
+          <Chip
+            size="small"
+            icon={<Eye size={14} />}
+            label="На рассмотрении"
+            color="secondary"
+            variant="outlined"
           />
         );
       case 'in_progress':
@@ -208,6 +234,17 @@ const TicketsListPage = () => {
             icon={<Clock size={14} />}
             label="В работе"
             color="warning"
+            variant="outlined"
+          />
+        );
+      case 'pending':
+        return (
+          <Chip
+            size="small"
+            icon={<MoreHorizontal size={14} />}
+            label="Ожидает"
+            color="default"
+            variant="outlined"
           />
         );
       case 'resolved':
@@ -217,6 +254,7 @@ const TicketsListPage = () => {
             icon={<CheckCircle size={14} />}
             label="Решена"
             color="success"
+            variant="outlined"
           />
         );
       case 'closed':
@@ -226,6 +264,7 @@ const TicketsListPage = () => {
             icon={<Archive size={14} />}
             label="Закрыта"
             color="default"
+            variant="outlined"
           />
         );
       default:
@@ -233,6 +272,53 @@ const TicketsListPage = () => {
           <Chip
             size="small"
             label={status}
+            color="default"
+            variant="outlined"
+          />
+        );
+    }
+  };
+
+  // Render type chip
+  const renderType = (type) => {
+    switch (type) {
+      case 'request':
+        return (
+          <Chip
+            size="small"
+            icon={<MessageSquare size={14} />}
+            label="Запрос"
+            color="primary"
+            variant="outlined"
+          />
+        );
+      case 'complaint':
+        return (
+          <Chip
+            size="small"
+            icon={<AlertCircle size={14} />}
+            label="Жалоба"
+            color="error"
+            variant="outlined"
+          />
+        );
+      case 'suggestion':
+        return (
+          <Chip
+            size="small"
+            icon={<Flag size={14} />}
+            label="Предложение"
+            color="success"
+            variant="outlined"
+          />
+        );
+      default:
+        return (
+          <Chip
+            size="small"
+            label={getTypeLabel(type)}
+            color="default"
+            variant="outlined"
           />
         );
     }
@@ -452,6 +538,25 @@ const TicketsListPage = () => {
               
               <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth size="small">
+                  <InputLabel>Тип</InputLabel>
+                  <Select
+                    name="type"
+                    value={filters.type}
+                    onChange={handleFilterChange}
+                    label="Тип"
+                  >
+                    <MenuItem value="">Все</MenuItem>
+                    {TICKET_TYPES.map(type => (
+                      <MenuItem key={type.value} value={type.value}>
+                        {type.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={4}>
+                <FormControl fullWidth size="small">
                   <InputLabel>Приоритет</InputLabel>
                   <Select
                     name="priority"
@@ -541,6 +646,7 @@ const TicketsListPage = () => {
                     <TableCell>Заявка</TableCell>
                     {!isTablet && <TableCell>Категория</TableCell>}
                     <TableCell>Статус</TableCell>
+                    {!isTablet && <TableCell>Тип</TableCell>}
                     {!isTablet && <TableCell>Приоритет</TableCell>}
                     <TableCell>Дата создания</TableCell>
                     <TableCell align="right">Действия</TableCell>
@@ -562,6 +668,7 @@ const TicketsListPage = () => {
                       </TableCell>
                       {!isTablet && <TableCell>{getCategoryLabel(ticket.category)}</TableCell>}
                       <TableCell>{renderStatus(ticket.status)}</TableCell>
+                      {!isTablet && <TableCell>{renderType(ticket.type)}</TableCell>}
                       {!isTablet && <TableCell>{renderPriority(ticket.priority)}</TableCell>}
                       <TableCell>{formatDate(ticket.created_at)}</TableCell>
                       <TableCell align="right">
