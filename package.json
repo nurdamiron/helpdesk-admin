@@ -48,7 +48,7 @@
     "postinstall": "echo 'Running with legacy peer deps' && npm ls"
   },
   "engines": {
-    "node": "16.x"
+    "node": "18.x"
   },
   "eslintConfig": {
     "extends": [
