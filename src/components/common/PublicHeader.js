@@ -67,7 +67,7 @@ const PublicHeader = () => {
         <Toolbar disableGutters>
           {/* Logo - desktop */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, alignItems: 'center' }}>
-            <HelpDeskLogo width={140} height={40} />
+            <HelpDeskLogo width={70} height={70} />
           </Box>
           <Typography
             variant="h6"
@@ -163,7 +163,7 @@ const PublicHeader = () => {
 
           {/* Logo - mobile */}
           <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1, alignItems: 'center' }}>
-            <HelpDeskLogo width={120} height={32} />
+            <HelpDeskLogo width={60} height={60} />
           </Box>
           <Typography
             variant="h6"

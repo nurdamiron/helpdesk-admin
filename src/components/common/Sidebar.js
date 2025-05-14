@@ -154,7 +154,7 @@ const Sidebar = () => {
         <Link to="/dashboard" style={{ textDecoration: 'none' }}>
           <HelpDeskLogo 
             width={isMobile ? 120 : 150} 
-            height={40} 
+            height={isMobile ? 120 : 150} 
           />
         </Link>
       </Box>
