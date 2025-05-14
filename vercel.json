@@ -1,22 +1,9 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "installCommand": "npm install --no-save",
-        "buildCommand": "node static-build.js",
-        "nodeVersion": "18.x",
-        "outputDirectory": "build"
-      }
-    }
-  ],
+  "buildCommand": false,
+  "outputDirectory": "build",
   "routes": [
     { "handle": "filesystem" },
     { "src": "/.*", "dest": "/index.html" }
-  ],
-  "env": {
-    "REACT_APP_API_URL": "https://helpdesk-backend-ycoo.onrender.com/api"
-  }
+  ]
 }
