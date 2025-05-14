@@ -5,7 +5,7 @@
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "installCommand": "npm install fs path --no-save",
+        "installCommand": "npm install --no-save",
         "buildCommand": "node static-build.js",
         "nodeVersion": "18.x",
         "outputDirectory": "build"

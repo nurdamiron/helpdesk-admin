@@ -47,15 +47,14 @@ function createStaticBuild() {
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="/images/logo.png" />
+    <link rel="icon" href="./images/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#1976d2" />
     <meta
       name="description"
       content="HelpDesk Admin Panel - Құрылыс Көмегі"
     />
-    <link rel="apple-touch-icon" href="/images/logo.png" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="./images/logo.png" />
     <title>HelpDesk Admin</title>
     <style>
       body {
@@ -72,7 +71,7 @@ function createStaticBuild() {
         min-height: 100vh;
         text-align: center;
       }
-      .logo-container {
+      .wrapper {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -84,9 +83,8 @@ function createStaticBuild() {
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       }
-      .logo {
-        width: 200px;
-        height: 200px;
+      img {
+        max-width: 200px;
         margin-bottom: 2rem;
       }
       h1 {
@@ -111,8 +109,8 @@ function createStaticBuild() {
     </style>
   </head>
   <body>
-    <div class="logo-container">
-      <img src="/images/logo.png" alt="HelpDesk Logo" class="logo" />
+    <div class="wrapper">
+      <img src="./images/logo.png" alt="Logo">
       <h1>HelpDesk Admin</h1>
       <p>Welcome to the HelpDesk Admin Portal. This system is designed to manage support tickets and customer inquiries efficiently.</p>
       <div class="message">The application is currently being updated.</div>
