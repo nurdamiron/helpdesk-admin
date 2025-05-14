@@ -15,7 +15,7 @@ try {
   const packageJson = require(packageJsonPath);
   
   packageJson.engines = {
-    node: ">=16.0.0 <18.0.0"
+    node: "16.x"
   };
   
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
