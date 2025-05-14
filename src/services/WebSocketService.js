@@ -25,7 +25,7 @@ class WebSocketService {
     
     if (process.env.NODE_ENV === 'production') {
       // В production режиме используем WSS для безопасного соединения
-      websocketUrl = process.env.REACT_APP_WS_URL || 'wss://helpdesk-backend-2.onrender.com/ws';
+      websocketUrl = process.env.REACT_APP_WS_URL || 'wss://helpdesk-backend-ycoo.onrender.com/ws';
     } else {
       // В режиме разработки используем локальный сервер
       websocketUrl = 'ws://localhost:5002/ws';

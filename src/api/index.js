@@ -7,7 +7,7 @@ let API_URL;
 // Проверяем режим работы (разработка или продакшн)
 if (process.env.NODE_ENV === 'production') {
   // Используем переменную окружения из .env файла, или URL для продакшна по умолчанию
-  API_URL = process.env.REACT_APP_API_URL || 'https://helpdesk-backend-2.onrender.com/api';
+  API_URL = process.env.REACT_APP_API_URL || 'https://helpdesk-backend-ycoo.onrender.com/api';
 } else {
   // В режиме разработки используем локальный сервер
   API_URL = 'http://localhost:5002/api';

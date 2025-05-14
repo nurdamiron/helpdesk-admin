@@ -43,10 +43,13 @@
     "workbox-streams": "^7.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "start:prod": "REACT_APP_ENV=production react-scripts start",
-    "build": "node node-version.js && node pre-build.js && SKIP_PREFLIGHT_CHECK=true CI=false REACT_APP_ENV=production react-scripts build",
-    "build:dev": "node node-version.js && node pre-build.js && SKIP_PREFLIGHT_CHECK=true CI=false REACT_APP_ENV=development react-scripts build",
+    "prestart": "node patch-dependencies.js",
+    "start": "craco start",
+    "dev": "craco start",
+    "start:prod": "REACT_APP_ENV=production craco start",
+    "build": "SKIP_PREFLIGHT_CHECK=true CI=false REACT_APP_ENV=production craco build",
+    "build:dev": "SKIP_PREFLIGHT_CHECK=true CI=false REACT_APP_ENV=development craco build",
+    "build:static": "node static-build.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "postinstall": "echo 'Running with legacy peer deps' && npm ls",

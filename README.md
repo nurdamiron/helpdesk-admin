@@ -12,8 +12,8 @@ The application uses environment-specific configuration files to manage API endp
 
 ### Environment Variables
 
-- `REACT_APP_API_URL`: Base URL for API requests (e.g., `https://helpdesk-backend-2.onrender.com/api`)
-- `REACT_APP_WS_URL`: WebSocket endpoint (e.g., `wss://helpdesk-backend-2.onrender.com/ws`)
+- `REACT_APP_API_URL`: Base URL for API requests (e.g., `https://helpdesk-backend-ycoo.onrender.com/api`)
+- `REACT_APP_WS_URL`: WebSocket endpoint (e.g., `wss://helpdesk-backend-ycoo.onrender.com/ws`)
 - `REACT_APP_ENV`: Current environment (`development` or `production`)
 
 ## Available Scripts
@@ -104,8 +104,8 @@ You can also set or override environment variables in the Vercel dashboard:
 1. Go to your project settings
 2. Navigate to the "Environment Variables" section
 3. Add the following variables:
-   - `REACT_APP_API_URL`: `https://helpdesk-backend-2.onrender.com/api`
-   - `REACT_APP_WS_URL`: `wss://helpdesk-backend-2.onrender.com/ws`
+   - `REACT_APP_API_URL`: `https://helpdesk-backend-ycoo.onrender.com/api`
+   - `REACT_APP_WS_URL`: `wss://helpdesk-backend-ycoo.onrender.com/ws`
    - `REACT_APP_ENV`: `production`
 
 #### Customizing the Backend URL

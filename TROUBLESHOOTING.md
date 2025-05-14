@@ -66,8 +66,8 @@ To check which API and WebSocket URLs your application is using:
 1. Open the browser console
 2. Look for log messages like:
    ```
-   Using API URL (production mode): https://helpdesk-backend-2.onrender.com/api
-   WebSocket URL (production mode): wss://helpdesk-backend-2.onrender.com/ws
+   Using API URL (production mode): https://helpdesk-backend-ycoo.onrender.com/api
+   WebSocket URL (production mode): wss://helpdesk-backend-ycoo.onrender.com/ws
    ```
 
 ### Manually Testing API Endpoints
@@ -75,7 +75,7 @@ To check which API and WebSocket URLs your application is using:
 Test if the API is accessible:
 
 ```bash
-curl https://helpdesk-backend-2.onrender.com/api/health
+curl https://helpdesk-backend-ycoo.onrender.com/api/health
 # Should return status information
 ```
 
