@@ -41,11 +41,14 @@
   "scripts": {
     "start": "react-scripts start",
     "start:prod": "REACT_APP_ENV=production react-scripts start",
-    "build": "node pre-build.js && CI=false REACT_APP_ENV=production react-scripts build",
-    "build:dev": "node pre-build.js && CI=false REACT_APP_ENV=development react-scripts build",
+    "build": "node node-version.js && node pre-build.js && CI=false REACT_APP_ENV=production react-scripts build",
+    "build:dev": "node node-version.js && node pre-build.js && CI=false REACT_APP_ENV=development react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "postinstall": "echo 'Running with legacy peer deps' && npm ls"
+  },
+  "engines": {
+    "node": ">=16.0.0 <18.0.0"
   },
   "eslintConfig": {
     "extends": [
@@ -68,11 +71,11 @@
   "resolutions": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "ajv": "^8.12.0",
-    "ajv-keywords": "^5.1.0"
+    "ajv": "^6.12.6",
+    "schema-utils": "^3.0.0"
   },
   "overrides": {
-    "ajv": "^8.12.0",
-    "ajv-keywords": "^5.1.0"
+    "ajv": "^6.12.6",
+    "schema-utils": "^3.0.0"
   }
 }
