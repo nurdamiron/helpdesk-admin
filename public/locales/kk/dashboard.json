@@ -1,0 +1,94 @@
+{
+  "title": "Басқару тақтасы",
+  "moderator": {
+    "title": "Модератор тақтасы"
+  },
+  "welcome": {
+    "greeting": "Қош келдіңіз, {{name}}!",
+    "message": "Жүйеге кіруіңізді қуана хабарлаймыз",
+    "morning": "Қайырлы таң!",
+    "afternoon": "Қайырлы күн!",
+    "evening": "Қайырлы кеш!",
+    "night": "Қайырлы түн!"
+  },
+  "stats": {
+    "title": "Өтініштер статистикасы",
+    "totalTickets": "Барлық өтініштер",
+    "newTickets": "Жаңа өтініштер",
+    "inProgressTickets": "Жұмыста",
+    "pendingTickets": "Күтуде",
+    "resolvedTickets": "Шешілген",
+    "totalAssigned": "Тағайындалған",
+    "totalClients": "Клиенттер",
+    "totalObjects": "Нысандар",
+    "today": "Бүгін",
+    "week": "Апта",
+    "month": "Ай"
+  },
+  "performance": {
+    "title": "Өнімділік",
+    "avgResponseTime": "Орташа жауап беру уақыты",
+    "currentLoad": "Ағымдағы жүктеме",
+    "efficiency": "Тиімділік коэффициенті",
+    "resolved": "Шешілген өтініштер"
+  },
+  "activity": {
+    "title": "Соңғы өтініштер"
+  },
+  "table": {
+    "id": "ID",
+    "subject": "Тақырып",
+    "status": "Статус",
+    "priority": "Басымдық",
+    "date": "Құрылған күні",
+    "requester": "Өтініш беруші",
+    "assignedTo": "Тағайындалған",
+    "actions": "Әрекеттер"
+  },
+  "actions": {
+    "view": "Қарау",
+    "edit": "Өңдеу"
+  },
+  "categories": {
+    "repair": "Жөндеу жұмыстары",
+    "plumbing": "Сантехника",
+    "electrical": "Электрика",
+    "construction": "Құрылыс",
+    "design": "Жобалау",
+    "consultation": "Кеңес беру",
+    "estimate": "Смета және есептеулер",
+    "materials": "Материалдар",
+    "warranty": "Кепілдік жағдайы",
+    "other": "Басқа"
+  },
+  "status": {
+    "new": "Жаңа",
+    "in_progress": "Жұмыста",
+    "pending": "Күтуде",
+    "resolved": "Шешілген",
+    "closed": "Жабық"
+  },
+  "recentTickets": {
+    "title": "Соңғы өтініштер",
+    "noTickets": "Өтініштер табылмады",
+    "viewAll": "Барлығын көру",
+    "createNew": "Жаңа өтініш жасау"
+  },
+  "users": {
+    "title": "Жүйе пайдаланушылары",
+    "admins": "Администраторлар",
+    "moderators": "Модераторлар",
+    "users": "Пайдаланушылар",
+    "manage": "Пайдаланушыларды басқару"
+  },
+  "loading": "Деректер жүктелуде...",
+  "error": "Статистика жүктеу кезінде қате пайда болды",
+  "debug": {
+    "startLoading": "Дашборд деректерін жүктеуді бастау",
+    "responseReceived": "API-ден жауап алынды",
+    "processingTickets": "Алынған өтінімдерді өңдеу",
+    "calculatedStats": "Есептелген статистика",
+    "noData": "Өтінімдер туралы деректер жоқ, бос тізім көрсетіледі",
+    "loadingError": "Дашборд деректерін жүктеу кезінде қате"
+  }
+}

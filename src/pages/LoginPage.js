@@ -1,6 +1,6 @@
 // src/pages/LoginPage.js
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   TextField,
@@ -12,37 +12,51 @@ import {
   InputAdornment,
   IconButton,
   Card,
-  CardContent
+  CardContent,
+  Link
 } from '@mui/material';
 import { Lock, Mail, Eye, EyeOff, Construction } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext'; // Используем контекст авторизации
+import { useTranslation } from 'react-i18next';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login, isAuthenticated, loading: authLoading } = useAuth(); // Используем hook useAuth
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { t } = useTranslation(['common', 'auth']);
+
+  // Получаем URL для перенаправления из sessionStorage, query параметра или используем дефолтный
+  const savedRedirect = sessionStorage.getItem('redirectAfterLogin');
+  const from = savedRedirect || location.state?.from || '/dashboard';
+  
+  // Получаем сообщение из state или из query params
+  const sessionExpired = new URLSearchParams(location.search).get('session_expired');
+  const message = location.state?.message || (sessionExpired ? t('auth:session.expired', 'Ваша сессия истекла. Пожалуйста, войдите снова.') : '');
 
   useEffect(() => {
-    // Если пользователь уже залогинен — уходим на /dashboard
+    // Если пользователь уже залогинен — уходим на страницу, с которой пришли
     if (isAuthenticated) {
-      navigate('/dashboard');
+      // Очищаем сохраненное перенаправление после использования
+      sessionStorage.removeItem('redirectAfterLogin');
+      navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate]); // Добавлен isAuthenticated в зависимости
+  }, [isAuthenticated, navigate, from]); // Добавлен from в зависимости
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     if (!email.trim()) {
-      setError('Введите email');
+      setError(t('auth:errors.emailRequired', 'Введите email'));
       return;
     }
     if (!password.trim()) {
-      setError('Введите пароль');
+      setError(t('auth:errors.passwordRequired', 'Введите пароль'));
       return;
     }
 
@@ -55,9 +69,21 @@ const LoginPage = () => {
       console.error('Login error:', err);
       
       if (err.response && err.response.data && err.response.data.error) {
-        setError(err.response.data.error);
+        // Более подробные ошибки от сервера
+        const serverError = err.response.data.error;
+        
+        if (typeof serverError === 'string') {
+          setError(serverError);
+        } else if (serverError.message) {
+          setError(serverError.message);
+        } else {
+          setError(t('auth:errors.loginFailed', 'Ошибка авторизации. Пожалуйста, попробуйте снова.'));
+        }
+      } else if (err.message) {
+        // Ошибки от клиента или сети
+        setError(err.message);
       } else {
-        setError('Ошибка авторизации. Пожалуйста, попробуйте снова.');
+        setError(t('auth:errors.loginFailed', 'Ошибка авторизации. Пожалуйста, попробуйте снова.'));
       }
       setLoading(false);
     }
@@ -96,12 +122,18 @@ const LoginPage = () => {
                 <Construction size={40} color="#1e88e5" />
               </Box>
               <Typography variant="h4" component="h1" sx={{ mb: 1, fontWeight: 500 }}>
-                Вход в систему
+                {t('auth:login', 'Вход в систему')}
               </Typography>
               <Typography variant="body1" color="textSecondary">
-                Строительная Помощь HelpDesk
+                {t('app.description', 'Строительная Помощь HelpDesk')}
               </Typography>
             </Box>
+
+            {message && (
+              <Alert severity="info" sx={{ mb: 3 }}>
+                {message}
+              </Alert>
+            )}
 
             {error && (
               <Alert severity="error" sx={{ mb: 3 }}>
@@ -112,7 +144,7 @@ const LoginPage = () => {
             <form onSubmit={handleSubmit}>
               <TextField
                 fullWidth
-                label="Email"
+                label={t('auth:email', 'Email')}
                 variant="outlined"
                 margin="normal"
                 autoFocus
@@ -129,7 +161,7 @@ const LoginPage = () => {
 
               <TextField
                 fullWidth
-                label="Пароль"
+                label={t('auth:password', 'Пароль')}
                 variant="outlined"
                 margin="normal"
                 type={showPassword ? 'text' : 'password'}
@@ -164,13 +196,70 @@ const LoginPage = () => {
                 disabled={loading || authLoading}
                 sx={{ mt: 3, mb: 2, py: 1.5 }}
               >
-                {loading || authLoading ? <CircularProgress size={24} /> : 'Войти'}
+                {loading || authLoading ? <CircularProgress size={24} /> : t('auth:loginButton', 'Войти')}
               </Button>
             </form>
+            
+            {/* Тестовые данные для входа */}
+            <Box sx={{ mt: 3, bgcolor: 'background.paper', p: 2, borderRadius: 1, border: '1px dashed #ccc' }}>
+              <Typography variant="subtitle2" gutterBottom>
+                {t('auth:demo.title', 'Тестовые данные для входа:')}
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Button 
+                    size="small" 
+                    variant="outlined" 
+                    sx={{ minWidth: 100, mr: 1 }}
+                    onClick={() => {
+                      setEmail('admin@example.com');
+                      setPassword('admin123');
+                    }}
+                  >
+                    {t('auth:demo.adminButton', 'Админ')}
+                  </Button>
+                  <Typography variant="caption">admin@example.com / admin123</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Button 
+                    size="small" 
+                    variant="outlined" 
+                    sx={{ minWidth: 100, mr: 1 }}
+                    onClick={() => {
+                      setEmail('moderator@example.com');
+                      setPassword('moderator123');
+                    }}
+                  >
+                    {t('auth:demo.moderatorButton', 'Модератор')}
+                  </Button>
+                  <Typography variant="caption">moderator@example.com / moderator123</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Button 
+                    size="small" 
+                    variant="outlined" 
+                    sx={{ minWidth: 100, mr: 1 }}
+                    onClick={() => {
+                      setEmail('user@example.com');
+                      setPassword('user123');
+                    }}
+                  >
+                    {t('auth:demo.userButton', 'Пользователь')}
+                  </Button>
+                  <Typography variant="caption">user@example.com / user123</Typography>
+                </Box>
+              </Box>
+              <Typography variant="caption" sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+                {t('auth:demo.instruction', 'Нажмите на кнопку, чтобы автоматически заполнить поля для соответствующей роли.')}
+              </Typography>
+            </Box>
 
             <Box mt={3} textAlign="center">
+              <Link href="/" variant="body2" sx={{ textDecoration: 'none', display: 'block', mb: 2 }}>
+                {t('auth:backToSite', 'Вернуться на главную страницу')}
+              </Link>
               <Typography variant="body2" color="textSecondary">
-                © {new Date().getFullYear()} Строительная Помощь. Все права защищены.
+                © {new Date().getFullYear()} {t('app.title', 'Строительная Помощь')}. {t('common:copyright', 'Все права защищены.')}
               </Typography>
             </Box>
           </CardContent>

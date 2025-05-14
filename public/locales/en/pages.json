@@ -1,0 +1,99 @@
+{
+  "notFound": {
+    "title": "Page Not Found",
+    "message": "The page you are looking for does not exist or has been moved.",
+    "button": "Return to Home"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "summary": "Summary",
+    "newTickets": "New Tickets",
+    "openTickets": "Open Tickets",
+    "resolvedTickets": "Resolved Tickets",
+    "assignedToMe": "Assigned to Me",
+    "statistics": "Statistics",
+    "recentTickets": "Recent Tickets",
+    "noTickets": "No Tickets",
+    "overview": "Overview",
+    "performance": "Performance"
+  },
+  "tickets": {
+    "title": "Tickets",
+    "newTicket": "New Ticket",
+    "ticketList": "Tickets List",
+    "ticketDetail": "Ticket Details",
+    "status": "Status",
+    "priority": "Priority",
+    "assigned": "Assigned",
+    "created": "Created",
+    "updated": "Updated",
+    "noTickets": "No Tickets",
+    "search": "Search Tickets",
+    "filter": "Filter"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "account": "Account",
+    "notifications": "Notifications",
+    "security": "Security",
+    "appearance": "Appearance",
+    "language": "Language",
+    "theme": "Theme"
+  },
+  "help": {
+    "title": "Help",
+    "subtitle": "User Manual and Frequently Asked Questions",
+    "documentation": "Documentation",
+    "faqs": "Frequently Asked Questions",
+    "support": "Support",
+    "contactUs": "Contact Us",
+    "contactSupport": "Contact Technical Support",
+    "contactSupportText": "If you have questions or issues while using the system, please contact our support team.",
+    "contactForm": {
+      "subject": "Subject",
+      "description": "Problem Description",
+      "submit": "Send Request"
+    },
+    "faq": {
+      "createTicket": {
+        "question": "How do I create a new ticket?",
+        "answer": "To create a new ticket, go to the \"Tickets\" section and click the \"Create Ticket\" button. Fill in all the required fields and click \"Save\". The ticket will then appear in the general list of tickets with a \"New\" status."
+      },
+      "assignResponsible": {
+        "question": "How do I assign a responsible person for a ticket?",
+        "answer": "Open the ticket details page. In the right control panel, find the \"Responsible\" field. Select an employee from the dropdown list and click the \"Save Changes\" button at the bottom of the panel."
+      },
+      "changeStatus": {
+        "question": "How do I change a ticket status?",
+        "answer": "Open the ticket details page. In the right control panel, find the \"Status\" field. Select the desired status from the dropdown list and click the \"Save Changes\" button."
+      },
+      "attachFile": {
+        "question": "How do I attach a file to a ticket?",
+        "answer": "Open the ticket details page. Go to the \"Files\" tab. Click the \"Upload File\" button and select a file from your computer. After uploading, the file will appear in the ticket's attachments list."
+      },
+      "addComment": {
+        "question": "How do I add a comment to a ticket?",
+        "answer": "Open the ticket details page. On the \"Discussion\" tab, you will see a form for sending messages. Enter the message text and click the \"Send\" button. Your message will appear in the ticket chat and will be visible to all participants."
+      }
+    },
+    "userManual": {
+      "title": "User Manual",
+      "description": "Complete guide to using the Helpdesk system for the construction company.",
+      "openButton": "Open Manual"
+    },
+    "videoTutorials": {
+      "title": "Video Tutorials",
+      "description": "Training videos on working with the customer support system.",
+      "ticketsVideo": "Creating and Processing Tickets",
+      "clientsVideo": "Working with Clients",
+      "reportsVideo": "Reports and Analytics"
+    },
+    "supportContacts": {
+      "title": "Support Contacts",
+      "email": "support@helpdesk.com",
+      "phone": "+1 (555) 123-4567",
+      "workHours": "Working hours: Mon-Fri from 9:00 to 18:00"
+    }
+  }
+} 

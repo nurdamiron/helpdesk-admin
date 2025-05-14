@@ -1,0 +1,206 @@
+{
+  "list": {
+    "title": "Өтініштер тізімі",
+    "noTickets": "Өтініштер жоқ",
+    "loadingError": "Өтініштер тізімін жүктеу мүмкін болмады. Кейінірек қайталап көріңіз.",
+    "loading": "Өтініштер жүктелуде...",
+    "searchPlaceholder": "Өтініштерді іздеу...",
+    "applyFilters": "Сүзгілерді қолдану",
+    "resetFilters": "Сүзгілерді тазалау",
+    "showFilters": "Сүзгілерді көрсету",
+    "hideFilters": "Сүзгілерді жасыру",
+    "advancedFilters": "Кеңейтілген сүзгілер",
+    "newTicket": "Жаңа өтініш",
+    "refresh": "Жаңарту",
+    "viewDetails": "Қарау",
+    "createFirst": "Алғашқы өтініш жасау",
+    "tableLabel": "Өтініштер тізімі",
+    "filterButton": "Сүзгілерді көрсету",
+    "filterApply": "Қолдану"
+  },
+  "table": {
+    "id": "ID",
+    "subject": "Тақырып",
+    "status": "Күйі",
+    "priority": "Басымдылық",
+    "category": "Санат",
+    "type": "Түрі",
+    "requester": "Өтініш беруші",
+    "assignee": "Жауапты",
+    "assigned": "Тағайындалған",
+    "assignedTo": "Тағайындалған",
+    "created": "Құрылған",
+    "createdAt": "Құрылған күні",
+    "updated": "Жаңартылған",
+    "dueDate": "Мерзімі",
+    "actions": "Әрекеттер",
+    "unknown": "Белгісіз",
+    "notAssigned": "Тағайындалмаған"
+  },
+  "filters": {
+    "status": "Күйі",
+    "type": "Өтініш түрі",
+    "category": "Санат",
+    "priority": "Басымдылық",
+    "assignee": "Жауапты",
+    "dateRange": "Кезең",
+    "startDate": "Бастап",
+    "endDate": "Дейін",
+    "all": "Барлығы",
+    "search": "Іздеу",
+    "apply": "Қолдану",
+    "reset": "Тазарту",
+    "show": "Сүзгілерді көрсету",
+    "hide": "Сүзгілерді жасыру"
+  },
+  "status": {
+    "new": "Жаңа",
+    "open": "Ашық",
+    "in_progress": "Жұмыста",
+    "pending": "Күтуде",
+    "waiting": "Күтуде",
+    "resolved": "Шешілген",
+    "closed": "Жабық",
+    "label": "Мәртебе"
+  },
+  "type": {
+    "construction": "Құрылыс жұмыстары",
+    "repair": "Жөндеу және әрлеу",
+    "breakdown": "Ақауларды жою",
+    "consultation": "Маман кеңесі",
+    "inspection": "Техникалық тексеру",
+    "material": "Материалдарды жеткізу",
+    "emergency": "Апаттық жағдай",
+    "other": "Басқа"
+  },
+  "category": {
+    "foundation": "Іргетас жұмыстары",
+    "framing": "Қаңқалық құрылыс",
+    "roofing": "Шатыр жұмыстары",
+    "masonry": "Қалау жұмыстары",
+    "plumbing": "Сантехникалық жұмыстар",
+    "electrical": "Электромонтаж жұмыстары",
+    "insulation": "Жылулау",
+    "drywall": "Гипсокартон жұмыстары",
+    "painting": "Сырлау жұмыстары",
+    "flooring": "Едендік жабындар",
+    "carpentry": "Ағаш ұсталық жұмыстар",
+    "windows": "Терезелер мен есіктер",
+    "landscaping": "Ландшафттық жұмыстар",
+    "renovation": "Қайта құру және қалпына келтіру",
+    "materials": "Құрылыс материалдарын жеткізу",
+    "equipment": "Құрылыс техникасы",
+    "design": "Жобалау және дизайн",
+    "permits": "Рұқсаттар мен құжаттама",
+    "inspection": "Техникалық қадағалау",
+    "other": "Басқа"
+  },
+  "priority": {
+    "low": "Төмен",
+    "medium": "Орташа",
+    "high": "Жоғары",
+    "urgent": "Шұғыл"
+  },
+  "pagination": {
+    "rowsPerPage": "Беттегі жолдар саны:",
+    "of": "ішінен",
+    "displayedRows": "{{from}}-{{to}} / {{count}}"
+  },
+  "footer": {
+    "total": "Барлығы {{count}} өтініш"
+  },
+  "actions": {
+    "view": "Қарау",
+    "edit": "Өңдеу"
+  },
+  "errors": {
+    "loadFailed": "Өтініштер тізімін жүктеу кезінде қате болды",
+    "createFailed": "Өтініш жасау мүмкін болмады. Кейінірек қайталап көріңіз.",
+    "accessDenied": "Сізде бұл өтінішке қол жеткізу құқығы жоқ",
+    "ticketNotFound": "Өтініш табылмады"
+  },
+  "create": {
+    "title": "Өтініш жасау",
+    "back": "Артқа",
+    "cancel": "Болдырмау",
+    "next": "Келесі",
+    "submit": "Жіберу",
+    "sending": "Жіберілуде...",
+    "success": "Өтініш сәтті жасалды! Сіз басты бетке бағытталасыз.",
+    "typeStep": "Өтініш түрі",
+    "detailsStep": "Өтініш мәліметтері",
+    "confirmationStep": "Растау",
+    "ticketType": "Өтініш түрі",
+    "category": "Санат",
+    "subject": "Тақырып",
+    "description": "Сипаттама",
+    "priority": "Басымдылық",
+    "contactPreference": "Байланыс тәсілі",
+    "contact": {
+      "email": "Email",
+      "phone": "Телефон"
+    },
+    "verification": {
+      "title": "Өтінішіңіздің деректерін тексеріңіз",
+      "type": "Өтініш түрі:",
+      "category": "Санат:",
+      "priority": "Басымдылық:",
+      "subject": "Тақырып:",
+      "contactInfo": "Байланыс ақпараты:",
+      "contactMethod": "Байланыс тәсілі:",
+      "description": "Сипаттама:"
+    },
+    "unknownStep": "Белгісіз қадам"
+  },
+  "files": {
+    "title": "Тіркелген файлдар",
+    "addFile": "Файл қосу",
+    "uploadFile": "Файл жүктеу",
+    "uploadSuccess": "Файл(дар) сәтті жүктелді",
+    "uploadError": "Файлды жүктеу мүмкін болмады. Қайталап көріңіз.",
+    "deleteError": "Файлды жою мүмкін болмады. Қайталап көріңіз.",
+    "uploading": "Файл жүктелуде...",
+    "noFiles": "Тіркелген файлдар жоқ",
+    "uploadInstruction": "Файлдарды осында жүктеу үшін \"Файл қосу\" түймесін басыңыз",
+    "defaultName": "Файл",
+    "download": "Жүктеп алу",
+    "delete": "Жою",
+    "sizeUnknown": "Белгісіз",
+    "sizeBytes": "Б",
+    "sizeKB": "КБ",
+    "sizeMB": "МБ"
+  },
+  "details": {
+    "ticketId": "Өтініш #{{id}}",
+    "type": "Түрі:",
+    "category": "Санаты:",
+    "priority": "Басымдылығы:",
+    "createdAt": "Құрылған күні:",
+    "description": "Сипаттамасы:",
+    "attachments": "Тіркелген файлдар:",
+    "requesterInfo": "Өтініш беруші туралы ақпарат",
+    "unknownUser": "Белгісіз пайдаланушы",
+    "noData": "Деректер жоқ",
+    "contactPreference": "Қалаулы байланыс әдісі",
+    "phone": "Телефон",
+    "created": "Құрылған",
+    "assignedTo": "Тағайындалған:"
+  },
+  "tabs": {
+    "discussion": "Талқылау",
+    "history": "Тарих",
+    "historyComingSoon": "Өзгерістер тарихы жақын арада қол жетімді болады"
+  },
+  "management": {
+    "title": "Өтінішті басқару",
+    "status": "Күйі:",
+    "priority": "Басымдылығы:"
+  },
+  "actions": {
+    "saving": "Сақталуда...",
+    "saveChanges": "Өзгерістерді сақтау"
+  },
+  "alerts": {
+    "saveSuccess": "Өзгерістер сәтті сақталды"
+  }
+}

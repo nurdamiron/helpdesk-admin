@@ -1,0 +1,206 @@
+{
+  "list": {
+    "title": "Tickets List",
+    "noTickets": "No tickets found",
+    "loadingError": "Failed to load tickets list. Please try again later.",
+    "loading": "Loading tickets...",
+    "searchPlaceholder": "Search tickets...",
+    "applyFilters": "Apply Filters",
+    "resetFilters": "Reset Filters",
+    "showFilters": "Show Filters",
+    "hideFilters": "Hide Filters",
+    "advancedFilters": "Advanced Filters",
+    "newTicket": "New Ticket",
+    "refresh": "Refresh",
+    "viewDetails": "View",
+    "createFirst": "Create First Ticket",
+    "tableLabel": "Tickets List",
+    "filterButton": "Show Filters",
+    "filterApply": "Apply"
+  },
+  "table": {
+    "id": "ID",
+    "subject": "Subject",
+    "status": "Status",
+    "priority": "Priority",
+    "category": "Category",
+    "type": "Type",
+    "requester": "Requester",
+    "assignee": "Assignee",
+    "assigned": "Assigned",
+    "assignedTo": "Assigned To",
+    "created": "Created",
+    "createdAt": "Created Date",
+    "updated": "Updated",
+    "dueDate": "Due Date",
+    "actions": "Actions",
+    "unknown": "Unknown",
+    "notAssigned": "Not Assigned"
+  },
+  "filters": {
+    "status": "Status",
+    "type": "Type",
+    "category": "Category",
+    "priority": "Priority",
+    "assignee": "Assignee",
+    "dateRange": "Date Range",
+    "startDate": "From",
+    "endDate": "To",
+    "all": "All",
+    "search": "Search",
+    "apply": "Apply",
+    "reset": "Reset",
+    "show": "Show Filters",
+    "hide": "Hide Filters"
+  },
+  "status": {
+    "new": "New",
+    "open": "Open",
+    "in_progress": "In Progress",
+    "pending": "Waiting",
+    "waiting": "Waiting",
+    "resolved": "Resolved",
+    "closed": "Closed",
+    "label": "Status"
+  },
+  "type": {
+    "construction": "Construction Work",
+    "repair": "Repair and Finishing",
+    "breakdown": "Troubleshooting",
+    "consultation": "Specialist Consultation",
+    "inspection": "Technical Inspection",
+    "material": "Material Delivery",
+    "emergency": "Emergency Situation",
+    "other": "Other"
+  },
+  "category": {
+    "foundation": "Foundation Works",
+    "framing": "Framing Construction",
+    "roofing": "Roofing Works",
+    "masonry": "Masonry Works",
+    "plumbing": "Plumbing Works",
+    "electrical": "Electrical Works",
+    "insulation": "Insulation",
+    "drywall": "Drywall Works",
+    "painting": "Painting Works",
+    "flooring": "Flooring",
+    "carpentry": "Carpentry Works",
+    "windows": "Windows and Doors",
+    "landscaping": "Landscaping Works",
+    "renovation": "Renovation and Restoration",
+    "materials": "Construction Materials Supply",
+    "equipment": "Construction Equipment",
+    "design": "Design and Planning",
+    "permits": "Permits and Documentation",
+    "inspection": "Technical Inspection",
+    "other": "Other"
+  },
+  "priority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "urgent": "Urgent"
+  },
+  "pagination": {
+    "rowsPerPage": "Rows per page:",
+    "of": "of",
+    "displayedRows": "{{from}}-{{to}} of {{count}}"
+  },
+  "footer": {
+    "total": "Total {{count}} tickets"
+  },
+  "actions": {
+    "view": "View",
+    "edit": "Edit"
+  },
+  "errors": {
+    "loadFailed": "Failed to load tickets list",
+    "createFailed": "Failed to create ticket. Please try again later.",
+    "accessDenied": "You do not have access to this ticket",
+    "ticketNotFound": "Ticket not found"
+  },
+  "create": {
+    "title": "Create Ticket",
+    "back": "Back",
+    "cancel": "Cancel",
+    "next": "Next",
+    "submit": "Submit",
+    "sending": "Sending...",
+    "success": "Ticket successfully created! You will be redirected to the home page.",
+    "typeStep": "Ticket Type",
+    "detailsStep": "Ticket Details",
+    "confirmationStep": "Confirmation",
+    "ticketType": "Ticket Type",
+    "category": "Category",
+    "subject": "Subject",
+    "description": "Description",
+    "priority": "Priority",
+    "contactPreference": "Preferred Contact Method",
+    "contact": {
+      "email": "Email",
+      "phone": "Phone"
+    },
+    "verification": {
+      "title": "Verify your ticket details",
+      "type": "Ticket Type:",
+      "category": "Category:",
+      "priority": "Priority:",
+      "subject": "Subject:",
+      "contactInfo": "Contact Information:",
+      "contactMethod": "Contact Method:",
+      "description": "Description:"
+    },
+    "unknownStep": "Unknown step"
+  },
+  "files": {
+    "title": "Attached Files",
+    "addFile": "Add File",
+    "uploadFile": "Upload File",
+    "uploadSuccess": "File(s) uploaded successfully",
+    "uploadError": "Failed to upload file. Please try again.",
+    "deleteError": "Failed to delete file. Please try again.",
+    "uploading": "Uploading file...",
+    "noFiles": "No attached files",
+    "uploadInstruction": "Click the \"Add File\" button to upload files here",
+    "defaultName": "File",
+    "download": "Download",
+    "delete": "Delete",
+    "sizeUnknown": "Unknown",
+    "sizeBytes": "B",
+    "sizeKB": "KB",
+    "sizeMB": "MB"
+  },
+  "details": {
+    "ticketId": "Ticket #{{id}}",
+    "type": "Type:",
+    "category": "Category:",
+    "priority": "Priority:",
+    "createdAt": "Created Date:",
+    "description": "Description:",
+    "attachments": "Attachments:",
+    "requesterInfo": "Requester Information",
+    "unknownUser": "Unknown User",
+    "noData": "No data",
+    "contactPreference": "Preferred Contact Method",
+    "phone": "Phone",
+    "created": "Created",
+    "assignedTo": "Assigned To:"
+  },
+  "tabs": {
+    "discussion": "Discussion",
+    "history": "History",
+    "historyComingSoon": "Change history will be available soon"
+  },
+  "management": {
+    "title": "Manage Ticket",
+    "status": "Status:",
+    "priority": "Priority:"
+  },
+  "actions": {
+    "saving": "Saving...",
+    "saveChanges": "Save Changes"
+  },
+  "alerts": {
+    "saveSuccess": "Changes saved successfully"
+  }
+}

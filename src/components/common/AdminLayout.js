@@ -89,8 +89,8 @@ const AdminLayout = () => {
 
   // Пункты меню навигации
   const menuItems = [
-    { path: '/dashboard', icon: <Home size={20} />, text: 'Главная' },
-    { path: '/tickets', icon: <TicketCheck size={20} />, text: 'Заявки' },
+    { path: '/dashboard', icon: <Home size={20} />, text: 'Басты бет' },
+    { path: '/tickets', icon: <TicketCheck size={20} />, text: 'Өтінімдер' },
     // { path: '/messages', icon: <Inbox size={20} />, text: 'Сообщения', count: 3 },
     // { path: '/clients', icon: <Users size={20} />, text: 'Клиенты' },
     // { path: '/objects', icon: <Building size={20} />, text: 'Объекты' },
@@ -99,15 +99,15 @@ const AdminLayout = () => {
 
   // Дополнительные пункты меню
   const secondaryMenuItems = [
-    { path: '/settings', icon: <Settings size={20} />, text: 'Настройки' },
-    { path: '/help', icon: <HelpCircle size={20} />, text: 'Помощь' },
+    { path: '/settings', icon: <Settings size={20} />, text: 'Параметрлер' },
+    { path: '/help', icon: <HelpCircle size={20} />, text: 'Көмек' },
   ];
 
   // Имитация уведомлений для демонстрации
   const notifications = [
-    { id: 1, text: 'Новая заявка #234', time: '5 минут назад' },
-    { id: 2, text: 'Сообщение от клиента Иванов И.И.', time: '15 минут назад' },
-    { id: 3, text: 'Напоминание: Встреча через 1 час', time: '30 минут назад' },
+    { id: 1, text: 'Жаңа өтінім #234', time: '5 минут бұрын' },
+    { id: 2, text: 'Клиенттен хабарлама', time: '15 минут бұрын' },
+    { id: 3, text: 'Еске салу: 1 сағаттан кейін кездесу', time: '30 минут бұрын' },
   ];
 
   // Если данные все еще загружаются, показываем индикатор загрузки
@@ -150,11 +150,11 @@ const AdminLayout = () => {
             {drawerOpen ? <ChevronLeft /> : <MenuIcon />}
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Строительная компания — HelpDesk
+            Құрылыс компаниясы — HelpDesk
           </Typography>
 
           {/* Иконка уведомлений */}
-          <Tooltip title="Уведомления">
+          <Tooltip title="Хабарламалар">
             <IconButton 
               color="inherit" 
               onClick={handleNotificationsMenuOpen}
@@ -289,7 +289,7 @@ const AdminLayout = () => {
         </MenuItem>
         <MenuItem onClick={handleLogout}>
           <LogOut size={16} style={{ marginRight: 8 }} />
-          Выйти
+          Шығу
         </MenuItem>
       </Menu>
 
@@ -315,7 +315,7 @@ const AdminLayout = () => {
         }}
       >
         <Box sx={{ p: 2, borderBottom: '1px solid #eee' }}>
-          <Typography variant="subtitle1">Уведомления</Typography>
+          <Typography variant="subtitle1">Хабарламалар</Typography>
         </Box>
         {notifications.map((notification) => (
           <MenuItem key={notification.id} onClick={handleNotificationsMenuClose}>
@@ -330,7 +330,7 @@ const AdminLayout = () => {
         <Divider />
         <MenuItem onClick={handleNotificationsMenuClose} sx={{ justifyContent: 'center' }}>
           <Typography variant="body2" color="primary">
-            Показать все уведомления
+            Барлық хабарламаларды көрсету
           </Typography>
         </MenuItem>
       </Menu>

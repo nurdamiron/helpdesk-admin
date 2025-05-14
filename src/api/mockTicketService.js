@@ -11,7 +11,7 @@ const getRandomDate = () => {
   
   // Generate mock ticket data
   const generateMockTickets = (count = 15) => {
-    const statuses = ['new', 'in_progress', 'resolved', 'closed'];
+    const statuses = ['new', 'in_progress', 'waiting', 'resolved', 'closed'];
     const priorities = ['low', 'medium', 'high', 'urgent'];
     const categories = ['repair', 'plumbing', 'electrical', 'construction', 'design', 'consultation'];
     

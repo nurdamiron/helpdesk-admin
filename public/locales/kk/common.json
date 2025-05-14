@@ -1,0 +1,143 @@
+{
+  "app": {
+    "title": "HelpDesk Admin",
+    "description": "Әкімші панелі"
+  },
+  "nav": {
+    "dashboard": "Басқару тақтасы",
+    "tickets": "Өтініштер",
+    "settings": "Параметрлер",
+    "users": "Пайдаланушылар",
+    "reports": "Есептер",
+    "help": "Анықтама"
+  },
+  "auth": {
+    "login": "Кіру",
+    "logout": "Шығу",
+    "email": "Email",
+    "password": "Құпия сөз",
+    "forgotPassword": "Құпия сөзді ұмыттыңыз ба?",
+    "rememberMe": "Есте сақтау",
+    "loginButton": "Кіру",
+    "loginError": "Қате email немесе құпия сөз",
+    "account": "Аккаунт",
+    "profile": "Профиль"
+  },
+  "language": {
+    "en": "English",
+    "ru": "Русский",
+    "kk": "Қазақша",
+    "select": "Тілді таңдау"
+  },
+  "errors": {
+    "loadFailed": "Деректерді жүктеу мүмкін болмады",
+    "loginFailed": "Кіру қатесі",
+    "serverError": "Сервер қатесі",
+    "unauthorized": "Авторизацияланбаған",
+    "forbidden": "Рұқсат етілмеген",
+    "apiError": "API қатесі"
+  },
+  "actions": {
+    "save": "Сақтау",
+    "saving": "Сақталуда...",
+    "cancel": "Болдырмау",
+    "delete": "Жою",
+    "deleting": "Жойылуда...",
+    "edit": "Өңдеу",
+    "view": "Көру",
+    "add": "Қосу",
+    "create": "Құру",
+    "update": "Жаңарту",
+    "close": "Жабу",
+    "back": "Артқа",
+    "next": "Келесі",
+    "submit": "Жіберу",
+    "search": "Іздеу",
+    "filter": "Сүзгі",
+    "clear": "Тазалау",
+    "reset": "Қалпына келтіру",
+    "refresh": "Жаңарту",
+    "upload": "Жүктеу",
+    "download": "Жүктеп алу",
+    "export": "Экспорт",
+    "assign": "Тағайындау",
+    "resolve": "Шешу",
+    "reopen": "Қайта ашу"
+  },
+  "status": {
+    "success": "Сәтті",
+    "error": "Қате",
+    "warning": "Ескерту",
+    "info": "Ақпарат",
+    "loading": "Жүктелуде...",
+    "notFound": "Табылмады",
+    "accessDenied": "Рұқсат етілмеген"
+  },
+  "validation": {
+    "required": "Бұл өріс міндетті",
+    "email": "Жарамды email мекенжайын енгізіңіз",
+    "minLength": "Кем дегенде {{min}} таңба енгізіңіз",
+    "maxLength": "{{max}} таңбадан артық енгізбеңіз",
+    "passwordMatch": "Құпия сөздер сәйкес келмейді",
+    "invalid": "Жарамсыз мән"
+  },
+  "notifications": {
+    "title": "Хабарламалар",
+    "new": "Жаңа хабарлама",
+    "all": "Барлық хабарламалар",
+    "mark_read": "Оқылған деп белгілеу",
+    "empty": "Жаңа хабарламалар жоқ",
+    "example1": "Жаңа өтініш #124",
+    "example2": "Клиент #120 өтінішіне жауап берді",
+    "example3": "Еске салу: #115 өтінішінің мерзімі"
+  },
+  "time": {
+    "today": "Бүгін",
+    "yesterday": "Кеше",
+    "tomorrow": "Ертең",
+    "days": "Күндер",
+    "weeks": "Апталар",
+    "months": "Айлар",
+    "years": "Жылдар",
+    "ago": "{{time}} бұрын",
+    "in": "{{time}} кейін",
+    "hoursAgo": "{{count}} сағат бұрын",
+    "minutesAgo": "{{count}} минут бұрын"
+  },
+  "dashboard": {
+    "title": "Басқару тақтасы",
+    "tickets": {
+      "new": "Жаңа өтініштер",
+      "inProgress": "Өңделуде",
+      "resolved": "Шешілген",
+      "closed": "Жабылған"
+    },
+    "statistics": {
+      "title": "Статистика",
+      "today": "Бүгін",
+      "week": "Апта",
+      "month": "Ай"
+    }
+  },
+  "roles": {
+    "admin": "Әкімші",
+    "moderator": "Модератор",
+    "staff": "Қызметкер",
+    "user": "Пайдаланушы"
+  },
+  "header": {
+    "profile": "Профиль",
+    "settings": "Параметрлер",
+    "logout": "Шығу",
+    "help": "Анықтама"
+  },
+  "footer": {
+    "copyright": "© {{year}} Құрылыс компаниясы HelpDesk. Барлық құқықтар қорғалған.",
+    "terms": "Қызмет көрсету шарттары",
+    "privacy": "Құпиялылық саясаты",
+    "contact": "Байланыс"
+  },
+  "rowsPerPage": "Беттегі жолдар:",
+  "of": "жалпы",
+  "copyright": "Барлық құқықтар қорғалған."
+}

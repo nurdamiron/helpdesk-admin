@@ -1,223 +1,140 @@
 // src/components/tickets/TicketInfo.js
 import React from 'react';
-import { 
-  Box, 
-  Typography, 
-  Divider, 
-  Grid, 
-  Card, 
-  CardContent 
+import {
+  Box,
+  Typography,
+  Divider,
+  Grid,
+  useTheme
 } from '@mui/material';
-import { 
-  User, 
-  Building, 
-  Calendar, 
-  FileText 
+import {
+  Calendar,
+  Tag,
+  MessageCircle,
+  AlertCircle,
+  User,
+  Building,
+  Mail,
+  Phone
 } from 'lucide-react';
+
 import { formatDate } from '../../utils/dateUtils';
-import { formatTicketCategory, formatPropertyType, formatKzPhoneNumber } from '../../utils/formatters';
 
 const TicketInfo = ({ ticket, isMobile }) => {
-  // Получаем информацию о клиенте и объекте из metadata
-  const requesterInfo = ticket.requester || ticket.metadata?.requester || {};
-  const propertyInfo = ticket.metadata?.property || ticket.property_type ? {
-    type: ticket.property_type,
-    address: ticket.property_address,
-    area: ticket.property_area
-  } : {};
+  const theme = useTheme();
+
+  if (!ticket) return null;
 
   return (
-    <>
-      <Typography variant="h6" gutterBottom>
+    <Box>
+      <Typography 
+        variant="h6" 
+        gutterBottom 
+        sx={{ 
+          fontWeight: 600,
+          position: 'relative',
+          paddingBottom: '10px',
+          '&:after': {
+            content: '""',
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            width: '40px',
+            height: '3px',
+            backgroundColor: theme.palette.primary.main,
+            borderRadius: '2px'
+          },
+          mb: 2
+        }}
+      >
         {ticket.subject}
       </Typography>
-      
-      <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-wrap' }}>
-        {ticket.description}
-      </Typography>
 
-      <Divider sx={{ my: 2 }} />
-
-      {/* Информация о клиенте и объекте */}
-      <Grid container spacing={2}>
-        {/* Информация о клиенте */}
-        <Grid item xs={12} sm={6}>
-          <Card variant="outlined" sx={{ height: '100%' }}>
-            <CardContent>
-              <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                <User size={18} style={{ marginRight: '8px' }} />
-                Информация о клиенте
-              </Typography>
-              
-              <Box sx={{ mt: 2 }}>
-                <Box 
-                  sx={{ 
-                    display: 'flex', 
-                    mb: 1,
-                    flexDirection: isMobile ? 'column' : 'row',
-                    alignItems: isMobile ? 'flex-start' : 'center' 
-                  }}
-                >
-                  <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
-                    ФИО:
-                  </Typography>
-                  <Typography variant="body2">
-                    {requesterInfo.full_name || 'Не указано'}
-                  </Typography>
-                </Box>
-                
-                <Box 
-                  sx={{ 
-                    display: 'flex', 
-                    mb: 1,
-                    flexDirection: isMobile ? 'column' : 'row',
-                    alignItems: isMobile ? 'flex-start' : 'center' 
-                  }}
-                >
-                  <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
-                    Email:
-                  </Typography>
-                  <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
-                    {requesterInfo.email ? (
-                      <a href={`mailto:${requesterInfo.email}`}>{requesterInfo.email}</a>
-                    ) : (
-                      'Не указан'
-                    )}
-                  </Typography>
-                </Box>
-                
-                <Box 
-                  sx={{ 
-                    display: 'flex', 
-                    mb: 1,
-                    flexDirection: isMobile ? 'column' : 'row',
-                    alignItems: isMobile ? 'flex-start' : 'center' 
-                  }}
-                >
-                  <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
-                    Телефон:
-                  </Typography>
-                  <Typography variant="body2">
-                    {requesterInfo.phone ? (
-                      <a href={`tel:${requesterInfo.phone}`}>{formatKzPhoneNumber(requesterInfo.phone)}</a>
-                    ) : (
-                      'Не указан'
-                    )}
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-        
-        {/* Информация об объекте */}
-        <Grid item xs={12} sm={6}>
-          <Card variant="outlined" sx={{ height: '100%' }}>
-            <CardContent>
-              <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                <Building size={18} style={{ marginRight: '8px' }} />
-                Информация об объекте
-              </Typography>
-              
-              <Box sx={{ mt: 2 }}>
-                <Box 
-                  sx={{ 
-                    display: 'flex', 
-                    mb: 1,
-                    flexDirection: isMobile ? 'column' : 'row',
-                    alignItems: isMobile ? 'flex-start' : 'center' 
-                  }}
-                >
-                  <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
-                    Тип объекта:
-                  </Typography>
-                  <Typography variant="body2">
-                    {formatPropertyType(propertyInfo.type) || 'Не указан'}
-                  </Typography>
-                </Box>
-                
-                <Box 
-                  sx={{ 
-                    display: 'flex', 
-                    mb: 1,
-                    flexDirection: isMobile ? 'column' : 'row',
-                    alignItems: isMobile ? 'flex-start' : 'center' 
-                  }}
-                >
-                  <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
-                    Адрес:
-                  </Typography>
-                  <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
-                    {propertyInfo.address || 'Не указан'}
-                  </Typography>
-                </Box>
-                
-                {propertyInfo.area && (
-                  <Box 
-                    sx={{ 
-                      display: 'flex', 
-                      mb: 1,
-                      flexDirection: isMobile ? 'column' : 'row',
-                      alignItems: isMobile ? 'flex-start' : 'center' 
-                    }}
-                  >
-                    <Typography variant="body2" sx={{ fontWeight: 'medium', mr: 1, minWidth: isMobile ? 'auto' : '100px' }}>
-                      Площадь:
-                    </Typography>
-                    <Typography variant="body2">
-                      {propertyInfo.area} м²
-                    </Typography>
-                  </Box>
-                )}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      {/* Метаданные заявки */}
-      <Box sx={{ mt: 3 }}>
+      <Box sx={{ mb: 3 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Box display="flex" alignItems="center" mb={1}>
-              <Calendar size={18} />
-              <Typography variant="body2" sx={{ ml: 1 }}>
-                <strong>Создана:</strong> {formatDate(ticket.created_at, 'Asia/Almaty')}
-              </Typography>
-            </Box>
-          </Grid>
-          
-          <Grid item xs={12} sm={6} md={3}>
-            <Box display="flex" alignItems="center" mb={1}>
-              <Calendar size={18} />
-              <Typography variant="body2" sx={{ ml: 1 }}>
-                <strong>Обновлена:</strong> {formatDate(ticket.updated_at, 'Asia/Almaty')}
-              </Typography>
-            </Box>
-          </Grid>
-          
-          <Grid item xs={12} sm={6} md={3}>
-            <Box display="flex" alignItems="center" mb={1}>
-              <FileText size={18} />
-              <Typography variant="body2" sx={{ ml: 1 }}>
-                <strong>Категория:</strong> {formatTicketCategory(ticket.category)}
-              </Typography>
-            </Box>
-          </Grid>
-          
-          {ticket.company_id && (
-            <Grid item xs={12} sm={6} md={3}>
-              <Box display="flex" alignItems="center" mb={1}>
-                <Building size={18} />
-                <Typography variant="body2" sx={{ ml: 1 }}>
-                  <strong>Компания:</strong> {ticket.company_name || `ID: ${ticket.company_id}`}
+          <Grid item xs={12} md={6}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <User size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
+              <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                Өтініш беруші: {' '}
+                <Typography component="span">
+                  {ticket.requester?.name || 
+                   ticket.metadata?.requester?.full_name || 
+                   'Көрсетілмеген'}
                 </Typography>
-              </Box>
-            </Grid>
-          )}
+              </Typography>
+            </Box>
+            
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Calendar size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
+              <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                Құрылған күні: {' '}
+                <Typography component="span">
+                  {formatDate(ticket.created_at)}
+                </Typography>
+              </Typography>
+            </Box>
+            
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Tag size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
+              <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                Санат: {' '}
+                <Typography component="span">
+                  {ticket.category}
+                </Typography>
+              </Typography>
+            </Box>
+          </Grid>
+          
+          <Grid item xs={12} md={6}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Mail size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
+              <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                Email: {' '}
+                <Typography component="span">
+                  {ticket.requester?.email || 
+                   ticket.metadata?.requester?.email || 
+                   'Көрсетілмеген'}
+                </Typography>
+              </Typography>
+            </Box>
+            
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Phone size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
+              <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                Телефон: {' '}
+                <Typography component="span">
+                  {ticket.requester?.phone || 
+                   ticket.metadata?.requester?.phone || 
+                   'Көрсетілмеген'}
+                </Typography>
+              </Typography>
+            </Box>
+            
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Building size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
+              <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                Мекенжай: {' '}
+                <Typography component="span">
+                  {ticket.property_address || 
+                   ticket.metadata?.property_address || 
+                   'Көрсетілмеген'}
+                </Typography>
+              </Typography>
+            </Box>
+          </Grid>
         </Grid>
       </Box>
-    </>
+
+      <Divider sx={{ mb: 2 }} />
+
+      <Typography variant="subtitle2" gutterBottom fontWeight={600}>
+        Өтініш сипаттамасы
+      </Typography>
+      <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', mb: 2 }}>
+        {ticket.description}
+      </Typography>
+    </Box>
   );
 };
 

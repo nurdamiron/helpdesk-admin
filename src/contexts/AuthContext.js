@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [initialized, setInitialized] = useState(false);
 
   // При загрузке приложения проверяем, есть ли сохраненный пользователь
   useEffect(() => {
@@ -23,6 +24,7 @@ export const AuthProvider = ({ children }) => {
         setError('Не удалось инициализировать авторизацию');
       } finally {
         setLoading(false);
+        setInitialized(true);
       }
     };
 
@@ -89,16 +91,68 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Проверка прав доступа пользователя - с учетом ролей в базе данных
+  const hasPermission = (requiredRole) => {
+    if (!user) return false;
+    
+    // Админ имеет доступ ко всему
+    if (user.role === 'admin') return true;
+    
+    // Support, Manager, Staff имеют доступ как модераторы
+    if (['support', 'manager', 'moderator', 'staff'].includes(user.role)) {
+      return requiredRole === 'moderator' || requiredRole === 'staff';
+    }
+    
+    // Обычный пользователь имеет доступ только к роли пользователя
+    if (user.role === 'user') {
+      return requiredRole === 'user';
+    }
+    
+    return false;
+  };
+
+  // Проверка конкретных прав доступа
+  const hasSpecificPermission = (permission) => {
+    if (!user) return false;
+    
+    // Разные права в зависимости от типа действия
+    switch(permission) {
+      case 'view_all_tickets':
+        return ['admin', 'support', 'manager', 'moderator', 'staff'].includes(user.role);
+        
+      case 'edit_any_ticket':
+        return ['admin', 'support', 'manager', 'moderator'].includes(user.role);
+        
+      case 'assign_tickets':
+        return ['admin', 'support', 'manager', 'moderator'].includes(user.role);
+        
+      case 'manage_users':
+        return user.role === 'admin';
+        
+      case 'access_reports':
+        return ['admin', 'manager'].includes(user.role);
+        
+      default:
+        return false;
+    }
+  };
+
   // Значение контекста, которое будет доступно потребителям
   const value = {
     user,
     loading,
     error,
+    initialized,
     login,
     logout,
     register,
     updateProfile,
-    isAuthenticated: !!user,
+    hasPermission,
+    hasSpecificPermission,
+    isAuthenticated: !!user && initialized,
+    isAdmin: user?.role === 'admin',
+    isModerator: ['moderator', 'admin', 'support', 'manager', 'staff'].includes(user?.role),
+    isUser: user?.role === 'user',
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,187 +1,253 @@
 // src/components/tickets/TicketHistory.js
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Typography, 
-  CircularProgress, 
-  Paper,
+import {
+  Box,
+  Typography,
+  List,
+  ListItem,
+  Divider,
+  CircularProgress,
   Alert,
-  Tooltip
+  Chip,
+  useTheme,
+  alpha,
+  Paper
 } from '@mui/material';
-import { 
-  Timeline, 
-  TimelineItem, 
-  TimelineSeparator, 
-  TimelineConnector, 
-  TimelineContent, 
-  TimelineDot
-} from '@mui/lab';
-import { 
-  Clock, 
-  CheckCircle, 
-  AlertCircle, 
-  User, 
-  MessageSquare, 
-  Paperclip, 
+import {
+  Clock,
+  User,
   Edit,
-  Star,
-  Flag,
-  Tag
+  Settings,
+  Mail,
+  CheckCircle,
+  MessageCircle,
+  FileText,
+  Users,
+  AlertCircle
 } from 'lucide-react';
 
-import { ticketService } from '../../api/ticketService';
-import { formatDate, formatRelativeTime } from '../../utils/dateUtils'; // Исправлен импорт
-import { formatTicketStatus, formatTicketPriority } from '../../utils/formatters';
+import api from '../../api/index';
+import { formatDate } from '../../utils/dateUtils';
 
-const TicketHistory = ({ ticketId, language = 'ru' }) => {
+// Функция для получения иконки события
+const getEventIcon = (eventType) => {
+  switch (eventType) {
+    case 'created':
+      return <Edit size={16} color="#4caf50" />;
+    case 'updated':
+      return <Settings size={16} color="#2196f3" />;
+    case 'status_change':
+      return <CheckCircle size={16} color="#ff9800" />;
+    case 'comment_added':
+      return <MessageCircle size={16} color="#9c27b0" />;
+    case 'file_uploaded':
+      return <FileText size={16} color="#795548" />;
+    case 'assigned':
+      return <Users size={16} color="#607d8b" />;
+    case 'email_sent':
+      return <Mail size={16} color="#00bcd4" />;
+    default:
+      return <AlertCircle size={16} color="#9e9e9e" />;
+  }
+};
+
+// Функция для форматирования текста события
+const getEventText = (event) => {
+  switch (event.type) {
+    case 'created':
+      return 'Өтінім жасалды';
+    case 'updated':
+      return `Өтінім жаңартылды: ${event.details?.fields?.join(', ') || 'өзгерістер'}`;
+    case 'status_change':
+      return `Күйі өзгертілді: ${event.details?.from} → ${event.details?.to}`;
+    case 'comment_added':
+      return 'Жаңа пікір қосылды';
+    case 'file_uploaded':
+      return `Файл жүктелді: ${event.details?.filename || 'файл'}`;
+    case 'assigned':
+      return `Тағайындалды: ${event.details?.assignee_name || event.details?.assignee || 'қызметкер'}`;
+    case 'email_sent':
+      return `Email жіберілді: ${event.details?.recipient || 'пайдаланушы'}`;
+    default:
+      return 'Өтінім жаңартылды';
+  }
+};
+
+const TicketHistory = ({ ticketId }) => {
+  const theme = useTheme();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!ticketId) return;
+    
     const fetchHistory = async () => {
       try {
         setLoading(true);
-        const data = await ticketService.getTicketHistory(ticketId);
-        setHistory(data);
+        const response = await api.get(`/tickets/${ticketId}/history`);
+        console.log('История заявки:', response.data);
+        
+        if (response.data && response.data.history) {
+          setHistory(response.data.history);
+        } else if (Array.isArray(response.data)) {
+          setHistory(response.data);
+        } else {
+          setHistory([]);
+        }
+        
+        setError(null);
       } catch (err) {
-        console.error('Error fetching ticket history:', err);
+        console.error('Ошибка при загрузке истории:', err);
         setError('Не удалось загрузить историю заявки');
+        setHistory([]);
       } finally {
         setLoading(false);
       }
     };
-
+    
     fetchHistory();
   }, [ticketId]);
 
-  const getEventIcon = (type) => {
-    switch (type) {
-      case 'status_change': return <Clock size={20} />;
-      case 'assigned': return <User size={20} />;
-      case 'comment': return <MessageSquare size={20} />;
-      case 'file_upload': return <Paperclip size={20} />;
-      case 'file_delete': return <Paperclip size={20} />;
-      case 'created': return <AlertCircle size={20} />;
-      case 'resolved': return <CheckCircle size={20} />;
-      case 'edited': return <Edit size={20} />;
-      case 'priority_change': return <Star size={20} />;
-      case 'deadline_change': return <Flag size={20} />;
-      case 'category_change': return <Tag size={20} />;
-      default: return <Clock size={20} />;
-    }
-  };
-
-  const getEventColor = (type) => {
-    switch (type) {
-      case 'status_change': return 'primary';
-      case 'assigned': return 'info';
-      case 'comment': return 'secondary';
-      case 'file_upload': return 'warning';
-      case 'file_delete': return 'error';
-      case 'created': return 'error';
-      case 'resolved': return 'success';
-      case 'edited': return 'warning';
-      case 'priority_change': return 'warning';
-      case 'deadline_change': return 'warning';
-      case 'category_change': return 'info';
-      default: return 'grey';
-    }
-  };
-
-  const getEventTitle = (event) => {
-    switch (event.type) {
-      case 'status_change':
-        return `Статус изменен на "${formatTicketStatus(event.data.newStatus, language)}"`;
-      case 'assigned':
-        return `Назначен ответственный: ${event.data.assignedTo?.name || 'Неизвестно'}`;
-      case 'comment':
-        return `Добавлен комментарий`;
-      case 'file_upload':
-        return `Загружен файл: ${event.data.fileName || 'Файл'}`;
-      case 'file_delete':
-        return `Удален файл: ${event.data.fileName || 'Файл'}`;
-      case 'created':
-        return `Заявка создана`;
-      case 'resolved':
-        return `Заявка решена`;
-      case 'edited':
-        return `Заявка отредактирована`;
-      case 'priority_change':
-        return `Приоритет изменен на "${formatTicketPriority(event.data.newPriority, language)}"`;
-      case 'deadline_change':
-        return event.data.newDeadline 
-          ? `Установлен дедлайн: ${formatDate(event.data.newDeadline)}` 
-          : `Дедлайн удален`;
-      case 'category_change':
-        return `Категория изменена на "${event.data.newCategory}"`;
-      default:
-        return `Неизвестное событие`;
-    }
-  };
-
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" p={3}>
-        <CircularProgress />
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+        <CircularProgress size={32} />
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box p={2}>
-        <Alert severity="error">{error}</Alert>
-      </Box>
+      <Alert severity="error" sx={{ mb: 2 }}>
+        {error}
+      </Alert>
     );
   }
 
   if (history.length === 0) {
     return (
-      <Box p={2}>
-        <Typography color="textSecondary">
-          История событий пуста
+      <Box 
+        sx={{ 
+          p: 4, 
+          textAlign: 'center', 
+          border: '1px dashed',
+          borderColor: 'divider',
+          borderRadius: 2,
+          bgcolor: alpha(theme.palette.background.default, 0.5)
+        }}
+      >
+        <Typography variant="body1" color="text.secondary" fontWeight={500}>
+          Әзірге тарих жоқ
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          Өтінімді жаңарту, пікір қосу немесе күйін өзгерту кезінде тарих жазбалары пайда болады
         </Typography>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ maxHeight: '500px', overflowY: 'auto', p: 1 }}>
-      <Timeline position="right">
+    <Box>
+      <Typography 
+        variant="h6" 
+        sx={{ 
+          fontWeight: 600,
+          position: 'relative',
+          paddingBottom: '10px',
+          marginBottom: 2,
+          '&:after': {
+            content: '""',
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            width: '40px',
+            height: '3px',
+            backgroundColor: theme.palette.primary.main,
+            borderRadius: '2px'
+          }
+        }}
+      >
+        Өтінім тарихы
+      </Typography>
+
+      <Box sx={{ 
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 16,
+          width: 2,
+          bgcolor: alpha(theme.palette.primary.main, 0.2),
+          zIndex: 0
+        }
+      }}>
         {history.map((event, index) => (
-          <TimelineItem key={event.id || index}>
-            <TimelineSeparator>
-              <TimelineDot color={getEventColor(event.type)}>
-                {getEventIcon(event.type)}
-              </TimelineDot>
-              {index < history.length - 1 && <TimelineConnector />}
-            </TimelineSeparator>
-            <TimelineContent>
-              <Paper elevation={0} variant="outlined" sx={{ p: 2, mb: 2 }}>
-                <Typography variant="subtitle2">
-                  {getEventTitle(event)}
+          <Box 
+            key={event.id || index}
+            sx={{ 
+              display: 'flex', 
+              mb: 2,
+              position: 'relative'
+            }}
+          >
+            <Box 
+              sx={{ 
+                width: 32, 
+                height: 32, 
+                borderRadius: '50%', 
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                zIndex: 1,
+                boxShadow: `0px 0px 0px 4px ${alpha('#fff', 0.7)}`
+              }}
+            >
+              {getEventIcon(event.type)}
+            </Box>
+            
+            <Box 
+              sx={{ 
+                flex: 1, 
+                ml: 2,
+                bgcolor: alpha(theme.palette.background.paper, 0.7),
+                borderRadius: 2,
+                p: 2,
+                boxShadow: `0 2px 8px ${alpha('#000', 0.05)}`
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="body2" fontWeight={600}>
+                  {getEventText(event)}
                 </Typography>
-                
-                {event.data?.description && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    {event.data.description}
-                  </Typography>
-                )}
-                
-                <Box display="flex" justifyContent="space-between" mt={0.5}>
-                  <Typography variant="caption" color="text.secondary">
-                    {event.user ? `${event.user.name}` : 'Система'}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {formatRelativeTime(event.timestamp, language)}
-                  </Typography>
-                </Box>
-              </Paper>
-            </TimelineContent>
-          </TimelineItem>
+                <Chip 
+                  label={formatDate(event.timestamp || event.created_at)} 
+                  size="small"
+                  variant="outlined"
+                  sx={{ fontSize: '0.7rem', height: 20 }}
+                />
+              </Box>
+              
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <User size={14} style={{ marginRight: 4, opacity: 0.7 }} />
+                <Typography variant="caption" color="text.secondary">
+                  {event.performed_by?.name || event.performed_by?.email || 'Система'}
+                </Typography>
+              </Box>
+              
+              {event.details?.notes && (
+                <Typography variant="body2" sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>
+                  {event.details.notes}
+                </Typography>
+              )}
+            </Box>
+          </Box>
         ))}
-      </Timeline>
+      </Box>
     </Box>
   );
 };

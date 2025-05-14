@@ -1,0 +1,94 @@
+{
+  "title": "Dashboard",
+  "moderator": {
+    "title": "Moderator Dashboard"
+  },
+  "welcome": {
+    "greeting": "Welcome, {{name}}",
+    "message": "We are glad to inform you about your login to the system",
+    "morning": "Good morning!",
+    "afternoon": "Good afternoon!",
+    "evening": "Good evening!",
+    "night": "Good night!"
+  },
+  "stats": {
+    "title": "Ticket Statistics",
+    "totalTickets": "Total Tickets",
+    "newTickets": "New Tickets",
+    "inProgressTickets": "In Progress",
+    "pendingTickets": "Pending",
+    "resolvedTickets": "Resolved",
+    "totalAssigned": "Assigned",
+    "totalClients": "Clients",
+    "totalObjects": "Objects",
+    "today": "Today",
+    "week": "Week",
+    "month": "Month"
+  },
+  "performance": {
+    "title": "Performance",
+    "avgResponseTime": "Average Response Time",
+    "currentLoad": "Current Load",
+    "efficiency": "Efficiency Coefficient",
+    "resolved": "Resolved Tickets"
+  },
+  "activity": {
+    "title": "Recent Activity"
+  },
+  "table": {
+    "id": "ID",
+    "subject": "Subject",
+    "status": "Status",
+    "priority": "Priority",
+    "date": "Created Date",
+    "requester": "Requester",
+    "assignedTo": "Assigned To",
+    "actions": "Actions"
+  },
+  "actions": {
+    "view": "View",
+    "edit": "Edit"
+  },
+  "categories": {
+    "repair": "Repair Works",
+    "plumbing": "Plumbing",
+    "electrical": "Electrical",
+    "construction": "Construction",
+    "design": "Design",
+    "consultation": "Consultation",
+    "estimate": "Estimates and Calculations",
+    "materials": "Materials",
+    "warranty": "Warranty Case",
+    "other": "Other"
+  },
+  "status": {
+    "new": "New",
+    "in_progress": "In Progress",
+    "pending": "Pending",
+    "resolved": "Resolved",
+    "closed": "Closed"
+  },
+  "recentTickets": {
+    "title": "Recent Tickets",
+    "noTickets": "No Tickets",
+    "viewAll": "View All",
+    "createNew": "Create Ticket"
+  },
+  "users": {
+    "title": "System Users",
+    "admins": "Administrators",
+    "moderators": "Moderators",
+    "users": "Users",
+    "manage": "Manage Users"
+  },
+  "loading": "Loading data...",
+  "error": "Failed to load dashboard data. Please try again later.",
+  "debug": {
+    "startLoading": "Starting to load dashboard data",
+    "responseReceived": "Response received from API",
+    "processingTickets": "Processing received tickets",
+    "calculatedStats": "Calculated statistics",
+    "noData": "No ticket data, displaying empty list",
+    "loadingError": "Error loading dashboard data"
+  }
+}

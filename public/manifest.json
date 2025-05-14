@@ -1,6 +1,9 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "HelpDesk Admin",
+  "name": "HelpDesk Admin Panel",
+  "description": "Құрылыс Көмегі - Әкімші панелі",
+  "lang": "kk",
+  "dir": "ltr",
   "icons": [
     {
       "src": "favicon.ico",
@@ -16,10 +19,48 @@
       "src": "logo512.png",
       "type": "image/png",
       "sizes": "512x512"
+    },
+    {
+      "src": "maskable_icon.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#1976d2",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "categories": ["business", "productivity"],
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    },
+    {
+      "src": "screenshot2.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Басқару тақтасы",
+      "short_name": "Тақта",
+      "description": "Басқару тақтасына өтіңіз",
+      "url": "/dashboard",
+      "icons": [{ "src": "shortcut-icon1.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Өтініштер",
+      "short_name": "Өтініштер",
+      "description": "Өтініштер тізіміне өтіңіз",
+      "url": "/tickets",
+      "icons": [{ "src": "shortcut-icon2.png", "sizes": "96x96" }]
+    }
+  ]
 }

@@ -1,0 +1,206 @@
+{
+  "list": {
+    "title": "Список обращений",
+    "noTickets": "Нет обращений",
+    "loadingError": "Не удалось загрузить список обращений. Пожалуйста, попробуйте позже.",
+    "loading": "Загрузка обращений...",
+    "searchPlaceholder": "Поиск обращений...",
+    "applyFilters": "Применить фильтры",
+    "resetFilters": "Сбросить фильтры",
+    "showFilters": "Показать фильтры",
+    "hideFilters": "Скрыть фильтры",
+    "advancedFilters": "Расширенные фильтры",
+    "newTicket": "Новое обращение",
+    "refresh": "Обновить",
+    "viewDetails": "Просмотр",
+    "createFirst": "Создать первое обращение",
+    "tableLabel": "Список обращений",
+    "filterButton": "Показать фильтры",
+    "filterApply": "Применить"
+  },
+  "table": {
+    "id": "ID",
+    "subject": "Тема",
+    "status": "Статус",
+    "priority": "Приоритет",
+    "category": "Категория",
+    "type": "Тип",
+    "requester": "Заявитель",
+    "assignee": "Ответственный",
+    "assigned": "Назначено",
+    "assignedTo": "Назначено",
+    "created": "Создано",
+    "createdAt": "Дата создания",
+    "updated": "Обновлено",
+    "dueDate": "Срок",
+    "actions": "Действия",
+    "unknown": "Неизвестно",
+    "notAssigned": "Не назначено"
+  },
+  "filters": {
+    "status": "Статус",
+    "type": "Тип обращения",
+    "category": "Категория",
+    "priority": "Приоритет",
+    "assignee": "Ответственный",
+    "dateRange": "Период",
+    "startDate": "С",
+    "endDate": "По",
+    "all": "Все",
+    "search": "Поиск",
+    "apply": "Применить",
+    "reset": "Сбросить",
+    "show": "Показать фильтры",
+    "hide": "Скрыть фильтры"
+  },
+  "status": {
+    "new": "Новая",
+    "open": "Открыта",
+    "in_progress": "В работе",
+    "pending": "Ожидает",
+    "waiting": "Ожидает",
+    "resolved": "Решена",
+    "closed": "Закрыта",
+    "label": "Статус"
+  },
+  "type": {
+    "construction": "Строительные работы",
+    "repair": "Ремонт и отделка",
+    "breakdown": "Устранение неисправностей",
+    "consultation": "Консультация специалиста",
+    "inspection": "Технический осмотр",
+    "material": "Доставка материалов",
+    "emergency": "Аварийная ситуация",
+    "other": "Другое"
+  },
+  "category": {
+    "foundation": "Фундаментные работы",
+    "framing": "Каркасное строительство",
+    "roofing": "Кровельные работы",
+    "masonry": "Кладочные работы",
+    "plumbing": "Сантехнические работы",
+    "electrical": "Электромонтажные работы",
+    "insulation": "Теплоизоляция",
+    "drywall": "Гипсокартонные работы",
+    "painting": "Малярные работы",
+    "flooring": "Напольные покрытия",
+    "carpentry": "Столярные работы",
+    "windows": "Окна и двери",
+    "landscaping": "Ландшафтные работы",
+    "renovation": "Реконструкция и реставрация",
+    "materials": "Поставка стройматериалов",
+    "equipment": "Строительная техника",
+    "design": "Проектирование и дизайн",
+    "permits": "Разрешения и документация",
+    "inspection": "Технический надзор",
+    "other": "Другое"
+  },
+  "priority": {
+    "low": "Низкий",
+    "medium": "Средний",
+    "high": "Высокий",
+    "urgent": "Срочный"
+  },
+  "pagination": {
+    "rowsPerPage": "Строк на странице:",
+    "of": "из",
+    "displayedRows": "{{from}}-{{to}} из {{count}}"
+  },
+  "footer": {
+    "total": "Всего {{count}} обращений"
+  },
+  "actions": {
+    "view": "Просмотр",
+    "edit": "Редактировать"
+  },
+  "errors": {
+    "loadFailed": "Ошибка при загрузке списка обращений",
+    "createFailed": "Не удалось создать заявку. Пожалуйста, попробуйте позже.",
+    "accessDenied": "У вас нет доступа к этой заявке",
+    "ticketNotFound": "Заявка не найдена"
+  },
+  "create": {
+    "title": "Создание заявки",
+    "back": "Назад",
+    "cancel": "Отмена",
+    "next": "Далее",
+    "submit": "Отправить",
+    "sending": "Отправка...",
+    "success": "Заявка успешно создана! Вы будете перенаправлены на главную страницу.",
+    "typeStep": "Тип заявки",
+    "detailsStep": "Детали заявки",
+    "confirmationStep": "Подтверждение",
+    "ticketType": "Тип заявки",
+    "category": "Категория",
+    "subject": "Тема",
+    "description": "Описание",
+    "priority": "Приоритет",
+    "contactPreference": "Предпочтительный способ связи",
+    "contact": {
+      "email": "Email",
+      "phone": "Телефон"
+    },
+    "verification": {
+      "title": "Проверьте данные вашей заявки",
+      "type": "Тип заявки:",
+      "category": "Категория:",
+      "priority": "Приоритет:",
+      "subject": "Тема:",
+      "contactInfo": "Контактная информация:",
+      "contactMethod": "Способ связи:",
+      "description": "Описание:"
+    },
+    "unknownStep": "Неизвестный шаг"
+  },
+  "files": {
+    "title": "Прикрепленные файлы",
+    "addFile": "Добавить файл",
+    "uploadFile": "Загрузить файл",
+    "uploadSuccess": "Файл(ы) успешно загружены",
+    "uploadError": "Не удалось загрузить файл. Пожалуйста, попробуйте еще раз.",
+    "deleteError": "Не удалось удалить файл. Пожалуйста, попробуйте еще раз.",
+    "uploading": "Загрузка файла...",
+    "noFiles": "Нет прикрепленных файлов",
+    "uploadInstruction": "Нажмите кнопку \"Добавить файл\", чтобы загрузить файлы",
+    "defaultName": "Файл",
+    "download": "Скачать",
+    "delete": "Удалить",
+    "sizeUnknown": "Неизвестно",
+    "sizeBytes": "Б",
+    "sizeKB": "КБ",
+    "sizeMB": "МБ"
+  },
+  "details": {
+    "ticketId": "Заявка #{{id}}",
+    "type": "Тип:",
+    "category": "Категория:",
+    "priority": "Приоритет:",
+    "createdAt": "Дата создания:",
+    "description": "Описание:",
+    "attachments": "Вложения:",
+    "requesterInfo": "Информация о заявителе",
+    "unknownUser": "Неизвестный пользователь",
+    "noData": "Нет данных",
+    "contactPreference": "Предпочтительный способ связи",
+    "phone": "Телефон",
+    "created": "Создано",
+    "assignedTo": "Назначено:"
+  },
+  "tabs": {
+    "discussion": "Обсуждение",
+    "history": "История",
+    "historyComingSoon": "История изменений будет доступна в ближайшее время"
+  },
+  "management": {
+    "title": "Управление заявкой",
+    "status": "Статус:",
+    "priority": "Приоритет:"
+  },
+  "actions": {
+    "saving": "Сохранение...",
+    "saveChanges": "Сохранить изменения"
+  },
+  "alerts": {
+    "saveSuccess": "Изменения успешно сохранены"
+  }
+}

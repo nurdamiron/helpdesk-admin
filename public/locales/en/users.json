@@ -1,0 +1,30 @@
+{
+  "managementTitle": "User Management",
+  "addUser": "Add User",
+  "editUser": "Edit User",
+  "deleteUser": "Delete User",
+  "deleteConfirmation": "Are you sure you want to delete user {{name}}?",
+  "deleteWarning": "This action cannot be undone.",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "email": "Email",
+  "password": "Password",
+  "newPassword": "New Password (leave empty to keep unchanged)",
+  "role": "Role",
+  "name": "Name",
+  "actions": "Actions",
+  "search": "Search users...",
+  "noUsers": "No users found.",
+  "noSearchResults": "No users found. Try changing your search query.",
+  "roles": {
+    "admin": "Administrator",
+    "moderator": "Moderator",
+    "staff": "Staff",
+    "user": "User"
+  },
+  "errors": {
+    "loadFailed": "Failed to load users. Please try again later.",
+    "saveFailed": "Failed to save user. Please try again later.",
+    "deleteFailed": "Failed to delete user. Please try again later."
+  }
+}

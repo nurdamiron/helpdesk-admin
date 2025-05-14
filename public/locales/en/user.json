@@ -1,0 +1,49 @@
+{
+  "dashboard": {
+    "title": "Personal Account",
+    "welcome": "Welcome, {{name}}!",
+    "createTicket": "Create Ticket",
+    "createFirstTicket": "Create First Ticket",
+    "yourTickets": "Your Tickets",
+    "totalTickets": "Total Tickets",
+    "activeTickets": "Active",
+    "resolvedTickets": "Resolved",
+    "recentTickets": "Recent Tickets",
+    "noTickets": "You don't have any tickets yet",
+    "viewAll": "View All",
+    "viewAllTickets": "View All Tickets",
+    "info": {
+      "title": "Information",
+      "createTicketInfo": "To create a new ticket, click the \"Create Ticket\" button. You can track the status of your tickets in the \"Recent Tickets\" section.",
+      "supportContact": "If you have any questions, please contact our support team at: ",
+      "needHelp": "Need Help?"
+    }
+  },
+  "tickets": {
+    "status": {
+      "new": "New",
+      "in_progress": "In Progress",
+      "pending": "Pending",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit"
+    }
+  },
+  "profile": {
+    "personalInfo": "Personal Information",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "updateProfile": "Update Profile",
+    "changePassword": "Change Password"
+  }
+}

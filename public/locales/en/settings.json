@@ -1,0 +1,73 @@
+{
+  "title": "Settings",
+  "description": "Manage system settings and profile",
+  "profile": {
+    "title": "User profile",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "position": "Position",
+    "phone": "Phone",
+    "saveButton": "Save profile",
+    "updating": "Updating...",
+    "updateSuccess": "Profile successfully updated"
+  },
+  "security": {
+    "title": "Security",
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "saveButton": "Save password",
+    "updating": "Updating...",
+    "updateSuccess": "Password successfully updated",
+    "currentPasswordError": "Incorrect current password"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "newTickets": {
+      "title": "New tickets",
+      "description": "Receive notifications when new tickets are created"
+    },
+    "responses": {
+      "title": "Client responses",
+      "description": "Receive notifications when responses come from clients"
+    },
+    "statusChanges": {
+      "title": "Ticket changes",
+      "description": "Receive notifications when ticket status changes"
+    },
+    "weeklyReport": {
+      "title": "Weekly report",
+      "description": "Receive weekly report about tickets"
+    }
+  },
+  "system": {
+    "title": "General settings",
+    "language": {
+      "title": "System language",
+      "kk": "Kazakh",
+      "ru": "Russian",
+      "en": "English"
+    },
+    "timezone": {
+      "title": "Time zone",
+      "almaty": "Almaty (GMT+6)",
+      "astana": "Astana (GMT+6)",
+      "moscow": "Moscow (GMT+3)"
+    },
+    "theme": {
+      "title": "Dark theme",
+      "description": "Use dark theme for interface"
+    },
+    "saveButton": "Save settings",
+    "saving": "Saving...",
+    "saveSuccess": "Settings successfully saved"
+  },
+  "validation": {
+    "required": "This field is required",
+    "emailInvalid": "Please enter a valid email address",
+    "passwordMinLength": "Password must be at least 6 characters long",
+    "passwordMismatch": "Passwords do not match"
+  }
+}

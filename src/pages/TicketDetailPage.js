@@ -1,584 +1,572 @@
-// src/pages/TicketDetailPage.js
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   Box, Grid, Paper, Typography, Chip, Divider, Button,
-  CircularProgress, Alert, useTheme, useMediaQuery, Tab, Tabs
+  CircularProgress, Alert, useTheme, useMediaQuery, Tab, Tabs,
+  List, ListItem, ListItemAvatar, Avatar, ListItemText, TextField
 } from '@mui/material';
 import { 
-  Clock, CheckCircle, AlertCircle, MoreHorizontal, 
-  ArrowLeft, Save, Calendar, Flag, MessageCircle, Edit, User, Send,
-  Building, Briefcase, Tag, Mail, Phone, MessageSquare, PenTool
-} from 'lucide-react';
-
-// Импортируем обновленные сервисы и утилиты
+  ArrowBack, Save, CalendarToday, PriorityHigh,
+  Email, Phone, Message, AttachFile
+} from '@mui/icons-material';
+import { useAuth } from '../contexts/AuthContext';
 import { ticketService } from '../api/ticketService';
-import { formatTicketStatus, formatTicketPriority, formatTicketCategory } from '../utils/formatters';
-
-// Импортируем компоненты
-import TicketInfo from '../components/tickets/TicketInfo';
-import TicketStatusSelect from '../components/tickets/TicketStatusSelect';
-import TicketHistory from '../components/tickets/TicketHistory';
 import TicketChat from '../components/chat/TicketChat';
-import TicketFiles from '../components/tickets/TicketFiles';
-import TicketInternalNotes from '../components/tickets/TicketInternalNotes';
 
-// Константы для выпадающих списков
-const TICKET_STATUSES = [
-  { value: 'new', label: 'Новая' },
-  { value: 'in_review', label: 'На рассмотрении' },
-  { value: 'in_progress', label: 'В работе' },
-  { value: 'pending', label: 'Ожидает' },
-  { value: 'resolved', label: 'Решена' },
-  { value: 'closed', label: 'Закрыта' }
-];
-
-const TICKET_PRIORITIES = [
-  { value: 'low', label: 'Низкий' },
-  { value: 'medium', label: 'Средний' },
-  { value: 'high', label: 'Высокий' },
-  { value: 'urgent', label: 'Срочный' }
-];
-
-const TICKET_TYPES = [
-  { value: 'request', label: 'Запрос' },
-  { value: 'complaint', label: 'Жалоба' },
-  { value: 'suggestion', label: 'Предложение' },
-  { value: 'other', label: 'Другое' }
-];
-
-const TICKET_CATEGORIES = [
-  { value: 'it', label: 'ИТ поддержка' },
-  { value: 'hr', label: 'Кадровые вопросы' },
-  { value: 'facilities', label: 'Инфраструктура' },
-  { value: 'finance', label: 'Финансы' },
-  { value: 'legal', label: 'Юридические вопросы' },
-  { value: 'security', label: 'Безопасность' },
-  { value: 'management', label: 'Руководство' },
-  { value: 'other', label: 'Другое' }
-];
-
+/**
+ * Компонент страницы с деталями заявки
+ * Отображается по-разному в зависимости от роли пользователя
+ */
 const TicketDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { user, isAdmin, isModerator } = useAuth();
+  const { t, i18n } = useTranslation(['tickets', 'common']);
   
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [savingSuccess, setSavingSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [messages, setMessages] = useState([]);
-  const [replyText, setReplyText] = useState('');
-  const [editMode, setEditMode] = useState(false);
-  const [updatedFields, setUpdatedFields] = useState({});
-  const [sendingReply, setSendingReply] = useState(false);
-  const [updating, setUpdating] = useState(false);
-
-  // Получение данных заявки при загрузке компонента
+  const [savingStatus, setSavingStatus] = useState({
+    loading: false,
+    success: false,
+    error: null
+  });
+  
+  // Загрузка данных заявки
   useEffect(() => {
-    const fetchTicketData = async () => {
+    const fetchTicket = async () => {
       try {
         setLoading(true);
-        setError(null);
         
+        // Запрос к API для получения заявки по ID
         const response = await ticketService.getTicketById(id);
-        console.log('Получены данные заявки:', response);
         
-        // Обработка ответа API
-        if (response.ticket) {
-          setTicket(response.ticket);
-          setMessages(response.messages || []);
-        } else if (response.data) {
-          setTicket(response.data);
-        } else {
-          setError('Не удалось получить данные заявки');
+        // Если был получен объект ticket внутри response, используем его
+        const ticketData = response.ticket || response;
+        
+        console.log('Fetched ticket:', ticketData);
+        
+        // Проверка доступа для обычного пользователя - должен видеть только свои заявки
+        if (user && user.role === 'user' && ticketData.requester?.id !== user.id && ticketData.user_id !== user.id) {
+          setError(t('tickets:errors.accessDenied', 'У вас нет доступа к этой заявке'));
+          setLoading(false);
+          return;
         }
+        
+        // Если данные пользователя отсутствуют в запросе, добавляем их из текущего пользователя
+        if ((!ticketData.requester || !ticketData.requester.name) && user) {
+          ticketData.requester = {
+            ...ticketData.requester,
+            name: user.name || user.full_name || user.email,
+            email: user.email,
+            id: user.id
+          };
+        }
+        
+        setTicket(ticketData);
+        setLoading(false);
       } catch (err) {
-        console.error('Ошибка при загрузке заявки:', err);
-        setError('Произошла ошибка при загрузке данных заявки');
-      } finally {
+        console.error('Error fetching ticket:', err);
+        setError('Не удалось загрузить данные заявки: ' + (err.message || 'Неизвестная ошибка'));
         setLoading(false);
       }
     };
-
-    if (id) {
-      fetchTicketData();
-    }
-  }, [id]);
-
-  // Обработчик изменения статуса
-  const handleStatusChange = (newStatus) => {
-    setTicket(prev => ({ ...prev, status: newStatus }));
-  };
-
-  // Обработчик изменения приоритета
-  const handlePriorityChange = (event) => {
-    setTicket(prev => ({ ...prev, priority: event.target.value }));
-  };
-
-  // Сохранение изменений заявки
-  const handleSave = async () => {
-    try {
-      setSaving(true);
-      setError(null);
-      
-      // Подготовка данных для обновления
-      const updateData = {
-        status: ticket.status,
-        priority: ticket.priority
-      };
-      
-      const response = await ticketService.updateTicket(id, updateData);
-      
-      console.log('Ответ API при обновлении:', response);
-      
-      setSavingSuccess(true);
-      
-      // Сбросить сообщение об успехе через 3 секунды
-      setTimeout(() => {
-        setSavingSuccess(false);
-      }, 3000);
-    } catch (err) {
-      console.error('Ошибка при обновлении заявки:', err);
-      setError('Не удалось сохранить изменения. Пожалуйста, попробуйте снова.');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  // Получение иконки статуса
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'new': return <AlertCircle color="#f44336" size={20} />;
-      case 'in_progress': return <Clock color="#2196f3" size={20} />;
-      case 'pending': return <Clock color="#ff9800" size={20} />;
-      case 'resolved': return <CheckCircle color="#4caf50" size={20} />;
-      case 'closed': return <CheckCircle color="#9e9e9e" size={20} />;
-      default: return <MoreHorizontal size={20} />;
-    }
-  };
-
-  // Обработчик смены вкладки
+    
+    fetchTicket();
+  }, [id, user]);
+  
+  // Обработчик изменения активной вкладки
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
-
-  // Handle reply text change
-  const handleReplyChange = (e) => {
-    setReplyText(e.target.value);
-  };
   
-  // Submit reply
-  const handleSubmitReply = async () => {
-    if (!replyText.trim()) return;
-    
-    setSendingReply(true);
-    try {
-      await ticketService.addMessage(id, {
-        content: replyText,
-        sender_type: 'staff'
-      });
-      
-      // Refresh messages
-      const result = await ticketService.getTicket(id);
-      setMessages(result.messages || []);
-      setReplyText('');
-      
-    } catch (err) {
-      console.error('Error sending reply:', err);
-      alert('Не удалось отправить сообщение. Попробуйте позже.');
-    } finally {
-      setSendingReply(false);
-    }
-  };
-  
-  // Toggle edit mode
-  const toggleEditMode = () => {
-    if (editMode) {
-      // Discard changes
-      setUpdatedFields({});
-    } else {
-      // Initialize form with current values
-      setUpdatedFields({
-        status: ticket.status,
-        priority: ticket.priority,
-        category: ticket.category,
-        type: ticket.type,
-        assigned_to: ticket.assigned_to || ''
-      });
-    }
-    setEditMode(!editMode);
-  };
-  
-  // Handle field change in edit mode
-  const handleFieldChange = (e) => {
-    const { name, value } = e.target;
-    setUpdatedFields(prev => ({
+  // Обработчик изменения статуса заявки
+  const handleStatusChange = (event) => {
+    setTicket(prev => ({
       ...prev,
-      [name]: value
+      status: event.target.value
     }));
   };
   
-  // Update ticket
-  const handleUpdateTicket = async () => {
-    setUpdating(true);
+  // Обработчик изменения приоритета заявки
+  const handlePriorityChange = (event) => {
+    setTicket(prev => ({
+      ...prev,
+      priority: event.target.value
+    }));
+  };
+  
+  // Обработчик сохранения изменений
+  const handleSaveChanges = async () => {
     try {
-      await ticketService.updateTicket(id, updatedFields);
+      setSavingStatus({
+        loading: true,
+        success: false,
+        error: null
+      });
       
-      // Refresh ticket details
-      const result = await ticketService.getTicket(id);
-      setTicket(result.ticket);
-      setMessages(result.messages || []);
-      setEditMode(false);
-      setUpdatedFields({});
+      // Подготовка данных для обновления
+      const ticketData = {
+        status: ticket.status,
+        priority: ticket.priority,
+        // Добавляем только необходимые поля, чтобы не перезаписать лишнее
+        metadata: ticket.metadata
+      };
+      
+      // Отправка запроса к API для обновления заявки
+      const response = await ticketService.updateTicket(ticket.id, ticketData);
+      
+      // Обрабатываем успешный ответ
+      console.log('Ticket updated:', response);
+      
+      setSavingStatus({
+        loading: false,
+        success: true,
+        error: null
+      });
+      
+      // Сбрасываем статус успеха через 3 секунды
+      setTimeout(() => {
+        setSavingStatus(prev => ({
+          ...prev,
+          success: false
+        }));
+      }, 3000);
+      
+      // Обновляем данные заявки на странице
+      const updatedTicket = response.ticket || response;
+      setTicket(updatedTicket);
       
     } catch (err) {
-      console.error('Error updating ticket:', err);
-      alert('Не удалось обновить информацию об обращении. Попробуйте позже.');
-    } finally {
-      setUpdating(false);
+      console.error('Error saving ticket:', err);
+      setSavingStatus({
+        loading: false,
+        success: false,
+        error: 'Не удалось сохранить изменения: ' + (err.message || 'Неизвестная ошибка')
+      });
     }
   };
-
+  
+  // Обработчик возврата к списку заявок
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+  
+  // Получение цвета для статуса заявки
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'new': return 'error';
+      case 'in_progress': return 'warning';
+      case 'pending': return 'info';
+      case 'resolved': return 'success';
+      case 'closed': return 'default';
+      default: return 'default';
+    }
+  };
+  
+  // Получение текста для статуса заявки
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'new': return 'Новая';
+      case 'in_progress': return 'В работе';
+      case 'pending': return 'Ожидает';
+      case 'resolved': return 'Решена';
+      case 'closed': return 'Закрыта';
+      default: return status;
+    }
+  };
+  
+  // Получение цвета для приоритета заявки
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'urgent': return 'error';
+      case 'high': return 'warning';
+      case 'medium': return 'info';
+      case 'low': return 'success';
+      default: return 'default';
+    }
+  };
+  
+  // Получение текста для приоритета заявки
+  const getPriorityText = (priority) => {
+    switch (priority) {
+      case 'urgent': return 'Срочный';
+      case 'high': return 'Высокий';
+      case 'medium': return 'Средний';
+      case 'low': return 'Низкий';
+      default: return priority;
+    }
+  };
+  
+  // Форматирование даты с учетом выбранного языка
+  const formatDate = (dateString) => {
+    const currentLang = i18n.language?.substring(0, 2) || 'ru';
+    const locale = currentLang === 'en' ? 'en-US' : (currentLang === 'ru' ? 'ru-RU' : 'kk-KZ');
+    
+    return new Date(dateString).toLocaleString(locale, {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+  
   // Отображение загрузки
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="80vh">
+      <Box display="flex" justifyContent="center" alignItems="center" height="70vh">
         <CircularProgress />
       </Box>
     );
   }
-
+  
   // Отображение ошибки
   if (error) {
     return (
-      <Box m={3}>
+      <Box sx={{ p: 3 }}>
         <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
         <Button 
           variant="outlined" 
-          startIcon={<ArrowLeft />} 
-          onClick={() => navigate('/tickets')}
-          sx={{ mt: 2 }}
+          startIcon={<ArrowBack />} 
+          onClick={handleGoBack}
         >
-          Вернуться к списку заявок
+          {t('common:actions.back', 'Назад')}
         </Button>
       </Box>
     );
   }
-
-  if (!ticket) return null;
-
-  return (
-    <Box p={isMobile ? 2 : 3}>
-      {/* Заголовок страницы */}
-      <Box 
-        sx={{ 
-          mb: 3, 
-          display: 'flex', 
-          flexDirection: isMobile ? 'column' : 'row',
-          alignItems: isMobile ? 'flex-start' : 'center',
-          gap: isMobile ? 2 : 0
-        }}
-      >
+  
+  // Если заявка не найдена
+  if (!ticket) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="warning" sx={{ mb: 2 }}>{t('tickets:errors.ticketNotFound', 'Заявка не найдена')}</Alert>
         <Button 
           variant="outlined" 
-          startIcon={<ArrowLeft />} 
-          onClick={() => navigate('/tickets')}
-          sx={{ mr: isMobile ? 0 : 2 }}
-          fullWidth={isMobile}
+          startIcon={<ArrowBack />} 
+          onClick={handleGoBack}
         >
-          Назад
+          {t('common:actions.back', 'Назад')}
         </Button>
-        <Typography 
-          variant={isMobile ? "h6" : "h5"} 
-          component="h1"
-          sx={{ 
-            whiteSpace: 'normal', 
-            wordBreak: 'break-word' 
-          }}
-        >
-          Заявка #{ticket.id}: {ticket.subject}
-        </Typography>
       </Box>
-
+    );
+  }
+  
+  return (
+    <Box sx={{ p: 3 }}>
+      {/* Верхняя панель */}
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 2,
+          mb: 3 
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Button 
+            variant="outlined" 
+            startIcon={<ArrowBack />} 
+            onClick={handleGoBack}
+          >
+            {t('common:actions.back', 'Назад')}
+          </Button>
+          <Typography variant={isMobile ? 'h6' : 'h5'}>
+            {t('tickets:details.ticketId', 'Заявка #{{id}}', {id: ticket.id})}
+          </Typography>
+          <Chip 
+            label={t(`tickets:status.${ticket.status}`, getStatusText(ticket.status))} 
+            color={getStatusColor(ticket.status)}
+            size={isMobile ? 'small' : 'medium'}
+          />
+        </Box>
+        
+        {/* Кнопка сохранения для админа или модератора */}
+        {(isAdmin || isModerator) && (
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={savingStatus.loading ? <CircularProgress size={20} /> : <Save />}
+            onClick={handleSaveChanges}
+            disabled={savingStatus.loading}
+          >
+            {savingStatus.loading ? t('tickets:actions.saving', 'Сохранение...') : t('tickets:actions.saveChanges', 'Сохранить изменения')}
+          </Button>
+        )}
+      </Box>
+      
       {/* Сообщение об успешном сохранении */}
-      {savingSuccess && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          Изменения успешно сохранены
+      {savingStatus.success && (
+        <Alert severity="success" sx={{ mb: 3 }}>
+          {t('tickets:alerts.saveSuccess', 'Изменения успешно сохранены')}
         </Alert>
       )}
-
-      <Grid container spacing={isMobile ? 2 : 3}>
-        {/* Основная колонка с информацией */}
-        <Grid item xs={12} md={8} order={isMobile ? 2 : 1}>
-          {/* Детали заявки */}
-          <Paper elevation={1} sx={{ p: isMobile ? 2 : 3, mb: isMobile ? 2 : 3 }}>
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                flexDirection: isMobile ? 'column' : 'row',
-                justifyContent: 'space-between', 
-                alignItems: isMobile ? 'flex-start' : 'center',
-                mb: 2, 
-                gap: isMobile ? 2 : 0
-              }}
-            >
-              <Box 
-                sx={{ 
-                  display: 'flex', 
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
-                  gap: 1
-                }}
-              >
-                {getStatusIcon(ticket.status)}
-                <Chip 
-                  label={formatTicketPriority(ticket.priority)} 
-                  color={
-                    ticket.priority === 'urgent' ? 'error' : 
-                    ticket.priority === 'high' ? 'warning' : 
-                    ticket.priority === 'medium' ? 'primary' : 'default'
-                  }
-                  size="small"
-                />
-                <Chip 
-                  label={formatTicketCategory(ticket.category)} 
-                  variant="outlined"
-                  size="small"
-                />
-              </Box>
-              
-              <Button 
-                variant="contained" 
-                color="primary" 
-                startIcon={<Save />}
-                onClick={handleSave}
-                disabled={saving}
-                fullWidth={isMobile}
-              >
-                {saving ? 'Сохранение...' : 'Сохранить'}
-              </Button>
-            </Box>
-
-            {/* Основная информация о заявке */}
-            <TicketInfo ticket={ticket} isMobile={isMobile} />
+      
+      {/* Сообщение об ошибке сохранения */}
+      {savingStatus.error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {savingStatus.error}
+        </Alert>
+      )}
+      
+      <Grid container spacing={3}>
+        {/* Основная информация о заявке */}
+        <Grid item xs={12} md={8}>
+          <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              {ticket.subject}
+            </Typography>
+            
+            <Grid container spacing={2} sx={{ mb: 3 }}>
+              <Grid item xs={6} sm={3}>
+                <Typography variant="body2" color="text.secondary">
+                  {t('tickets:details.type', 'Тип:')}
+                </Typography>
+                <Typography variant="body1">
+                  {t(`tickets:type.${ticket.type}`, ticket.type)}
+                </Typography>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Typography variant="body2" color="text.secondary">
+                  {t('tickets:details.category', 'Категория:')}
+                </Typography>
+                <Typography variant="body1">
+                  {t(`tickets:category.${ticket.category}`, ticket.category)}
+                </Typography>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Typography variant="body2" color="text.secondary">
+                  {t('tickets:details.priority', 'Приоритет:')}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                  <Chip 
+                    label={t(`tickets:priority.${ticket.priority}`, getPriorityText(ticket.priority))}
+                    color={getPriorityColor(ticket.priority)}
+                    size="small"
+                    variant="outlined"
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Typography variant="body2" color="text.secondary">
+                  {t('tickets:details.createdAt', 'Дата создания:')}
+                </Typography>
+                <Typography variant="body1">
+                  {formatDate(ticket.created_at)}
+                </Typography>
+              </Grid>
+            </Grid>
+            
+            <Typography variant="subtitle1" fontWeight={500} gutterBottom>
+              {t('tickets:details.description', 'Описание:')}
+            </Typography>
+            <Typography variant="body1" paragraph style={{ whiteSpace: 'pre-wrap' }}>
+              {ticket.description}
+            </Typography>
+            
+            {ticket.attachments && ticket.attachments.length > 0 && (
+              <>
+                <Typography variant="subtitle1" fontWeight={500} gutterBottom>
+                  {t('tickets:details.attachments', 'Вложения:')}
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                  {ticket.attachments.map((attachment, index) => (
+                    <Chip
+                      key={index}
+                      icon={<AttachFile />}
+                      label={attachment.filename}
+                      variant="outlined"
+                      clickable
+                      component="a"
+                      href={attachment.url}
+                      target="_blank"
+                    />
+                  ))}
+                </Box>
+              </>
+            )}
           </Paper>
-
-          {/* Вкладки - Обсуждение, Файлы, История */}
-          <Paper elevation={1} sx={{ p: isMobile ? 2 : 3 }}>
+          
+          {/* Вкладки с чатом и историей */}
+          <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
               <Tabs 
                 value={activeTab} 
                 onChange={handleTabChange}
                 variant={isMobile ? "scrollable" : "standard"}
-                scrollButtons={isMobile ? "auto" : "standard"}
-                allowScrollButtonsMobile
+                scrollButtons={isMobile ? "auto" : false}
               >
-                <Tab 
-                  label="Обсуждение"
-                  id="tab-0"
-                  aria-controls="tabpanel-0"
-                />
-                <Tab 
-                  label="Файлы"
-                  id="tab-1"
-                  aria-controls="tabpanel-1"
-                />
-                <Tab 
-                  label="История"
-                  id="tab-2"
-                  aria-controls="tabpanel-2"
-                />
+                <Tab label={t('tickets:tabs.discussion', 'Обсуждение')} />
+                <Tab label={t('tickets:tabs.history', 'История')} />
               </Tabs>
             </Box>
             
-            {/* Содержимое вкладок */}
+            {/* Вкладка обсуждения */}
             <TabPanel value={activeTab} index={0}>
               <TicketChat 
                 ticketId={ticket.id}
-                requesterEmail={ticket.requester?.email || ticket.metadata?.requester?.email}
+                messages={ticket.messages}
+                userRole={user?.role}
               />
             </TabPanel>
             
+            {/* Вкладка истории */}
             <TabPanel value={activeTab} index={1}>
-              <TicketFiles 
-                ticketId={ticket.id} 
-                files={ticket.attachments || []}
-              />
-            </TabPanel>
-            
-            <TabPanel value={activeTab} index={2}>
-              <TicketHistory 
-                ticketId={ticket.id}
-              />
+              <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+                {t('tickets:tabs.historyComingSoon', 'История изменений будет доступна в ближайшее время')}
+              </Typography>
             </TabPanel>
           </Paper>
         </Grid>
-
-        {/* Правая колонка - управление заявкой */}
-        <Grid item xs={12} md={4} order={isMobile ? 1 : 2}>
-          <Paper elevation={1} sx={{ p: isMobile ? 2 : 3, mb: isMobile ? 2 : 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Управление заявкой
-            </Typography>
-            
-            <Box mb={3}>
-              <Typography variant="subtitle2" gutterBottom>
-                Статус
+        
+        {/* Боковая панель */}
+        <Grid item xs={12} md={4}>
+          {/* Управление заявкой (только для админа и модератора) */}
+          {(isAdmin || isModerator) && (
+            <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+              <Typography variant="h6" gutterBottom>
+                {t('tickets:management.title', 'Управление заявкой')}
               </Typography>
-              <TicketStatusSelect
-                value={ticket.status}
-                onChange={handleStatusChange}
-              />
-            </Box>
-            
-            <Divider sx={{ my: 2 }} />
-            
-            <Box mb={2}>
-              <Typography variant="subtitle2" gutterBottom>
-                Приоритет
-              </Typography>
-              <select
-                value={ticket.priority || 'medium'}
-                onChange={handlePriorityChange}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  borderRadius: '4px',
-                  border: '1px solid #ccc',
-                  fontSize: '14px'
-                }}
-              >
-                <option value="low">Низкий</option>
-                <option value="medium">Средний</option>
-                <option value="high">Высокий</option>
-                <option value="urgent">Срочный</option>
-              </select>
-            </Box>
-            
-            <Box sx={{ mt: 3 }}>
-              <Button 
-                variant="contained" 
+              
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  {t('tickets:management.status', 'Статус:')}
+                </Typography>
+                <select
+                  value={ticket.status}
+                  onChange={handleStatusChange}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    borderRadius: '4px',
+                    border: '1px solid #ddd',
+                    marginBottom: '16px'
+                  }}
+                >
+                  <option value="new">{t('tickets:status.new', 'Новая')}</option>
+                  <option value="in_progress">{t('tickets:status.in_progress', 'В работе')}</option>
+                  <option value="pending">{t('tickets:status.pending', 'Ожидает')}</option>
+                  <option value="resolved">{t('tickets:status.resolved', 'Решена')}</option>
+                  <option value="closed">{t('tickets:status.closed', 'Закрыта')}</option>
+                </select>
+                
+                <Typography variant="subtitle2" gutterBottom>
+                  {t('tickets:management.priority', 'Приоритет:')}
+                </Typography>
+                <select
+                  value={ticket.priority}
+                  onChange={handlePriorityChange}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    borderRadius: '4px',
+                    border: '1px solid #ddd'
+                  }}
+                >
+                  <option value="low">{t('tickets:priority.low', 'Низкий')}</option>
+                  <option value="medium">{t('tickets:priority.medium', 'Средний')}</option>
+                  <option value="high">{t('tickets:priority.high', 'Высокий')}</option>
+                  <option value="urgent">{t('tickets:priority.urgent', 'Срочный')}</option>
+                </select>
+              </Box>
+              
+              <Button
+                variant="contained"
                 color="primary"
-                startIcon={<Save />}
-                onClick={handleSave}
-                disabled={saving}
                 fullWidth
+                startIcon={savingStatus.loading ? <CircularProgress size={20} /> : <Save />}
+                onClick={handleSaveChanges}
+                disabled={savingStatus.loading}
               >
-                {saving ? 'Сохранение...' : 'Сохранить изменения'}
+                {savingStatus.loading ? t('tickets:actions.saving', 'Сохранение...') : t('tickets:actions.saveChanges', 'Сохранить изменения')}
               </Button>
-            </Box>
-          </Paper>
-
-          <Paper elevation={1} sx={{ p: isMobile ? 2 : 3 }}>
+            </Paper>
+          )}
+          
+          {/* Информация о пользователе */}
+          <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom>
-              Внутренние заметки
+              {t('tickets:details.requesterInfo', 'Информация о заявителе')}
             </Typography>
-            <TicketInternalNotes ticketId={ticket.id} notes={ticket.internalNotes || []} />
+            
+            <List disablePadding>
+              <ListItem sx={{ px: 0 }}>
+                <ListItemAvatar>
+                  <Avatar>{ticket.requester?.name?.charAt(0) || user?.name?.charAt(0) || 'U'}</Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={ticket.requester?.name || ticket.requester?.full_name || user?.name || user?.full_name || user?.email || t('tickets:details.unknownUser', 'Неизвестный пользователь')}
+                  secondary={ticket.requester?.email || user?.email || ''}
+                />
+              </ListItem>
+            </List>
+            
+            <Box sx={{ mt: 2 }}>
+              {ticket.requester?.phone && (
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Phone fontSize="small" sx={{ mr: 1, opacity: 0.6 }} />
+                  <Typography variant="body2">
+                    {ticket.requester.phone}
+                  </Typography>
+                </Box>
+              )}
+              
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <Email fontSize="small" sx={{ mr: 1, opacity: 0.6 }} />
+                <Typography variant="body2">
+                  {ticket.requester?.email || t('tickets:details.noData', 'Нет данных')}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <Message fontSize="small" sx={{ mr: 1, opacity: 0.6 }} />
+                <Typography variant="body2">
+                  {t('tickets:details.contactPreference', 'Предпочтительный способ связи')}: {ticket.metadata?.contactPreference === 'email' ? 'Email' : t('tickets:details.phone', 'Телефон')}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <CalendarToday fontSize="small" sx={{ mr: 1, opacity: 0.6 }} />
+                <Typography variant="body2">
+                  {t('tickets:details.created', 'Создано')}: {formatDate(ticket.created_at)}
+                </Typography>
+              </Box>
+            </Box>
+            
+            {ticket.assigned_user && (
+              <Box sx={{ mt: 3 }}>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="subtitle1" gutterBottom>
+                  {t('tickets:details.assignedTo', 'Назначено:')}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Avatar sx={{ width: 32, height: 32, mr: 1 }}>
+                    {ticket.assigned_user.name?.charAt(0) || 'M'}
+                  </Avatar>
+                  <Typography variant="body2">
+                    {ticket.assigned_user.name || ticket.assigned_user.email}
+                  </Typography>
+                </Box>
+              </Box>
+            )}
           </Paper>
         </Grid>
       </Grid>
-
-      {/* Messages/communication */}
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-          <MessageCircle size={20} style={{ marginRight: 8 }} />
-          Переписка
-        </Typography>
-        
-        <Box sx={{ mb: 3 }}>
-          {messages.length > 0 ? (
-            <List>
-              {messages.map((message, index) => (
-                <React.Fragment key={message.id || index}>
-                  <ListItem alignItems="flex-start">
-                    <ListItemAvatar>
-                      <Avatar>
-                        {message.sender_type === 'requester' ? 
-                          'С' : message.sender_type === 'staff' ? 'A' : 'S'}
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={
-                        <Typography
-                          sx={{ display: 'flex', justifyContent: 'space-between' }}
-                          component="div"
-                        >
-                          <span>
-                            {message.sender_type === 'requester' ? 'Сотрудник' : 
-                             message.sender_type === 'staff' ? 'Администратор' : 'Система'}
-                            {message.sender_name && ` - ${message.sender_name}`}
-                          </span>
-                          <Typography variant="body2" color="text.secondary">
-                            {formatDate(message.created_at)}
-                          </Typography>
-                        </Typography>
-                      }
-                      secondary={
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          color="text.primary"
-                          sx={{ 
-                            display: 'inline',
-                            whiteSpace: 'pre-wrap'
-                          }}
-                        >
-                          {message.content}
-                        </Typography>
-                      }
-                    />
-                  </ListItem>
-                  {index < messages.length - 1 && <Divider variant="inset" component="li" />}
-                </React.Fragment>
-              ))}
-            </List>
-          ) : (
-            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-              Пока нет сообщений
-            </Typography>
-          )}
-        </Box>
-        
-        {/* Reply form */}
-        <Box>
-          <Typography variant="subtitle1" gutterBottom>
-            Ответить
-          </Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={3}
-            placeholder="Введите ваше сообщение..."
-            value={replyText}
-            onChange={handleReplyChange}
-            variant="outlined"
-            sx={{ mb: 2 }}
-          />
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button
-              variant="contained"
-              color="primary"
-              endIcon={<Send size={16} />}
-              disabled={!replyText.trim() || sendingReply}
-              onClick={handleSubmitReply}
-            >
-              {sendingReply ? 'Отправка...' : 'Отправить'}
-            </Button>
-          </Box>
-        </Box>
-      </Paper>
     </Box>
   );
 };
 
-// Компонент для отображения содержимого вкладок
-function TabPanel(props) {
+// Компонент для вкладок
+const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
-
+  
   return (
     <div
       role="tabpanel"
@@ -587,9 +575,13 @@ function TabPanel(props) {
       aria-labelledby={`tab-${index}`}
       {...other}
     >
-      {value === index && <Box>{children}</Box>}
+      {value === index && (
+        <Box sx={{ pt: 2 }}>
+          {children}
+        </Box>
+      )}
     </div>
   );
-}
+};
 
 export default TicketDetailPage;

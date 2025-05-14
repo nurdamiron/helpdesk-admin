@@ -1,314 +1,419 @@
 // src/components/tickets/TicketFiles.js
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
+  Button,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   IconButton,
-  Tooltip,
-  Button,
-  Dialog,
+  Divider,
   CircularProgress,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Paper,
+  Alert,
+  Tooltip,
   Grid,
   Card,
-  CardContent,
-  CardActions,
-  Alert
+  useTheme,
+  alpha
 } from '@mui/material';
 import {
-  FileText,
-  Image,
-  FileArchive,
-  FilePlus,
-  Download,
-  X,
-  Eye,
-  Trash2,
-  Upload,
-  File
+  File as FileIcon,
+  Image as ImageIcon,
+  FileText as FileTextIcon,
+  Download as DownloadIcon,
+  Upload as UploadIcon,
+  Trash2 as TrashIcon,
+  Plus as PlusIcon,
+  AlertCircle,
+  CheckCircle,
+  Calendar
 } from 'lucide-react';
-import { ticketService } from '../../api/ticketService';
+
+import api from '../../api/index';
 import { formatDate } from '../../utils/dateUtils';
-import { formatFileSize } from '../../utils/formatters';
+
+// Функция для определения типа файла
+const getFileIcon = (fileName) => {
+  if (!fileName) return <FileIcon size={20} />;
+  
+  const extension = fileName.split('.').pop().toLowerCase();
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
+  const documentExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'rtf', 'odt'];
+  
+  if (imageExtensions.includes(extension)) {
+    return <ImageIcon size={20} color="#4caf50" />;
+  } else if (documentExtensions.includes(extension)) {
+    return <FileTextIcon size={20} color="#2196f3" />;
+  }
+  
+  return <FileIcon size={20} color="#ff9800" />;
+};
+
+// Функция для форматирования размера файла
+const formatFileSize = (bytes, t) => {
+  if (!bytes || isNaN(bytes)) return t('tickets:files.sizeUnknown', 'Неизвестно');
+  
+  if (bytes < 1024) return bytes + ' ' + t('tickets:files.sizeBytes', 'Б');
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' ' + t('tickets:files.sizeKB', 'КБ');
+  return (bytes / (1024 * 1024)).toFixed(2) + ' ' + t('tickets:files.sizeMB', 'МБ');
+};
 
 const TicketFiles = ({ ticketId, files = [] }) => {
-  const [uploadLoading, setUploadLoading] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewFile, setPreviewFile] = useState(null);
+  const { t } = useTranslation(['tickets', 'common']);
+  const theme = useTheme();
+  const fileInputRef = useRef(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [localFiles, setLocalFiles] = useState(files);
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [attachments, setAttachments] = useState(files);
+  const [preview, setPreview] = useState(null);
 
-  // Функция загрузки файла
-  const handleFileUpload = async (event) => {
+  // Обработчик добавления файла
+  const handleAddFile = () => {
+    fileInputRef.current.click();
+  };
+
+  // Обработчик изменения файла
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    
+    setUploading(true);
+    setError(null);
+    setSuccess(false);
+    
     try {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      setUploadLoading(true);
-      setError(null);
-      setSuccess(null);
-
-      const response = await ticketService.uploadFile(ticketId, file);
+      const formData = new FormData();
+      files.forEach((file, index) => {
+        formData.append(`files[${index}]`, file);
+      });
       
-      // Добавляем загруженный файл в список
-      setLocalFiles([...localFiles, response]);
-      setSuccess('Файл успешно загружен');
-
-      // Сбросить сообщение об успехе через 3 секунды
-      setTimeout(() => setSuccess(null), 3000);
+      // Имитация прогресса загрузки
+      const interval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 95) {
+            clearInterval(interval);
+            return 95;
+          }
+          return prev + 5;
+        });
+      }, 100);
+      
+      const response = await api.post(`/tickets/${ticketId}/attachments`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(percentCompleted);
+        }
+      });
+      
+      clearInterval(interval);
+      setUploadProgress(100);
+      
+      // Обновление списка вложений
+      const newAttachments = response.data.attachments || response.data;
+      setAttachments(prev => [...prev, ...newAttachments]);
+      setSuccess(true);
+      
+      // Сброс формы через 2 секунды
+      setTimeout(() => {
+        setUploading(false);
+        setUploadProgress(0);
+        setSuccess(false);
+        e.target.value = null;
+      }, 2000);
+      
     } catch (err) {
-      setError('Не удалось загрузить файл');
-      console.error('Error uploading file:', err);
-    } finally {
-      setUploadLoading(false);
-      
-      // Сбрасываем значение input для возможности выбора того же файла снова
-      event.target.value = '';
+      console.error('Ошибка при загрузке файла:', err);
+      setError(t('tickets:files.uploadError', 'Не удалось загрузить файл. Пожалуйста, попробуйте еще раз.'));
+      setUploading(false);
+      setUploadProgress(0);
+      e.target.value = null;
     }
   };
 
-  // Открыть предпросмотр файла
+  // Обработчик удаления файла
+  const handleDeleteFile = async (fileId) => {
+    try {
+      await api.delete(`/tickets/${ticketId}/attachments/${fileId}`);
+      setAttachments(prev => prev.filter(file => file.id !== fileId));
+    } catch (err) {
+      console.error('Ошибка при удалении файла:', err);
+      setError(t('tickets:files.deleteError', 'Не удалось удалить файл. Пожалуйста, попробуйте еще раз.'));
+    }
+  };
+
+  // Обработчик предпросмотра изображения
   const handlePreview = (file) => {
-    setPreviewFile(file);
-    setPreviewOpen(true);
-  };
-
-  // Закрыть предпросмотр файла
-  const handleClosePreview = () => {
-    setPreviewOpen(false);
-    setPreviewFile(null);
-  };
-
-  // Удалить файл
-  const handleDelete = async (fileId) => {
-    try {
-      setDeleteLoading(true);
-      setError(null);
-      setSuccess(null);
-
-      await ticketService.deleteFile(ticketId, fileId);
-      
-      // Удаляем файл из списка
-      setLocalFiles(localFiles.filter(file => file.id !== fileId));
-      setSuccess('Файл успешно удален');
-
-      // Сбросить сообщение об успехе через 3 секунды
-      setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
-      setError('Не удалось удалить файл');
-      console.error('Error deleting file:', err);
-    } finally {
-      setDeleteLoading(false);
+    const extension = file.filename?.split('.').pop().toLowerCase();
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
+    
+    if (imageExtensions.includes(extension)) {
+      setPreview(file);
     }
   };
 
-  // Определить иконку файла по типу
-  const getFileIcon = (fileType) => {
-    switch (true) {
-      case fileType.startsWith('image/'):
-        return <Image size={24} />;
-      case fileType === 'application/pdf':
-        return <FileText size={24} />;
-      case fileType === 'application/zip':
-      case fileType === 'application/x-zip-compressed':
-      case fileType === 'application/x-rar-compressed':
-        return <FileArchive size={24} />;
-      default:
-        return <File size={24} />;
-    }
-  };
-
-  // Проверить, возможен ли предпросмотр файла
-  const canPreview = (fileType) => {
-    return fileType.startsWith('image/') || fileType === 'application/pdf';
+  // Закрытие предпросмотра
+  const closePreview = () => {
+    setPreview(null);
   };
 
   return (
     <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6">Файлы заявки ({localFiles.length})</Typography>
-        <Box>
-          <input
-            type="file"
-            id="file-upload"
-            style={{ display: 'none' }}
-            onChange={handleFileUpload}
-          />
-          <label htmlFor="file-upload">
-            <Button
-              variant="contained"
-              component="span"
-              startIcon={uploadLoading ? <CircularProgress size={20} /> : <Upload />}
-              disabled={uploadLoading}
-            >
-              Загрузить файл
-            </Button>
-          </label>
-        </Box>
+      {/* Заголовок */}
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        mb: 2 
+      }}>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            fontWeight: 600,
+            position: 'relative',
+            paddingBottom: '10px',
+            '&:after': {
+              content: '""',
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              width: '40px',
+              height: '3px',
+              backgroundColor: theme.palette.primary.main,
+              borderRadius: '2px'
+            }
+          }}
+        >
+          {t('tickets:files.title', 'Прикрепленные файлы')}
+        </Typography>
+        
+        <Button
+          variant="outlined"
+          startIcon={<PlusIcon size={16} />}
+          onClick={handleAddFile}
+          disabled={uploading}
+          size="small"
+          sx={{ fontWeight: 500 }}
+        >
+          {t('tickets:files.addFile', 'Добавить файл')}
+        </Button>
+        
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+          multiple
+        />
       </Box>
-
-      {/* Сообщения об ошибках и успехе */}
+      
+      {/* Сообщения об ошибке или успехе */}
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
       )}
-
+      
       {success && (
         <Alert severity="success" sx={{ mb: 2 }}>
-          {success}
+          {t('tickets:files.uploadSuccess', 'Файл(ы) успешно загружены')}
         </Alert>
       )}
-
+      
+      {/* Индикатор загрузки */}
+      {uploading && (
+        <Box sx={{ mb: 2, p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ width: '100%', mr: 1 }}>
+              <Typography variant="body2" fontWeight={500}>
+                {t('tickets:files.uploading', 'Загрузка файла...')} {uploadProgress}%
+              </Typography>
+              <Box sx={{ 
+                width: '100%', 
+                height: 4, 
+                bgcolor: '#e0e0e0',
+                borderRadius: 1,
+                mt: 0.5
+              }}>
+                <Box sx={{ 
+                  width: `${uploadProgress}%`, 
+                  height: '100%', 
+                  bgcolor: theme.palette.primary.main,
+                  borderRadius: 1,
+                  transition: 'width 0.3s ease'
+                }} />
+              </Box>
+            </Box>
+            <CircularProgress 
+              variant="determinate" 
+              value={uploadProgress} 
+              size={24} 
+            />
+          </Box>
+        </Box>
+      )}
+      
       {/* Список файлов */}
-      {localFiles.length === 0 ? (
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          py={4}
-          bgcolor="background.paper"
-          border={1}
-          borderColor="divider"
-          borderRadius={1}
+      {attachments.length === 0 ? (
+        <Box 
+          sx={{ 
+            p: 4, 
+            textAlign: 'center', 
+            border: '1px dashed',
+            borderColor: 'divider',
+            borderRadius: 2,
+            bgcolor: alpha(theme.palette.background.default, 0.5)
+          }}
         >
-          <FilePlus size={48} color="#9e9e9e" />
-          <Typography color="textSecondary" mt={2}>
-            К этой заявке пока не прикреплено ни одного файла
+          <Typography variant="body1" color="text.secondary" fontWeight={500}>
+            {t('tickets:files.noFiles', 'Нет прикрепленных файлов')}
           </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            {t('tickets:files.uploadInstruction', 'Нажмите кнопку "Добавить файл", чтобы загрузить файлы')}
+          </Typography>
+          <Button
+            variant="outlined"
+            startIcon={<UploadIcon size={16} />}
+            onClick={handleAddFile}
+            sx={{ mt: 2, fontWeight: 500 }}
+          >
+            {t('tickets:files.uploadFile', 'Загрузить файл')}
+          </Button>
         </Box>
       ) : (
         <Grid container spacing={2}>
-          {localFiles.map((file) => (
-            <Grid item xs={12} sm={6} md={4} key={file.id}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Box display="flex" alignItems="center" mb={1}>
-                    {getFileIcon(file.type)}
-                    <Typography variant="subtitle2" ml={1} noWrap>
-                      {file.name}
+          {attachments.map((file) => (
+            <Grid item xs={12} sm={6} md={4} key={file.id || file.filename}>
+              <Card 
+                sx={{ 
+                  p: 2,
+                  borderRadius: 2,
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  '&:hover': {
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
+                  }
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Box sx={{ mr: 1 }}>
+                    {getFileIcon(file.filename)}
+                  </Box>
+                  <Box sx={{ flex: 1, overflow: 'hidden' }}>
+                    <Typography 
+                      variant="body2" 
+                      fontWeight={500}
+                      sx={{ 
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {file.filename || t('tickets:files.defaultName', 'Файл')}
+                    </Typography>
+                  </Box>
+                </Box>
+                
+                <Box sx={{ mt: 'auto' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+                    <Calendar size={14} style={{ marginRight: '4px', opacity: 0.7 }} />
+                    <Typography variant="caption" color="text.secondary">
+                      {formatDate(file.created_at || new Date())}
                     </Typography>
                   </Box>
                   
-                  <Typography variant="caption" color="textSecondary" display="block">
-                    Размер: {formatFileSize(file.size)}
-                  </Typography>
-                  
-                  <Typography variant="caption" color="textSecondary" display="block">
-                    Загружен: {formatDate(file.uploadedAt)}
-                  </Typography>
-                  
-                  <Typography variant="caption" color="textSecondary" display="block" noWrap>
-                    Кем: {file.uploadedBy && file.uploadedBy.name ? file.uploadedBy.name : 'Система'}
-                  </Typography>
-                </CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography variant="caption" color="text.secondary">
+                      {formatFileSize(file.size, t)}
+                    </Typography>
+                  </Box>
+                </Box>
                 
-                <CardActions sx={{ justifyContent: 'flex-end' }}>
-                  {canPreview(file.type) && (
-                    <Tooltip title="Предпросмотр">
-                      <IconButton size="small" onClick={() => handlePreview(file)}>
-                        <Eye size={18} />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                  
-                  <Tooltip title="Скачать">
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, gap: 1 }}>
+                  <Tooltip title={t('tickets:files.download', 'Скачать')}>
                     <IconButton 
-                      size="small" 
-                      href={file.url} 
-                      download={file.name}
+                      size="small"
+                      component="a"
+                      href={file.url}
+                      download
                       target="_blank"
+                      sx={{ 
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        '&:hover': {
+                          bgcolor: alpha(theme.palette.primary.main, 0.2)
+                        }
+                      }}
                     >
-                      <Download size={18} />
+                      <DownloadIcon size={16} />
                     </IconButton>
                   </Tooltip>
                   
-                  <Tooltip title="Удалить">
+                  <Tooltip title={t('tickets:files.delete', 'Удалить')}>
                     <IconButton 
-                      size="small" 
-                      onClick={() => handleDelete(file.id)}
-                      disabled={deleteLoading}
+                      size="small"
+                      onClick={() => handleDeleteFile(file.id)}
+                      sx={{ 
+                        bgcolor: alpha(theme.palette.error.main, 0.1),
+                        '&:hover': {
+                          bgcolor: alpha(theme.palette.error.main, 0.2)
+                        }
+                      }}
                     >
-                      {deleteLoading ? <CircularProgress size={18} /> : <Trash2 size={18} />}
+                      <TrashIcon size={16} color={theme.palette.error.main} />
                     </IconButton>
                   </Tooltip>
-                </CardActions>
+                </Box>
               </Card>
             </Grid>
           ))}
         </Grid>
       )}
-
-      {/* Диалог предпросмотра */}
-      <Dialog
-        open={previewOpen}
-        onClose={handleClosePreview}
-        maxWidth="md"
-        fullWidth
-      >
-        {previewFile && (
-          <>
-            <DialogTitle>
-              <Box display="flex" justifyContent="space-between" alignItems="center">
-                {previewFile.name}
-                <IconButton onClick={handleClosePreview}>
-                  <X size={20} />
-                </IconButton>
-              </Box>
-            </DialogTitle>
-            <DialogContent>
-              {previewFile.type.startsWith('image/') ? (
-                <Box 
-                  component="img" 
-                  src={previewFile.url} 
-                  alt={previewFile.name}
-                  sx={{ 
-                    maxWidth: '100%', 
-                    maxHeight: '70vh',
-                    display: 'block',
-                    margin: '0 auto'
-                  }}
-                />
-              ) : previewFile.type === 'application/pdf' ? (
-                <Box 
-                  component="iframe" 
-                  src={previewFile.url}
-                  sx={{ 
-                    width: '100%', 
-                    height: '70vh', 
-                    border: 'none'
-                  }}
-                />
-              ) : (
-                <Typography>
-                  Предпросмотр для этого типа файлов недоступен
-                </Typography>
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button 
-                href={previewFile.url} 
-                download={previewFile.name}
-                target="_blank"
-                variant="contained"
-                startIcon={<Download />}
-              >
-                Скачать
-              </Button>
-              <Button onClick={handleClosePreview}>Закрыть</Button>
-            </DialogActions>
-          </>
-        )}
-      </Dialog>
+      
+      {/* Предпросмотр изображения */}
+      {preview && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            bgcolor: 'rgba(0, 0, 0, 0.8)',
+            zIndex: 1300,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 2
+          }}
+          onClick={closePreview}
+        >
+          <Box
+            component="img"
+            src={preview.url}
+            alt={preview.filename}
+            sx={{
+              maxWidth: '90%',
+              maxHeight: '90%',
+              objectFit: 'contain',
+              borderRadius: 1,
+              bgcolor: 'white',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)'
+            }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

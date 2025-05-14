@@ -1,6 +1,7 @@
 // src/components/common/AppLayout.js
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   AppBar,
@@ -27,6 +28,9 @@ import Sidebar from './Sidebar';
 import Breadcrumbs from './Breadcrumbs';
 import { useAuth } from '../../contexts/AuthContext';
 import { ticketService } from '../../api/ticketService';
+import LanguageSwitcher from './LanguageSwitcher.js';
+import HelpDeskLogo from '../../assets/images/logo.jsx';
+import PageTransition from './PageTransition';
 
 const AppLayout = () => {
   const theme = useTheme();
@@ -35,6 +39,7 @@ const AppLayout = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   const { user, logout } = useAuth();
+  const { t } = useTranslation(['common']);
   
   // State for mobile sidebar
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -62,13 +67,13 @@ const AppLayout = () => {
           const data = await ticketService.getTicket(ticketId);
           setTicketInfo(data);
         } catch (err) {
-          console.error('Error fetching ticket info for breadcrumbs:', err);
+          console.error(t('errors.ticketInfo', 'Ошибка при загрузке информации о заявке:'), err);
         }
       };
       
       fetchTicketInfo();
     }
-  }, [ticketId, ticketInfo]);
+  }, [ticketId, ticketInfo, t]);
   
   // Clear ticket info when navigating away
   useEffect(() => {
@@ -110,6 +115,13 @@ const AppLayout = () => {
   // Sidebar component (responsive)
   const sidebarContent = <Sidebar />;
 
+  // Пример уведомлений (в реальном приложении должны загружаться с сервера)
+  const notifications = [
+    { id: 1, title: t('notifications.example1', 'Новое обращение #124'), time: t('time.minutesAgo', {count: 5}, '5 минут назад') },
+    { id: 2, title: t('notifications.example2', 'Ответ клиента по обращению #120'), time: t('time.minutesAgo', {count: 15}, '15 минут назад') },
+    { id: 3, title: t('notifications.example3', 'Напоминание: срок обращения #115'), time: t('time.hoursAgo', {count: 1}, '1 час назад') }
+  ];
+
   return (
     <Box sx={{ display: 'flex' }}>
       {/* App Bar */}
@@ -129,7 +141,7 @@ const AppLayout = () => {
           {isMobile && (
             <IconButton
               color="inherit"
-              aria-label="open drawer"
+              aria-label={t('aria.openMenu', 'Открыть меню')}
               edge="start"
               onClick={handleDrawerToggle}
               sx={{ mr: 2 }}
@@ -139,28 +151,32 @@ const AppLayout = () => {
           )}
           
           {/* App title */}
-          <Typography 
-            variant="h6" 
-            noWrap 
-            component="div"
+          <Box 
             sx={{ 
               flexGrow: 1,
+              display: 'flex',
+              alignItems: 'center',
               color: theme.palette.text.primary 
             }}
           >
-            Строительная компания — HelpDesk
-          </Typography>
+            <HelpDeskLogo width={isMobile ? 120 : 140} height={40} />
+          </Box>
+          
+          {/* Language switcher */}
+          <Box sx={{ mr: 2 }}>
+            <LanguageSwitcher />
+          </Box>
           
           {/* Notification button */}
           <IconButton
             color="inherit"
-            aria-label="notifications"
+            aria-label={t('notifications.title', 'Уведомления')}
             aria-controls={openNotifications ? 'notifications-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={openNotifications ? 'true' : undefined}
             onClick={handleNotificationOpen}
           >
-            <Badge badgeContent={3} color="error">
+            <Badge badgeContent={notifications.length} color="error">
               <Bell size={22} />
             </Badge>
           </IconButton>
@@ -171,6 +187,7 @@ const AppLayout = () => {
             aria-controls={openUserMenu ? 'user-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={openUserMenu ? 'true' : undefined}
+            aria-label={t('auth.profile', 'Профиль')}
             sx={{ ml: 1 }}
           >
             <Avatar 
@@ -230,8 +247,10 @@ const AppLayout = () => {
           />
         </Container>
         
-        {/* Page content */}
+        {/* Page content with animation */}
+        <PageTransition transitionKey={location.pathname + location.search}>
         <Outlet />
+        </PageTransition>
       </Box>
       
       {/* User Menu */}
@@ -248,12 +267,12 @@ const AppLayout = () => {
       >
         <MenuItem onClick={handleUserMenuClose}>
           <User size={16} style={{ marginRight: 8 }} />
-          Профиль
+          {t('auth.profile', 'Профиль')}
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleLogout}>
           <LogOut size={16} style={{ marginRight: 8 }} />
-          Выйти
+          {t('auth.logout', 'Выход')}
         </MenuItem>
       </Menu>
       
@@ -276,29 +295,29 @@ const AppLayout = () => {
         }}
       >
         <Box sx={{ p: 2, borderBottom: '1px solid #eee' }}>
-          <Typography variant="subtitle1">Уведомления (3)</Typography>
+          <Typography variant="subtitle1">
+            {t('notifications.title', 'Уведомления')} ({notifications.length})
+          </Typography>
         </Box>
-        <MenuItem onClick={handleNotificationClose}>
-          <Box sx={{ py: 1 }}>
-            <Typography variant="body2" fontWeight={500}>Новая заявка #124</Typography>
-            <Typography variant="caption" color="text.secondary">5 минут назад</Typography>
-          </Box>
-        </MenuItem>
-        <MenuItem onClick={handleNotificationClose}>
-          <Box sx={{ py: 1 }}>
-            <Typography variant="body2" fontWeight={500}>Ответ от клиента в заявке #120</Typography>
-            <Typography variant="caption" color="text.secondary">15 минут назад</Typography>
-          </Box>
-        </MenuItem>
-        <MenuItem onClick={handleNotificationClose}>
-          <Box sx={{ py: 1 }}>
-            <Typography variant="body2" fontWeight={500}>Напоминание: дедлайн заявки #115</Typography>
-            <Typography variant="caption" color="text.secondary">1 час назад</Typography>
-          </Box>
-        </MenuItem>
+        
+        {notifications.map((notification) => (
+          <MenuItem key={notification.id} onClick={handleNotificationClose}>
+            <Box sx={{ py: 1 }}>
+              <Typography variant="body2" fontWeight={500}>
+                {notification.title}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {notification.time}
+              </Typography>
+            </Box>
+          </MenuItem>
+        ))}
+        
         <Divider />
         <MenuItem onClick={handleNotificationClose} sx={{ justifyContent: 'center' }}>
-          <Typography variant="body2" color="primary">Все уведомления</Typography>
+          <Typography variant="body2" color="primary">
+            {t('notifications.all', 'Все уведомления')}
+          </Typography>
         </MenuItem>
       </Menu>
     </Box>

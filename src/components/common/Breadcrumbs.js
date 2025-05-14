@@ -1,6 +1,6 @@
-// src/components/common/Breadcrumbs.js
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   Breadcrumbs as MuiBreadcrumbs, 
   Typography, 
@@ -22,20 +22,21 @@ const Breadcrumbs = ({ ticketId, ticketSubject }) => {
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { t } = useTranslation(['common']);
   
   // Function to get proper path label and icon
   const getPathDetails = (path) => {
     switch(path) {
       case 'dashboard':
-        return { label: 'Главная', icon: <Home size={16} /> };
+        return { label: t('nav.dashboard', 'Панель мониторинга'), icon: <Home size={16} /> };
       case 'tickets':
-        return { label: 'Заявки', icon: <TicketCheck size={16} /> };
+        return { label: t('nav.tickets', 'Обращения'), icon: <TicketCheck size={16} /> };
       case 'settings':
-        return { label: 'Настройки', icon: <Settings size={16} /> };
+        return { label: t('nav.settings', 'Настройки'), icon: <Settings size={16} /> };
       case 'help':
-        return { label: 'Помощь', icon: <HelpCircle size={16} /> };
+        return { label: t('nav.help', 'Справка'), icon: <HelpCircle size={16} /> };
       case 'profile':
-        return { label: 'Профиль', icon: <User size={16} /> };
+        return { label: t('auth.profile', 'Профиль'), icon: <User size={16} /> };
       default:
         if (ticketId && path === ticketId) {
           return { 
@@ -44,7 +45,7 @@ const Breadcrumbs = ({ ticketId, ticketSubject }) => {
                 `#${ticketId}: ${ticketSubject.substring(0, 20)}${ticketSubject.length > 20 ? '...' : ''}` : 
                 `#${ticketId}: ${ticketSubject}`
               ) : 
-              `Заявка #${ticketId}`, 
+              t('tickets.ticketNumber', 'Обращение #{{number}}', { number: ticketId }), 
             icon: null 
           };
         }
@@ -64,7 +65,7 @@ const Breadcrumbs = ({ ticketId, ticketSubject }) => {
     <Box sx={{ mb: 2, mt: 1 }}>
       <MuiBreadcrumbs 
         separator={<ChevronRight size={14} />} 
-        aria-label="breadcrumb"
+        aria-label={t('aria.breadcrumbs', 'навигационная цепочка')}
       >
         {/* Home link always shown */}
         <MuiLink 
@@ -79,7 +80,7 @@ const Breadcrumbs = ({ ticketId, ticketSubject }) => {
           }}
         >
           <Home size={16} style={{ marginRight: '4px' }} />
-          {!isMobile && <Typography variant="body2">Главная</Typography>}
+          {!isMobile && <Typography variant="body2">{t('nav.dashboard', 'Панель мониторинга')}</Typography>}
         </MuiLink>
         
         {/* Path segments */}
@@ -128,4 +129,4 @@ const Breadcrumbs = ({ ticketId, ticketSubject }) => {
   );
 };
 
-export default Breadcrumbs;
+export default Breadcrumbs; 

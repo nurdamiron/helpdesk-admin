@@ -1,0 +1,143 @@
+{
+  "app": {
+    "title": "HelpDesk Admin",
+    "description": "Admin Panel"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "tickets": "Tickets",
+    "settings": "Settings",
+    "users": "Users",
+    "reports": "Reports",
+    "help": "Help"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "rememberMe": "Remember me",
+    "loginButton": "Login",
+    "loginError": "Incorrect email or password",
+    "account": "Account",
+    "profile": "Profile"
+  },
+  "language": {
+    "en": "English",
+    "ru": "Russian",
+    "kk": "Kazakh",
+    "select": "Select language"
+  },
+  "errors": {
+    "loadFailed": "Failed to load data",
+    "loginFailed": "Login failed",
+    "serverError": "Server error",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Access denied",
+    "apiError": "API Error"
+  },
+  "actions": {
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "edit": "Edit",
+    "view": "View",
+    "add": "Add",
+    "create": "Create",
+    "update": "Update",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "reset": "Reset",
+    "refresh": "Refresh",
+    "upload": "Upload",
+    "download": "Download",
+    "export": "Export",
+    "assign": "Assign",
+    "resolve": "Resolve",
+    "reopen": "Reopen"
+  },
+  "status": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information",
+    "loading": "Loading...",
+    "notFound": "Not Found",
+    "accessDenied": "Access Denied"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "minLength": "Please enter at least {{min}} characters",
+    "maxLength": "Please enter no more than {{max}} characters",
+    "passwordMatch": "Passwords do not match",
+    "invalid": "Invalid value"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "new": "New notification",
+    "all": "All notifications",
+    "mark_read": "Mark as read",
+    "empty": "No new notifications",
+    "example1": "New ticket #124",
+    "example2": "Client response on ticket #120",
+    "example3": "Reminder: deadline for ticket #115"
+  },
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "days": "Days",
+    "weeks": "Weeks",
+    "months": "Months",
+    "years": "Years",
+    "ago": "{{time}} ago",
+    "in": "in {{time}}",
+    "hoursAgo": "{{count}} hours ago",
+    "minutesAgo": "{{count}} minutes ago"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "tickets": {
+      "new": "New tickets",
+      "inProgress": "In progress",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "statistics": {
+      "title": "Statistics",
+      "today": "Today",
+      "week": "Week",
+      "month": "Month"
+    }
+  },
+  "roles": {
+    "admin": "Administrator",
+    "moderator": "Moderator",
+    "staff": "Staff",
+    "user": "User"
+  },
+  "header": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "help": "Help"
+  },
+  "footer": {
+    "copyright": "© {{year}} Construction Company HelpDesk. All rights reserved.",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "contact": "Contact"
+  },
+  "rowsPerPage": "Rows per page:",
+  "of": "of",
+  "copyright": "All rights reserved."
+}

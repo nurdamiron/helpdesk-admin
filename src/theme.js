@@ -1,53 +1,48 @@
 // src/theme.js
 import { createTheme } from '@mui/material/styles';
 
-// Цветовая схема, подходящая для строительной компании
+// Create a theme instance.
 const theme = createTheme({
   palette: {
+    mode: 'light',
     primary: {
-      main: '#1e88e5', // Синий - основной цвет
-      light: '#5eb8ff',
-      dark: '#005cb2',
-      contrastText: '#ffffff',
+      main: '#1976d2',
+      light: '#42a5f5',
+      dark: '#1565c0',
+      contrastText: '#fff',
     },
     secondary: {
-      main: '#ff8f00', // Оранжевый - вторичный цвет (как стройка)
-      light: '#ffc046',
-      dark: '#c56000',
-      contrastText: '#000000',
+      main: '#9c27b0',
+      light: '#ba68c8',
+      dark: '#7b1fa2',
+      contrastText: '#fff',
     },
     error: {
       main: '#d32f2f',
-      light: '#ff6659',
-      dark: '#9a0007',
     },
     warning: {
-      main: '#ff9800',
-      light: '#ffc947',
-      dark: '#c66900',
+      main: '#ffa000',
     },
     info: {
       main: '#29b6f6',
-      light: '#73e8ff',
-      dark: '#0086c3',
     },
     success: {
-      main: '#4caf50',
-      light: '#80e27e',
-      dark: '#087f23',
+      main: '#66bb6a',
     },
     background: {
       default: '#f5f5f5',
       paper: '#ffffff',
     },
     text: {
-      primary: '#263238',
-      secondary: '#546e7a',
+      primary: '#212121',
+      secondary: '#757575',
     },
   },
   typography: {
     fontFamily: [
       'Roboto',
+      '-apple-system',
+      'BlinkMacSystemFont',
       '"Segoe UI"',
       'Arial',
       'sans-serif',
@@ -55,100 +50,105 @@ const theme = createTheme({
     h1: {
       fontSize: '2.5rem',
       fontWeight: 500,
+      lineHeight: 1.2,
+      '@media (max-width:600px)': {
+        fontSize: '2rem',
+      },
     },
     h2: {
       fontSize: '2rem',
       fontWeight: 500,
+      lineHeight: 1.3,
+      '@media (max-width:600px)': {
+        fontSize: '1.75rem',
+      },
     },
     h3: {
       fontSize: '1.75rem',
       fontWeight: 500,
+      lineHeight: 1.4,
+      '@media (max-width:600px)': {
+        fontSize: '1.5rem',
+      },
     },
     h4: {
       fontSize: '1.5rem',
       fontWeight: 500,
+      lineHeight: 1.5,
+      '@media (max-width:600px)': {
+        fontSize: '1.25rem',
+      },
     },
     h5: {
       fontSize: '1.25rem',
       fontWeight: 500,
+      lineHeight: 1.5,
+      '@media (max-width:600px)': {
+        fontSize: '1.1rem',
+      },
     },
     h6: {
-      fontSize: '1rem',
+      fontSize: '1.125rem',
       fontWeight: 500,
+      lineHeight: 1.6,
+      '@media (max-width:600px)': {
+        fontSize: '1rem',
+      },
     },
     subtitle1: {
       fontSize: '1rem',
-      fontWeight: 400,
+      lineHeight: 1.75,
     },
     subtitle2: {
       fontSize: '0.875rem',
       fontWeight: 500,
+      lineHeight: 1.57,
     },
     body1: {
       fontSize: '1rem',
-      fontWeight: 400,
+      lineHeight: 1.5,
     },
     body2: {
       fontSize: '0.875rem',
-      fontWeight: 400,
+      lineHeight: 1.43,
     },
     button: {
+      fontSize: '0.875rem',
       fontWeight: 500,
-      textTransform: 'none', // Без преобразования текста в верхний регистр
+      lineHeight: 1.75,
+      textTransform: 'none',
+    },
+    caption: {
+      fontSize: '0.75rem',
+      lineHeight: 1.66,
+    },
+    overline: {
+      fontSize: '0.75rem',
+      fontWeight: 500,
+      lineHeight: 2.66,
+      textTransform: 'uppercase',
     },
   },
-  shape: {
-    borderRadius: 8, // Скругление углов элементов
-  },
-  shadows: [
-    'none',
-    '0px 2px 1px -1px rgba(0,0,0,0.1),0px 1px 1px 0px rgba(0,0,0,0.07),0px 1px 3px 0px rgba(0,0,0,0.06)',
-    '0px 3px 1px -2px rgba(0,0,0,0.1),0px 2px 2px 0px rgba(0,0,0,0.07),0px 1px 5px 0px rgba(0,0,0,0.06)',
-    '0px 3px 3px -2px rgba(0,0,0,0.1),0px 3px 4px 0px rgba(0,0,0,0.07),0px 1px 8px 0px rgba(0,0,0,0.06)',
-    '0px 2px 4px -1px rgba(0,0,0,0.1),0px 4px 5px 0px rgba(0,0,0,0.07),0px 1px 10px 0px rgba(0,0,0,0.06)',
-    '0px 3px 5px -1px rgba(0,0,0,0.1),0px 5px 8px 0px rgba(0,0,0,0.07),0px 1px 14px 0px rgba(0,0,0,0.06)',
-    '0px 3px 5px -1px rgba(0,0,0,0.1),0px 6px 10px 0px rgba(0,0,0,0.07),0px 1px 18px 0px rgba(0,0,0,0.06)',
-    '0px 4px 5px -2px rgba(0,0,0,0.1),0px 7px 10px 1px rgba(0,0,0,0.07),0px 2px 16px 1px rgba(0,0,0,0.06)',
-    '0px 5px 5px -3px rgba(0,0,0,0.1),0px 8px 10px 1px rgba(0,0,0,0.07),0px 3px 14px 2px rgba(0,0,0,0.06)',
-    '0px 5px 6px -3px rgba(0,0,0,0.1),0px 9px 12px 1px rgba(0,0,0,0.07),0px 3px 16px 2px rgba(0,0,0,0.06)',
-    '0px 6px 6px -3px rgba(0,0,0,0.1),0px 10px 14px 1px rgba(0,0,0,0.07),0px 4px 18px 3px rgba(0,0,0,0.06)',
-    '0px 6px 7px -4px rgba(0,0,0,0.1),0px 11px 15px 1px rgba(0,0,0,0.07),0px 4px 20px 3px rgba(0,0,0,0.06)',
-    '0px 7px 8px -4px rgba(0,0,0,0.1),0px 12px 17px 2px rgba(0,0,0,0.07),0px 5px 22px 4px rgba(0,0,0,0.06)',
-    '0px 7px 8px -4px rgba(0,0,0,0.1),0px 13px 19px 2px rgba(0,0,0,0.07),0px 5px 24px 4px rgba(0,0,0,0.06)',
-    '0px 7px 9px -4px rgba(0,0,0,0.1),0px 14px 21px 2px rgba(0,0,0,0.07),0px 5px 26px 4px rgba(0,0,0,0.06)',
-    '0px 8px 9px -5px rgba(0,0,0,0.1),0px 15px 22px 2px rgba(0,0,0,0.07),0px 6px 28px 5px rgba(0,0,0,0.06)',
-    '0px 8px 10px -5px rgba(0,0,0,0.1),0px 16px 24px 2px rgba(0,0,0,0.07),0px 6px 30px 5px rgba(0,0,0,0.06)',
-    '0px 8px 11px -5px rgba(0,0,0,0.1),0px 17px 26px 2px rgba(0,0,0,0.07),0px 6px 32px 5px rgba(0,0,0,0.06)',
-    '0px 9px 11px -5px rgba(0,0,0,0.1),0px 18px 28px 2px rgba(0,0,0,0.07),0px 7px 34px 6px rgba(0,0,0,0.06)',
-    '0px 9px 12px -6px rgba(0,0,0,0.1),0px 19px 29px 2px rgba(0,0,0,0.07),0px 7px 36px 6px rgba(0,0,0,0.06)',
-    '0px 10px 13px -6px rgba(0,0,0,0.1),0px 20px 31px 3px rgba(0,0,0,0.07),0px 8px 38px 7px rgba(0,0,0,0.06)',
-    '0px 10px 13px -6px rgba(0,0,0,0.1),0px 21px 33px 3px rgba(0,0,0,0.07),0px 8px 40px 7px rgba(0,0,0,0.06)',
-    '0px 10px 14px -6px rgba(0,0,0,0.1),0px 22px 35px 3px rgba(0,0,0,0.07),0px 8px 42px 7px rgba(0,0,0,0.06)',
-    '0px 11px 14px -7px rgba(0,0,0,0.1),0px 23px 36px 3px rgba(0,0,0,0.07),0px 9px 44px 8px rgba(0,0,0,0.06)',
-    '0px 11px 15px -7px rgba(0,0,0,0.1),0px 24px 38px 3px rgba(0,0,0,0.07),0px 9px 46px 8px rgba(0,0,0,0.06)',
-  ],
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
           borderRadius: 8,
-          padding: '8px 16px',
-        },
-        containedPrimary: {
-          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-          '&:hover': {
-            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.15)',
+          textTransform: 'none',
+          '&.MuiButton-containedPrimary:hover': {
+            backgroundColor: '#1565c0',
           },
+        },
+        sizeLarge: {
+          padding: '10px 22px',
+          fontSize: '1rem',
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
-        rounded: {
+        root: {
           borderRadius: 8,
-        },
-        elevation1: {
-          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05)',
         },
       },
     },
@@ -156,47 +156,78 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 8,
-          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05)',
-          overflow: 'hidden',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
         },
       },
     },
-    MuiChip: {
+    MuiCardHeader: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
-          fontWeight: 500,
+          padding: '16px 24px',
+        },
+      },
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: '24px',
+          '&:last-child': {
+            paddingBottom: '24px',
+          },
         },
       },
     },
     MuiTableCell: {
       styleOverrides: {
-        head: {
-          fontWeight: 600,
-          backgroundColor: '#f7fafc',
+        root: {
+          padding: '12px 16px',
+          '@media (max-width:600px)': {
+            padding: '8px 10px',
+          },
         },
       },
     },
     MuiTableRow: {
       styleOverrides: {
         root: {
-          '&:hover': {
-            backgroundColor: '#f7fafc',
+          '&:last-child td': {
+            borderBottom: 0,
           },
         },
       },
     },
-    MuiDrawer: {
+    MuiTableContainer: {
       styleOverrides: {
-        paper: {
-          boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+        root: {
+          overflow: 'auto',
+          '@media (max-width:600px)': {
+            maxWidth: '100%',
+          },
         },
       },
     },
-    MuiAppBar: {
+    MuiTab: {
       styleOverrides: {
         root: {
-          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+          fontWeight: 500,
+          minWidth: 'auto',
+          '&.Mui-selected': {
+            color: '#1976d2',
+          },
+        },
+      },
+    },
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          paddingLeft: {
+            xs: 16,
+            sm: 24,
+          },
+          paddingRight: {
+            xs: 16,
+            sm: 24,
+          },
         },
       },
     },
@@ -209,35 +240,52 @@ const theme = createTheme({
         },
       },
     },
-    MuiListItem: {
+    MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
-          '&.Mui-selected': {
-            backgroundColor: '#e3f2fd',
-            '&:hover': {
-              backgroundColor: '#e3f2fd',
-            },
+          borderRadius: 16,
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          '@media (max-width:600px)': {
+            fontSize: '0.875rem',
           },
         },
       },
     },
-    MuiTab: {
+    MuiFormLabel: {
       styleOverrides: {
         root: {
-          textTransform: 'none',
-          fontWeight: 500,
-        },
-      },
-    },
-    MuiAlert: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
+          '@media (max-width:600px)': {
+            fontSize: '0.875rem',
+          },
         },
       },
     },
   },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 960,
+      lg: 1280,
+      xl: 1920,
+    },
+  },
+  shape: {
+    borderRadius: 8,
+  },
+  shadows: [
+    'none',
+    '0px 1px 3px 0px rgba(0,0,0,0.08),0px 1px 1px 0px rgba(0,0,0,0.04),0px 2px 1px -1px rgba(0,0,0,0.02)',
+    '0px 1px 5px 0px rgba(0,0,0,0.08),0px 2px 2px 0px rgba(0,0,0,0.04),0px 3px 1px -2px rgba(0,0,0,0.02)',
+    '0px 1px 8px 0px rgba(0,0,0,0.08),0px 3px 4px 0px rgba(0,0,0,0.04),0px 3px 3px -2px rgba(0,0,0,0.02)',
+    '0px 2px 4px -1px rgba(0,0,0,0.08),0px 4px 5px 0px rgba(0,0,0,0.04),0px 1px 10px 0px rgba(0,0,0,0.02)',
+    // Остальные тени (5-24) остаются стандартными MUI
+  ],
 });
 
 export default theme;

@@ -1,235 +1,219 @@
 // src/pages/HelpPage.js
-import React from 'react';
+import React, { useState } from 'react';
 import { 
+  Box, 
   Container, 
   Typography, 
   Paper, 
-  Accordion, 
-  AccordionSummary, 
-  AccordionDetails,
-  Box,
   Button,
+  Grid, 
+  Card, 
+  CardContent, 
+  CardActions,
   Divider,
-  Card,
-  CardContent,
-  Grid,
-  TextField,
-  Link
+  Alert
 } from '@mui/material';
-import {
-  HelpCircle,
-  ChevronDown,
-  FileText,
-  Video,
-  MessageCircle,
-  Mail,
-  Phone,
-  ExternalLink
-} from 'lucide-react';
+import { Info, AlertTriangle, FileText, MessageCircle, Mail, ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useErrorHandler } from '../components/common/ErrorHandler';
+import { usePermission } from '../hooks/usePermission';
 
 const HelpPage = () => {
-  return (
-    <Container maxWidth="lg">
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" component="h1">
-          Помощь
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Руководство пользователя и часто задаваемые вопросы
-        </Typography>
-      </Box>
+  const { t } = useTranslation(['help', 'common']);
+  const { showError, showErrorModal } = useErrorHandler();
+  const { canViewAnalytics } = usePermission();
+  const [testSuccess, setTestSuccess] = useState(false);
+  
+  // Функция для тестирования отображения обычной ошибки
+  const handleTestError = () => {
+    showError(t('help:testErrorMessage', 'Это тестовое сообщение об ошибке'));
+    setTestSuccess(true);
+  };
+  
+  // Функция для тестирования отображения модальной ошибки
+  const handleTestErrorModal = () => {
+    showErrorModal(
+      t('help:testModalTitle', 'Тестовая ошибка'), 
+      t('help:testModalMessage', 'Это тестовое модальное окно с ошибкой'),
+      { stack: 'Error: Test error\n  at HelpPage.handleTestErrorModal' }
+    );
+    setTestSuccess(true);
+  };
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, mb: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Часто задаваемые вопросы
-            </Typography>
-            
-            <Accordion>
-              <AccordionSummary expandIcon={<ChevronDown />}>
-                <Typography>Как создать новую заявку?</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>
-                  Для создания новой заявки перейдите в раздел "Заявки" и нажмите кнопку "Создать заявку". 
-                  Заполните все необходимые поля формы и нажмите "Сохранить". После этого заявка появится 
-                  в общем списке заявок со статусом "Новая".
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-            
-            <Accordion>
-              <AccordionSummary expandIcon={<ChevronDown />}>
-                <Typography>Как назначить ответственного за заявку?</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>
-                  Откройте детальную страницу заявки. В правой панели управления найдите поле "Ответственный". 
-                  Выберите сотрудника из выпадающего списка и нажмите кнопку "Сохранить изменения" внизу панели.
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-            
-            <Accordion>
-              <AccordionSummary expandIcon={<ChevronDown />}>
-                <Typography>Как изменить статус заявки?</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>
-                  Откройте детальную страницу заявки. В правой панели управления найдите поле "Статус". 
-                  Выберите нужный статус из выпадающего списка и нажмите кнопку "Сохранить изменения".
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-            
-            <Accordion>
-              <AccordionSummary expandIcon={<ChevronDown />}>
-                <Typography>Как прикрепить файл к заявке?</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>
-                  Откройте детальную страницу заявки. Перейдите на вкладку "Файлы". Нажмите кнопку 
-                  "Загрузить файл" и выберите файл на вашем компьютере. После загрузки файл появится 
-                  в списке вложений заявки.
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-            
-            <Accordion>
-              <AccordionSummary expandIcon={<ChevronDown />}>
-                <Typography>Как добавить комментарий к заявке?</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>
-                  Откройте детальную страницу заявки. На вкладке "Обсуждение" вы увидите форму для отправки 
-                  сообщений. Введите текст сообщения и нажмите кнопку "Отправить". Ваше сообщение появится 
-                  в чате заявки и будет видно всем участникам.
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-          </Paper>
-          
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Связаться с технической поддержкой
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            
-            <Typography variant="body1" paragraph>
-              Если у вас возникли вопросы или проблемы при работе с системой, вы можете обратиться в нашу службу поддержки.
-            </Typography>
-            
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Тема обращения"
-                  variant="outlined"
-                  size="small"
-                  margin="normal"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Описание проблемы"
-                  variant="outlined"
-                  size="small"
-                  margin="normal"
-                  multiline
-                  rows={4}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                  <Button 
-                    variant="contained" 
-                    startIcon={<Mail />}
-                  >
-                    Отправить обращение
-                  </Button>
-                </Box>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
+  return (
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Paper sx={{ p: { xs: 2, md: 4 } }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          {t('help:title', 'Справка и руководство')}
+        </Typography>
         
-        <Grid item xs={12} md={4}>
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <FileText size={20} style={{ marginRight: 10 }} />
-                <Typography variant="h6">Руководство пользователя</Typography>
-              </Box>
-              <Typography variant="body2" paragraph>
-                Полное руководство по использованию системы Helpdesk для строительной компании.
-              </Typography>
+        <Typography variant="body1" paragraph>
+          {t('help:description', 'Здесь вы найдете информацию о работе с системой HelpDesk и ответы на часто задаваемые вопросы.')}
+        </Typography>
+        
+        {testSuccess && (
+          <Alert severity="success" sx={{ my: 2 }}>
+            {t('help:testSuccess', 'Тестирование системы уведомлений прошло успешно')}
+          </Alert>
+        )}
+        
+        <Divider sx={{ my: 3 }} />
+        
+        <Typography variant="h5" gutterBottom>
+          {t('help:testSectionTitle', 'Тестирование системы')}
+                </Typography>
+        
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="body1" paragraph>
+            {t('help:testSectionDescription', 'Здесь вы можете протестировать работу различных компонентов системы.')}
+                </Typography>
+          
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <Grid item>
+              <Button 
+                  variant="outlined"
+                color="primary" 
+                onClick={handleTestError}
+                startIcon={<AlertTriangle size={18} />}
+                  >
+                {t('help:testError', 'Тест уведомления')}
+                  </Button>
+            </Grid>
+            <Grid item>
               <Button 
                 variant="outlined" 
-                startIcon={<ExternalLink />}
-                fullWidth
+                color="error" 
+                onClick={handleTestErrorModal}
+                startIcon={<AlertTriangle size={18} />}
               >
-                Открыть руководство
+                {t('help:testErrorModal', 'Тест модальной ошибки')}
               </Button>
+            </Grid>
+          </Grid>
+        </Box>
+        
+        <Divider sx={{ my: 3 }} />
+        
+        <Typography variant="h5" gutterBottom>
+          {t('help:topicsTitle', 'Разделы справки')}
+        </Typography>
+        
+        <Grid container spacing={3} sx={{ mt: 1 }}>
+          <Grid item xs={12} md={6}>
+            <Card variant="outlined">
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                  <FileText size={24} color={canViewAnalytics() ? '#1e88e5' : '#757575'} />
+                  <Typography variant="h6" sx={{ ml: 1.5 }}>
+                    {t('help:topic1Title', 'Работа с заявками')}
+                  </Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary">
+                  {t('help:topic1Description', 'Создание, просмотр и управление заявками в системе.')}
+                </Typography>
             </CardContent>
+              <CardActions>
+                <Button size="small">{t('help:readMore', 'Подробнее')}</Button>
+              </CardActions>
           </Card>
+          </Grid>
           
-          <Card sx={{ mb: 3 }}>
+          <Grid item xs={12} md={6}>
+            <Card variant="outlined">
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Video size={20} style={{ marginRight: 10 }} />
-                <Typography variant="h6">Видео-инструкции</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                  <MessageCircle size={24} color="#1e88e5" />
+                  <Typography variant="h6" sx={{ ml: 1.5 }}>
+                    {t('help:topic2Title', 'Коммуникация с клиентами')}
+                  </Typography>
               </Box>
-              <Typography variant="body2" paragraph>
-                Обучающие видео по работе с системой поддержки клиентов.
+                <Typography variant="body2" color="text.secondary">
+                  {t('help:topic2Description', 'Общение с клиентами, отправка уведомлений и управление сообщениями.')}
               </Typography>
-              <Box sx={{ mb: 2 }}>
-                <Link href="#" underline="none">
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <ChevronDown size={14} style={{ transform: 'rotate(-90deg)', marginRight: 8 }} />
-                    <Typography variant="body2">Создание и обработка заявок</Typography>
-                  </Box>
-                </Link>
-                <Link href="#" underline="none">
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <ChevronDown size={14} style={{ transform: 'rotate(-90deg)', marginRight: 8 }} />
-                    <Typography variant="body2">Работа с клиентами</Typography>
-                  </Box>
-                </Link>
-                <Link href="#" underline="none">
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <ChevronDown size={14} style={{ transform: 'rotate(-90deg)', marginRight: 8 }} />
-                    <Typography variant="body2">Отчеты и аналитика</Typography>
-                  </Box>
-                </Link>
-              </Box>
             </CardContent>
+              <CardActions>
+                <Button size="small">{t('help:readMore', 'Подробнее')}</Button>
+              </CardActions>
           </Card>
+          </Grid>
           
-          <Card>
+          <Grid item xs={12} md={6}>
+            <Card variant="outlined">
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <MessageCircle size={20} style={{ marginRight: 10 }} />
-                <Typography variant="h6">Контакты поддержки</Typography>
-              </Box>
-              <Box sx={{ mb: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <Mail size={16} style={{ marginRight: 8 }} />
-                  <Typography variant="body2">support@helpdesk.ru</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                  <Info size={24} color="#1e88e5" />
+                  <Typography variant="h6" sx={{ ml: 1.5 }}>
+                    {t('help:topic3Title', 'Часто задаваемые вопросы')}
+                  </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <Phone size={16} style={{ marginRight: 8 }} />
-                  <Typography variant="body2">+7 (495) 123-45-67</Typography>
-                </Box>
+                <Typography variant="body2" color="text.secondary">
+                  {t('help:topic3Description', 'Ответы на наиболее популярные вопросы пользователей системы.')}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button size="small">{t('help:readMore', 'Подробнее')}</Button>
+              </CardActions>
+            </Card>
+          </Grid>
+          
+          <Grid item xs={12} md={6}>
+            <Card variant="outlined">
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                  <Mail size={24} color="#1e88e5" />
+                  <Typography variant="h6" sx={{ ml: 1.5 }}>
+                    {t('help:topic4Title', 'Обратная связь')}
+                  </Typography>
               </Box>
               <Typography variant="body2" color="text.secondary">
-                Время работы: Пн-Пт с 9:00 до 18:00
+                  {t('help:topic4Description', 'Свяжитесь с нами для получения дополнительной помощи или предложений по улучшению.')}
               </Typography>
             </CardContent>
+              <CardActions>
+                <Button size="small">{t('help:readMore', 'Подробнее')}</Button>
+              </CardActions>
           </Card>
         </Grid>
       </Grid>
+        
+        <Box sx={{ mt: 4, p: 3, bgcolor: '#f8f9fa', borderRadius: 1 }}>
+          <Typography variant="subtitle1" gutterBottom fontWeight={500}>
+            {t('help:additionalResources', 'Дополнительные ресурсы')}
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+            <Button 
+              variant="text" 
+              color="primary" 
+              startIcon={<ExternalLink size={16} />}
+              href="https://helpdesk-docs.example.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('help:documentation', 'Документация')}
+            </Button>
+            <Button 
+              variant="text" 
+              color="primary" 
+              startIcon={<ExternalLink size={16} />}
+              href="https://helpdesk-training.example.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('help:training', 'Обучающие материалы')}
+            </Button>
+            <Button 
+              variant="text" 
+              color="primary" 
+              startIcon={<ExternalLink size={16} />}
+              href="https://helpdesk-support.example.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('help:support', 'Техническая поддержка')}
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
     </Container>
   );
 };
