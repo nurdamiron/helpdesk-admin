@@ -1,8 +1,9 @@
 // src/api/index.js
 import axios from 'axios';
 
-// Базовый URL для API
+// Базовый URL для API - explicitly use env var or fallback
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5002/api';
+console.log('Using API URL:', API_URL); // Debug log for API URL
 
 // Отключить использование мокового сервиса
 export const USE_MOCK_DATA = false;
@@ -13,6 +14,8 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Add CORS settings
+  withCredentials: false,
 });
 
 // Добавляем перехватчик запросов для добавления токена авторизации

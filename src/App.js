@@ -1,7 +1,7 @@
 // src/App.js
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { ThemeProvider, CssBaseline } from '@mui/material';
+import { ThemeProvider, CssBaseline, Box, Typography } from '@mui/material';
 import { SnackbarProvider } from 'notistack';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -78,11 +78,40 @@ function App() {
       meta.setAttribute('content', t('app.description', 'Система обработки заявок и обращений'));
       document.head.appendChild(meta);
     }
+    
+    // Log the current API URL for debugging
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('API URL:', process.env.REACT_APP_API_URL);
   }, [i18n.language, t]);
   
+  // Environment indicator for development
+  const EnvIndicator = () => {
+    if (process.env.NODE_ENV !== 'development') return null;
+    
+    return (
+      <Box 
+        sx={{ 
+          position: 'fixed', 
+          bottom: 0, 
+          right: 0, 
+          bgcolor: 'warning.main', 
+          color: 'warning.contrastText',
+          zIndex: 9999,
+          px: 1,
+          py: 0.5,
+          fontSize: '10px',
+          opacity: 0.8
+        }}
+      >
+        API: {process.env.REACT_APP_API_URL || 'Default'}
+      </Box>
+    );
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <EnvIndicator />
       <SnackbarProvider maxSnack={3} autoHideDuration={5000}>
         <AuthProvider>
           <ErrorProvider>

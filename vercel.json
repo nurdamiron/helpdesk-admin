@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "installCommand": "npm install --legacy-peer-deps",
+        "buildCommand": "CI=false npm run build"
+      }
+    }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/.*", "dest": "/index.html" }
+  ],
+  "env": {
+    "REACT_APP_API_URL": "https://helpdesk-backend-ycoo.onrender.com/api"
+  }
+}

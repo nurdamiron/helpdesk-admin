@@ -6,7 +6,7 @@ const HelpDeskLogo = ({ width = 180, height = 60 }) => {
   return (
     <Box
       component="img"
-      src="/logo.svg"
+      src="/images/logo.png"
       alt="HelpDesk Logo"
       sx={{
         width: width,
