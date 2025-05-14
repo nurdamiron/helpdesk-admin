@@ -12,6 +12,7 @@
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
     "@testing-library/user-event": "^13.5.0",
+    "ajv": "^8.12.0",
     "axios": "^1.8.2",
     "i18next": "^24.0.0",
     "i18next-browser-languagedetector": "^7.2.0",
@@ -41,8 +42,8 @@
   "scripts": {
     "start": "react-scripts start",
     "start:prod": "REACT_APP_ENV=production react-scripts start",
-    "build": "node pre-build.js && CI=false REACT_APP_ENV=production react-scripts build",
-    "build:dev": "node pre-build.js && CI=false REACT_APP_ENV=development react-scripts build",
+    "build": "CI=false REACT_APP_ENV=production react-scripts build",
+    "build:dev": "CI=false REACT_APP_ENV=development react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "postinstall": "echo 'Running with legacy peer deps' && npm ls"

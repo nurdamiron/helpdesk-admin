@@ -1,9 +1,19 @@
 // src/api/index.js
 import axios from 'axios';
 
-// Базовый URL для API - explicitly use env var or fallback
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5002/api';
-console.log('Using API URL:', API_URL); // Debug log for API URL
+// Определение базового URL для API в зависимости от среды
+let API_URL;
+
+// Проверяем режим работы (разработка или продакшн)
+if (process.env.NODE_ENV === 'production') {
+  // Используем переменную окружения из .env файла, или URL для продакшна по умолчанию
+  API_URL = process.env.REACT_APP_API_URL || 'https://helpdesk-backend-2.onrender.com/api';
+} else {
+  // В режиме разработки используем локальный сервер
+  API_URL = 'http://localhost:5002/api';
+}
+
+console.log(`Using API URL (${process.env.NODE_ENV} mode):`, API_URL);
 
 // Отключить использование мокового сервиса
 export const USE_MOCK_DATA = false;

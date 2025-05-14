@@ -20,26 +20,21 @@ class WebSocketService {
     this.lastHeartbeat = null;
     this.heartbeatInterval = null;
     
-    // Определяем базовый URL из текущего местоположения или переменной окружения
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // Определяем базовый URL для WebSocket в зависимости от среды
+    let websocketUrl;
     
-    // Простое определение среды: если localhost, то используем прямое соединение с бэкендом
-    const isLocalDevelopment = window.location.hostname === 'localhost';
-    
-    // Определяем хост и порт для WebSocket сервера
-    let backendHost = '';
-    
-    if (isLocalDevelopment) {
-      // Обновляем порт сервера на 5002, согласно актуальной конфигурации в server.js
-      backendHost = 'localhost:5002';
-      console.warn('Режим разработки: используем WebSocket сервер на', backendHost);
+    if (process.env.NODE_ENV === 'production') {
+      // В production режиме используем WSS для безопасного соединения
+      websocketUrl = process.env.REACT_APP_WS_URL || 'wss://helpdesk-backend-2.onrender.com/ws';
     } else {
-      // В проде используем текущий хост
-      backendHost = window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+      // В режиме разработки используем локальный сервер
+      websocketUrl = 'ws://localhost:5002/ws';
     }
     
+    console.log(`WebSocket URL (${process.env.NODE_ENV} mode):`, websocketUrl);
+    
     // Базовый URL для WebSocket соединения
-    this.baseUrl = `${protocol}//${backendHost}/ws`;
+    this.baseUrl = websocketUrl;
     
     // Настраиваем слушатели событий сети
     this.setupNetworkListeners();
