@@ -7,4 +7,13 @@ const validateOptions = (schema, options, path) => {
   return options; // Skip validation and just pass through
 };
 
-module.exports = { validateOptions };
+// Export the validate function for terser-webpack-plugin
+const validate = (schema, options) => {
+  return options; // Skip validation and just pass through
+};
+
+module.exports = { 
+  validateOptions,
+  validate,
+  default: validate
+};

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": null,
+  "buildCommand": "bash vercel-build.sh",
   "outputDirectory": "build",
   "routes": [
     { "handle": "filesystem" },
