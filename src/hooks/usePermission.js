@@ -111,6 +111,15 @@ export const usePermission = () => {
     return user.role === 'admin';
   }, [user]);
   
+  /**
+   * Проверяет, может ли пользователь управлять пользователями системы (список всех пользователей)
+   * @returns {boolean} Может ли пользователь управлять пользователями системы
+   */
+  const canManageUsers = useCallback(() => {
+    if (!user) return false;
+    return user.role === 'admin';
+  }, [user]);
+  
   return {
     canPerform,
     canEditTicket,
@@ -119,7 +128,8 @@ export const usePermission = () => {
     canViewAnalytics,
     canExportData,
     canViewAllTickets,
-    canManageSettings
+    canManageSettings,
+    canManageUsers
   };
 };
 

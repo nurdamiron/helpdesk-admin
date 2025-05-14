@@ -34,9 +34,7 @@ const Footer = () => {
               {t('footer:links', 'Ссылки')}
             </Typography>
             <Stack spacing={1}>
-              <Link component={RouterLink} to="/" color="inherit" underline="hover">
-                {t('header:home', 'Главная')}
-              </Link>
+
               <Link component={RouterLink} to="/login" color="inherit" underline="hover">
                 {t('header:login', 'Войти')}
               </Link>

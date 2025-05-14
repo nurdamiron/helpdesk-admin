@@ -18,42 +18,32 @@ export const chatService = {
   sendMessage: async (ticketId, messageData) => {
     try {
       // Подготовка данных для отправки
+      // Преобразуем тип пользователя для совместимости с бэкендом
+      let senderType = messageData.sender_type || 'admin';
+      
+      // Если прислали 'staff', преобразуем в 'admin' для совместимости с бэкендом
+      if (senderType === 'staff') {
+        senderType = 'admin';
+      }
+      
       const payload = {
-        body: messageData.body || '',  // Убедимся, что body всегда строка
-        attachments: messageData.attachments || [],
-        // Добавляем флаг для отправки на email
-        notify_email: messageData.sendToEmail || false
+        content: messageData.content || '',
+        sender_type: senderType,
+        notify_requester: messageData.sendToEmail || false
       };
       
-      // Проверка, если сообщение пустое и нет вложений
-      if (!payload.body.trim() && (!payload.attachments || payload.attachments.length === 0)) {
-        throw new Error('Сообщение должно содержать текст или вложения');
+      // Проверка, если сообщение пустое
+      if (!payload.content.trim()) {
+        throw new Error('Сообщение должно содержать текст');
       }
+      
+      console.log('Отправка сообщения с типом отправителя:', payload.sender_type);
       
       // Отправляем запрос
       const response = await api.post(`/tickets/${ticketId}/messages`, payload);
       return response.data.message || response.data;
     } catch (error) {
       console.error(`Error sending message for ticket ${ticketId}:`, error);
-      throw error;
-    }
-  },
-
-  // Загрузить вложение к сообщению
-  uploadAttachment: async (ticketId, file) => {
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      const response = await api.post(`/tickets/${ticketId}/attachments`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        }
-      });
-      
-      return response.data.attachment || response.data;
-    } catch (error) {
-      console.error(`Error uploading attachment for ticket ${ticketId}:`, error);
       throw error;
     }
   },

@@ -44,10 +44,16 @@ import {
   Person as PersonIcon,
   AdminPanelSettings as AdminIcon,
   Engineering as EngineerIcon,
-  Shield as ModeratorIcon
+  Shield as ModeratorIcon,
+  CheckCircle as ActiveIcon,
+  Cancel as InactiveIcon,
+  ToggleOn as ToggleOnIcon,
+  ToggleOff as ToggleOffIcon
 } from '@mui/icons-material';
 import { authService } from '../api/authService';
 import { useAuth } from '../contexts/AuthContext';
+import UserFormDialog from '../components/users/UserFormDialog';
+import UserStatusChip from '../components/users/UserStatusChip';
 
 const UserRoleChip = ({ role }) => {
   const { t } = useTranslation(['users']);
@@ -92,7 +98,8 @@ const UserRoleChip = ({ role }) => {
   }
 };
 
-const UserFormDialog = ({ open, handleClose, handleSubmit, editUser, loading, error }) => {
+// Using imported UserFormDialog component instead of this one
+/*const UserFormDialog = ({ open, handleClose, handleSubmit, editUser, loading, error }) => {
   const { t } = useTranslation(['users', 'common']);
   const [formData, setFormData] = useState({
     first_name: '',
@@ -100,6 +107,7 @@ const UserFormDialog = ({ open, handleClose, handleSubmit, editUser, loading, er
     email: '',
     password: '',
     role: 'staff',
+    is_active: true,
   });
   
   // Если передан пользователь для редактирования - заполняем форму его данными
@@ -227,7 +235,7 @@ const UserFormDialog = ({ open, handleClose, handleSubmit, editUser, loading, er
       </form>
     </Dialog>
   );
-};
+};*/
 
 const DeleteConfirmDialog = ({ open, handleClose, handleConfirm, loading, userName }) => {
   const { t } = useTranslation(['users', 'common']);
@@ -263,6 +271,7 @@ const UsersManagementPage = () => {
   const { t } = useTranslation(['users', 'common']);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const { user: currentUser } = useAuth();
   
   const [users, setUsers] = useState([]);
@@ -400,6 +409,28 @@ const UsersManagementPage = () => {
     }
   };
   
+  // Обработчик переключения статуса пользователя (активный/неактивный)
+  const handleToggleUserStatus = async (user) => {
+    if (!user) return;
+    
+    setFormLoading(true);
+    
+    try {
+      const updatedStatus = !user.is_active;
+      await authService.updateUser(user.id, { is_active: updatedStatus });
+      
+      // Обновляем статус пользователя в списке
+      setUsers(prev => prev.map(u => 
+        u.id === user.id ? { ...u, is_active: updatedStatus } : u
+      ));
+    } catch (err) {
+      console.error('Ошибка при изменении статуса пользователя:', err);
+      setError(t('users:errors.statusUpdateFailed', 'Не удалось изменить статус пользователя. Попробуйте позже.'));
+    } finally {
+      setFormLoading(false);
+    }
+  };
+  
   // Обработчик удаления пользователя
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
@@ -457,9 +488,9 @@ const UsersManagementPage = () => {
   };
   
   return (
-    <Box sx={{ px: 4, py: 3, maxWidth: 1600, mx: 'auto' }}>
+    <Box sx={{ px: { xs: 2, sm: 3, md: 4 }, py: 3, maxWidth: 1600, mx: 'auto' }}>
       <Paper sx={{ p: { xs: 2, md: 4 }, borderRadius: 2 }}>
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'start', sm: 'center' }, mb: 3, gap: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, mb: 3, gap: 2, width: '100%' }}>
           <Typography variant="h5" component="h1" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
             {t('users:managementTitle', 'Управление пользователями')}
           </Typography>
@@ -476,7 +507,8 @@ const UsersManagementPage = () => {
               '&:hover': {
                 boxShadow: theme.shadows[5],
               },
-              borderRadius: '8px'
+              borderRadius: '8px',
+              width: { xs: '100%', sm: 'auto' }
             }}
           >
             {t('users:addUser', 'Добавить пользователя')}
@@ -485,7 +517,7 @@ const UsersManagementPage = () => {
         
         <Divider sx={{ mb: 3 }} />
         
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 3, width: '100%' }}>
           <TextField
             fullWidth
             placeholder={t('users:search', 'Поиск пользователей...')}
@@ -519,27 +551,42 @@ const UsersManagementPage = () => {
                 </Typography>
               </Box>
             ) : (
-              <Grid container spacing={2}>
+              <Grid container spacing={2} sx={{ width: '100%' }}>
                 {filteredUsers
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((user) => (
                     <Grid item xs={12} key={user.id}>
-                      <Card variant="outlined" sx={{ borderRadius: 2 }}>
+                      <Card variant="outlined" sx={{ borderRadius: 2, width: '100%' }}>
                         <CardContent>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                            <Typography variant="h6">{user.first_name} {user.last_name}</Typography>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1, flexWrap: 'wrap', gap: 1 }}>
+                            <Typography variant="h6" noWrap sx={{ maxWidth: { xs: '150px', sm: '200px' } }}>{user.first_name} {user.last_name}</Typography>
                             <UserRoleChip role={user.role} />
                           </Box>
-                          <Typography variant="body2" color="textSecondary">{user.email}</Typography>
+                          <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }} noWrap>{user.email}</Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <UserStatusChip isActive={user.is_active} />
+                          </Box>
                         </CardContent>
-                        <CardActions>
+                        <CardActions sx={{ flexWrap: 'wrap', gap: 1 }}>
                           {canEditUser(user) && (
                             <Button 
                               size="small" 
                               startIcon={<EditIcon />}
                               onClick={() => handleOpenEditDialog(user)}
+                              sx={{ mb: { xs: 1, sm: 0 } }}
                             >
                               {t('common:edit', 'Редактировать')}
+                            </Button>
+                          )}
+                          {canEditUser(user) && (
+                            <Button 
+                              size="small"
+                              color={user.is_active ? "default" : "primary"}
+                              startIcon={user.is_active ? <ToggleOnIcon /> : <ToggleOffIcon />}
+                              onClick={() => handleToggleUserStatus(user)}
+                              sx={{ mb: { xs: 1, sm: 0 } }}
+                            >
+                              {user.is_active ? t('users:deactivate', 'Деактивировать') : t('users:activate', 'Активировать')}
                             </Button>
                           )}
                           {canDeleteUser(user) && (
@@ -548,6 +595,7 @@ const UsersManagementPage = () => {
                               color="error" 
                               startIcon={<DeleteIcon />}
                               onClick={() => handleOpenDeleteDialog(user)}
+                              sx={{ mb: { xs: 1, sm: 0 } }}
                             >
                               {t('common:delete', 'Удалить')}
                             </Button>
@@ -562,20 +610,21 @@ const UsersManagementPage = () => {
         ) : (
           // Десктопное представление в виде таблицы
           <>
-            <TableContainer>
-              <Table>
+            <TableContainer sx={{ overflow: 'auto', maxWidth: '100%' }}>
+              <Table sx={{ minWidth: { xs: 650, sm: 800 } }}>
                 <TableHead>
                   <TableRow>
                     <TableCell>{t('users:name', 'Имя')}</TableCell>
                     <TableCell>{t('users:email', 'Email')}</TableCell>
                     <TableCell>{t('users:role', 'Роль')}</TableCell>
+                    <TableCell>{t('users:status', 'Статус')}</TableCell>
                     <TableCell align="right">{t('users:actions', 'Действия')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {filteredUsers.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={4} align="center">
+                      <TableCell colSpan={5} align="center">
                         <Typography color="textSecondary" sx={{ py: 3 }}>
                           {searchTerm 
                             ? t('users:noSearchResults', 'Пользователи не найдены. Попробуйте изменить поисковый запрос.') 
@@ -593,19 +642,40 @@ const UsersManagementPage = () => {
                           <TableCell>
                             <UserRoleChip role={user.role} />
                           </TableCell>
+                          <TableCell>
+                            <UserStatusChip isActive={user.is_active} />
+                          </TableCell>
                           <TableCell align="right">
                             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                               {canEditUser(user) && (
                                 <Tooltip title={t('common:edit', 'Редактировать')}>
-                                  <IconButton onClick={() => handleOpenEditDialog(user)}>
-                                    <EditIcon />
+                                  <IconButton 
+                                    size="small"
+                                    onClick={() => handleOpenEditDialog(user)}
+                                  >
+                                    <EditIcon fontSize={isSmallScreen ? "small" : "medium"} />
+                                  </IconButton>
+                                </Tooltip>
+                              )}
+                              {canEditUser(user) && (
+                                <Tooltip title={user.is_active ? t('users:deactivate', 'Деактивировать') : t('users:activate', 'Активировать')}>
+                                  <IconButton 
+                                    size="small"
+                                    color={user.is_active ? "default" : "primary"}
+                                    onClick={() => handleToggleUserStatus(user)}
+                                  >
+                                    {user.is_active ? <ToggleOnIcon fontSize={isSmallScreen ? "small" : "medium"} /> : <ToggleOffIcon fontSize={isSmallScreen ? "small" : "medium"} />}
                                   </IconButton>
                                 </Tooltip>
                               )}
                               {canDeleteUser(user) && (
                                 <Tooltip title={t('common:delete', 'Удалить')}>
-                                  <IconButton color="error" onClick={() => handleOpenDeleteDialog(user)}>
-                                    <DeleteIcon />
+                                  <IconButton 
+                                    size="small"
+                                    color="error" 
+                                    onClick={() => handleOpenDeleteDialog(user)}
+                                  >
+                                    <DeleteIcon fontSize={isSmallScreen ? "small" : "medium"} />
                                   </IconButton>
                                 </Tooltip>
                               )}
@@ -627,10 +697,18 @@ const UsersManagementPage = () => {
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage={t('common:rowsPerPage', 'Строк на странице:')}
+          labelRowsPerPage={isSmallScreen ? '' : t('common:rowsPerPage', 'Строк на странице:')}
           labelDisplayedRows={({ from, to, count }) => 
             `${from}-${to} ${t('common:of', 'из')} ${count}`
           }
+          sx={{
+            '.MuiTablePagination-selectLabel': {
+              display: { xs: 'none', sm: 'block' }
+            },
+            '.MuiTablePagination-select': {
+              marginRight: { xs: 1, sm: 2 }
+            }
+          }}
         />
       </Paper>
       

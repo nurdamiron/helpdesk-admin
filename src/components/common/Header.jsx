@@ -11,13 +11,11 @@ import {
   MenuItem,
   Avatar,
   Tooltip,
-  Badge,
   useTheme,
   useMediaQuery
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  Bell,
   ChevronLeft,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -33,14 +31,6 @@ const Header = ({ drawerOpen, setDrawerOpen }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [notificationsAnchorEl, setNotificationsAnchorEl] = useState(null);
-
-  // Имитация уведомлений для демонстрации
-  const notifications = [
-    { id: 1, text: 'Жаңа өтінім #234', time: '5 минут бұрын' },
-    { id: 2, text: 'Клиенттен хабарлама', time: '15 минут бұрын' },
-    { id: 3, text: 'Еске салу: 1 сағаттан кейін кездесу', time: '30 минут бұрын' },
-  ];
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -50,13 +40,6 @@ const Header = ({ drawerOpen, setDrawerOpen }) => {
     setAnchorElUser(null);
   };
 
-  const handleNotificationsMenuOpen = (event) => {
-    setNotificationsAnchorEl(event.currentTarget);
-  };
-
-  const handleNotificationsMenuClose = () => {
-    setNotificationsAnchorEl(null);
-  };
 
   const handleLogout = () => {
     logout();
@@ -81,70 +64,70 @@ const Header = ({ drawerOpen, setDrawerOpen }) => {
           duration: theme.transitions.duration.leavingScreen,
         }),
         bgcolor: '#2b3a47', // Тёмно-синий оттенок для строительной тематики
+        zIndex: theme.zIndex.drawer + 1, // Ensure header stays on top
       }}
+      elevation={2}
     >
-      <Toolbar>
+      <Toolbar sx={{ 
+        minHeight: { xs: '56px', sm: '64px' },
+        px: { xs: 1, sm: 2 }
+      }}>
         <IconButton
           color="inherit"
           aria-label="open drawer"
           edge="start"
           onClick={() => setDrawerOpen(!drawerOpen)}
-          sx={{ mr: 2, display: { sm: 'none' } }}
+          sx={{ 
+            mr: { xs: 1, sm: 2 }, 
+            display: { sm: 'none' },
+            padding: { xs: '8px', sm: '12px' }
+          }}
         >
-          {drawerOpen ? <ChevronLeft /> : <MenuIcon />}
+          {drawerOpen ? <ChevronLeft size={isMobile ? 20 : 24} /> : <MenuIcon size={isMobile ? 20 : 24} />}
         </IconButton>
         
-        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+        <Typography 
+          variant="h6" 
+          noWrap 
+          component="div" 
+          sx={{ 
+            flexGrow: 1,
+            fontSize: { xs: '1rem', sm: '1.25rem' },
+            marginLeft: { xs: 0.5, sm: 0 },
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
           {menuItems.find(item => location.pathname.startsWith(item.path))?.text || t('app.title')}
         </Typography>
         
-        {/* Язык - делаем более заметным */}
-        <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+        {/* Language switcher - more visible on mobile */}
+        <Box sx={{ 
+          mr: { xs: 1, sm: 2 }, 
+          display: 'flex', 
+          alignItems: 'center' 
+        }}>
           <LanguageSwitcher />
         </Box>
 
-        {/* Уведомления */}
-        <Tooltip title={t('notifications.title', 'Хабарламалар')}>
-          <IconButton 
-            color="inherit" 
-            onClick={handleNotificationsMenuOpen}
-            sx={{ mr: 1 }}
-          >
-            <Badge badgeContent={notifications.length} color="error">
-              <Bell size={20} />
-            </Badge>
-          </IconButton>
-        </Tooltip>
-        <Menu
-          sx={{ mt: '45px' }}
-          id="notifications-menu"
-          anchorEl={notificationsAnchorEl}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          keepMounted
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          open={Boolean(notificationsAnchorEl)}
-          onClose={handleNotificationsMenuClose}
-        >
-          {notifications.map((notification) => (
-            <MenuItem key={notification.id} onClick={handleNotificationsMenuClose}>
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="body1">{notification.text}</Typography>
-                <Typography variant="caption" color="text.secondary">{notification.time}</Typography>
-              </Box>
-            </MenuItem>
-          ))}
-        </Menu>
-        
-        {/* Профиль */}
+        {/* Profile */}
         <Tooltip title={t('auth.account', 'Профиль')}>
-          <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-            <Avatar alt={user?.name || "User"}>
+          <IconButton 
+            onClick={handleOpenUserMenu} 
+            sx={{ 
+              p: 0,
+              width: { xs: 32, sm: 40 },
+              height: { xs: 32, sm: 40 }
+            }}
+          >
+            <Avatar 
+              alt={user?.name || "User"}
+              sx={{ 
+                width: { xs: 32, sm: 40 },
+                height: { xs: 32, sm: 40 }
+              }}
+            >
               {user?.name?.charAt(0) || user?.first_name?.charAt(0) || user?.email?.charAt(0) || "U"}
             </Avatar>
           </IconButton>
@@ -164,12 +147,26 @@ const Header = ({ drawerOpen, setDrawerOpen }) => {
           }}
           open={Boolean(anchorElUser)}
           onClose={handleCloseUserMenu}
+          PaperProps={{
+            elevation: 3,
+            sx: {
+              minWidth: 150,
+              '& .MuiMenuItem-root': {
+                px: 2,
+                py: 1
+              }
+            }
+          }}
         >
           <MenuItem onClick={handleCloseUserMenu} component={RouterLink} to="/settings/profile">
-            <Typography textAlign="center">{t('auth.profile', 'Профиль')}</Typography>
+            <Typography textAlign="center" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+              {t('auth.profile', 'Профиль')}
+            </Typography>
           </MenuItem>
           <MenuItem onClick={handleLogout}>
-            <Typography textAlign="center">{t('auth.logout', 'Шығу')}</Typography>
+            <Typography textAlign="center" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+              {t('auth.logout', 'Шығу')}
+            </Typography>
           </MenuItem>
         </Menu>
       </Toolbar>

@@ -4,21 +4,44 @@ import { useTranslation } from 'react-i18next';
 import { 
   Box, Grid, Paper, Typography, Chip, Divider, Button,
   CircularProgress, Alert, useTheme, useMediaQuery, Tab, Tabs,
-  List, ListItem, ListItemAvatar, Avatar, ListItemText, TextField
+  List, ListItem, ListItemAvatar, Avatar, ListItemText
 } from '@mui/material';
 import { 
-  ArrowBack, Save, CalendarToday, PriorityHigh,
+  ArrowBack, Save, CalendarToday,
   Email, Phone, Message, AttachFile
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { ticketService } from '../api/ticketService';
 import TicketChat from '../components/chat/TicketChat';
 
+// TabPanel component for Tabs
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`ticket-tabpanel-${index}`}
+      aria-labelledby={`ticket-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ pt: 2 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
+
 /**
  * Компонент страницы с деталями заявки
  * Отображается по-разному в зависимости от роли пользователя
+ * @param {Object} props - Component props
+ * @param {boolean} props.editMode - Whether to display the page in edit mode
  */
-const TicketDetailPage = () => {
+const TicketDetailPage = ({ editMode = false }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -30,6 +53,8 @@ const TicketDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
+  // Set initial edit state based on editMode prop
+  const [isEditing, setIsEditing] = useState(editMode);
   const [savingStatus, setSavingStatus] = useState({
     loading: false,
     success: false,
@@ -37,6 +62,13 @@ const TicketDetailPage = () => {
   });
   
   // Загрузка данных заявки
+  // If in edit mode from URL, show edit form when loaded
+  useEffect(() => {
+    if (editMode) {
+      setIsEditing(true);
+    }
+  }, [editMode]);
+
   useEffect(() => {
     const fetchTicket = async () => {
       try {
@@ -117,6 +149,16 @@ const TicketDetailPage = () => {
         metadata: ticket.metadata
       };
       
+      // If subject was edited, include it in the update
+      if (ticket.subject) {
+        ticketData.subject = ticket.subject;
+      }
+      
+      // If description was edited, include it in the update
+      if (ticket.description) {
+        ticketData.description = ticket.description;
+      }
+      
       // Отправка запроса к API для обновления заявки
       const response = await ticketService.updateTicket(ticket.id, ticketData);
       
@@ -129,12 +171,21 @@ const TicketDetailPage = () => {
         error: null
       });
       
+      // If we're in edit mode (from URL), redirect back to view page after saving
+      if (editMode) {
+        navigate(`/tickets/${ticket.id}`);
+        return;
+      }
+      
+      // For inline edits, show success message and update UI
       // Сбрасываем статус успеха через 3 секунды
       setTimeout(() => {
         setSavingStatus(prev => ({
           ...prev,
           success: false
         }));
+        // Exit edit mode if we were editing inline
+        if (isEditing) setIsEditing(false);
       }, 3000);
       
       // Обновляем данные заявки на странице
@@ -560,27 +611,6 @@ const TicketDetailPage = () => {
         </Grid>
       </Grid>
     </Box>
-  );
-};
-
-// Компонент для вкладок
-const TabPanel = (props) => {
-  const { children, value, index, ...other } = props;
-  
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`tabpanel-${index}`}
-      aria-labelledby={`tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ pt: 2 }}>
-          {children}
-        </Box>
-      )}
-    </div>
   );
 };
 

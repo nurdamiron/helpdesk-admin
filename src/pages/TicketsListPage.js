@@ -293,7 +293,7 @@ const TicketsListPage = () => {
   const visibleColumns = getVisibleColumns();
   
   return (
-    <Box sx={{ px: 3, py: 3, maxWidth: 1600, mx: 'auto' }}>
+    <Box sx={{ px: { xs: 1, sm: 2, md: 3 }, py: { xs: 2, sm: 3 }, maxWidth: 1600, mx: 'auto' }}>
       {/* Заголовок страницы */}
       <Box 
         sx={{ 
@@ -305,7 +305,11 @@ const TicketsListPage = () => {
           gap: 2
         }}
       >
-        <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
+        <Typography variant="h4" sx={{ 
+          fontWeight: 'bold', 
+          color: theme.palette.primary.main,
+          fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
+        }}>
           {t('tickets:list.title', 'Өтініштер тізімі')}
         </Typography>
         
@@ -332,6 +336,9 @@ const TicketsListPage = () => {
               '&:hover': {
                 boxShadow: theme.shadows[5],
               },
+              py: { xs: 1, sm: 1.5 },
+              px: { xs: 2, sm: 3 },
+              whiteSpace: 'nowrap',
             }}
           >
             {t('tickets:list.newTicket', 'Жаңа өтініш')}
@@ -348,8 +355,8 @@ const TicketsListPage = () => {
       
       {/* Панель фильтров */}
       {showFilters && (
-        <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-          <Grid container spacing={2} alignItems="center">
+        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 }, borderRadius: 2 }}>
+          <Grid container spacing={{ xs: 1.5, sm: 2 }} alignItems="center">
             <Grid item xs={12} sm={6} md={3}>
               <TextField
                 fullWidth
@@ -358,14 +365,15 @@ const TicketsListPage = () => {
                 value={filters.search}
                 onChange={handleFilterChange('search')}
                 InputProps={{
-                  startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} />,
+                  startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1, fontSize: { xs: '1.2rem', sm: '1.5rem' } }} />,
+                  sx: { fontSize: { xs: '0.875rem', sm: '1rem' } }
                 }}
               />
             </Grid>
             
             <Grid item xs={12} sm={6} md={3}>
               <FormControl fullWidth>
-                <InputLabel>{t('tickets:filters.status', 'Статус')}</InputLabel>
+                <InputLabel sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>{t('tickets:filters.status', 'Статус')}</InputLabel>
                 <Select
                   value={filters.status}
                   onChange={handleFilterChange('status')}
@@ -383,7 +391,7 @@ const TicketsListPage = () => {
             
             <Grid item xs={12} sm={6} md={3}>
               <FormControl fullWidth>
-                <InputLabel>{t('tickets:filters.priority', 'Басымдық')}</InputLabel>
+                <InputLabel sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>{t('tickets:filters.priority', 'Басымдық')}</InputLabel>
                 <Select
                   value={filters.priority}
                   onChange={handleFilterChange('priority')}
@@ -398,13 +406,18 @@ const TicketsListPage = () => {
               </FormControl>
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+            <Grid item xs={12} sm={6} md={3} sx={{ display: 'flex', justifyContent: { xs: 'space-between', sm: 'flex-end' }, gap: 1 }}>
               <Button
                 variant="outlined"
                 color="secondary"
                 startIcon={<RefreshIcon />}
                 onClick={handleResetFilters}
-                sx={{ borderRadius: '8px' }}
+                sx={{ 
+                  borderRadius: '8px',
+                  px: { xs: 1.5, sm: 2 },
+                  py: { xs: 0.75, sm: 1 },
+                  fontSize: { xs: '0.8125rem', sm: '0.875rem' }
+                }}
               >
                 {t('tickets:filters.reset', 'Тазарту')}
               </Button>
@@ -416,7 +429,10 @@ const TicketsListPage = () => {
                 onClick={fetchTickets}
                 sx={{ 
                   borderRadius: '8px',
-                  boxShadow: theme.shadows[2]
+                  boxShadow: theme.shadows[2],
+                  px: { xs: 1.5, sm: 2 },
+                  py: { xs: 0.75, sm: 1 },
+                  fontSize: { xs: '0.8125rem', sm: '0.875rem' }
                 }}
               >
                 {t('tickets:filters.apply', 'Қолдану')}
@@ -427,13 +443,18 @@ const TicketsListPage = () => {
       )}
       
       {/* Таблица заявок */}
-      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 2 }}>
-        <TableContainer>
+      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 2, boxShadow: { xs: 1, sm: 2 } }}>
+        <TableContainer sx={{ 
+          '.MuiTableCell-root': {
+            padding: { xs: '8px 8px', sm: '16px 16px' }
+          },
+          overflowX: 'auto'
+        }}>
           <Table stickyHeader aria-label={t('tickets:list.tableLabel', 'Өтініштер тізімі')}>
             <TableHead>
               <TableRow>
                 {visibleColumns.includes('id') && (
-                  <TableCell sx={{ fontWeight: 'bold' }}>
+                  <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                     <Box 
                       sx={{ 
                         display: 'flex', 
@@ -449,13 +470,13 @@ const TicketsListPage = () => {
                 )}
                 
                 {visibleColumns.includes('subject') && (
-                  <TableCell sx={{ fontWeight: 'bold' }}>
+                  <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                     {t('tickets:table.subject', 'Тақырыбы')}
                   </TableCell>
                 )}
                 
                 {visibleColumns.includes('status') && (
-                  <TableCell sx={{ fontWeight: 'bold' }}>
+                  <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                     <Box 
                       sx={{ 
                         display: 'flex', 
@@ -515,7 +536,7 @@ const TicketsListPage = () => {
                 )}
                 
                 {visibleColumns.includes('actions') && (
-                  <TableCell align="right" sx={{ fontWeight: 'bold' }}>
+                  <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                     {t('tickets:table.actions', 'Әрекеттер')}
                   </TableCell>
                 )}
@@ -531,7 +552,7 @@ const TicketsListPage = () => {
               ) : tickets.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={visibleColumns.length} align="center">
-                    <Typography variant="body1" sx={{ py: 3, color: 'text.secondary' }}>
+                    <Typography variant="body1" sx={{ py: { xs: 2, sm: 3 }, color: 'text.secondary', fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                       {t('tickets:list.noTickets', 'Өтініштер табылмады')}
                     </Typography>
                     <Button
@@ -571,7 +592,10 @@ const TicketsListPage = () => {
                         variant="body2" 
                         fontWeight={ticket.status === 'new' ? 600 : 400} 
                         noWrap 
-                        sx={{ maxWidth: { xs: 100, sm: 200, md: 300 } }}
+                        sx={{ 
+                          maxWidth: { xs: 80, sm: 200, md: 300 },
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                        }}
                       >
                         {ticket.subject}
                       </Typography>
@@ -585,14 +609,30 @@ const TicketsListPage = () => {
                           label={getStatusText(ticket.status)} 
                           color={getStatusColor(ticket.status)}
                           size="small"
-                          sx={{ fontWeight: 500 }}
+                          sx={{ 
+                            fontWeight: 500,
+                            '& .MuiChip-label': { 
+                              px: { xs: 0.75, sm: 1.5 },
+                              fontSize: { xs: '0.625rem', sm: '0.75rem' } 
+                            },
+                            height: { xs: 24, sm: 32 },
+                            minWidth: { xs: 60, sm: 75 }
+                          }}
                         />
                       ) : (
                         <Chip 
                           label={t('tickets:status.new', 'Жаңа')} 
                           color="error"
                           size="small"
-                          sx={{ fontWeight: 500 }}
+                          sx={{ 
+                            fontWeight: 500,
+                            '& .MuiChip-label': { 
+                              px: { xs: 0.75, sm: 1.5 },
+                              fontSize: { xs: '0.625rem', sm: '0.75rem' } 
+                            },
+                            height: { xs: 24, sm: 32 },
+                            minWidth: { xs: 60, sm: 75 }
+                          }}
                         />
                       )}
                     </TableCell>
@@ -604,7 +644,15 @@ const TicketsListPage = () => {
                         label={getPriorityText(ticket.priority)} 
                         color={getPriorityColor(ticket.priority)}
                         size="small"
-                        variant="outlined"
+                        sx={{ 
+                          fontWeight: 500,
+                          '& .MuiChip-label': { 
+                            px: { xs: 0.75, sm: 1.5 },
+                            fontSize: { xs: '0.625rem', sm: '0.75rem' } 
+                          },
+                          height: { xs: 24, sm: 32 },
+                          minWidth: { xs: 60, sm: 75 }
+                        }}
                       />
                     </TableCell>
                   )}
@@ -612,7 +660,7 @@ const TicketsListPage = () => {
                   {visibleColumns.includes('requester') && (
                     <TableCell>
                       <Tooltip title={ticket.requester?.email || ''}>
-                        <Typography variant="body2" noWrap sx={{ maxWidth: 150 }}>
+                        <Typography variant="body2" noWrap sx={{ maxWidth: 150, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                           {ticket.requester?.name || t('tickets:table.unknown', 'Белгісіз')}
                         </Typography>
                       </Tooltip>
@@ -621,7 +669,7 @@ const TicketsListPage = () => {
                   
                   {visibleColumns.includes('created_at') && (
                     <TableCell>
-                      <Typography variant="body2">
+                      <Typography variant="body2" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                         {formatDate(ticket.created_at)}
                       </Typography>
                     </TableCell>
@@ -648,6 +696,10 @@ const TicketsListPage = () => {
                           <IconButton 
                             size="small" 
                             color="primary"
+                            sx={{ 
+                              padding: { xs: '4px', sm: '8px' },
+                              '& .MuiSvgIcon-root': { fontSize: { xs: '1rem', sm: '1.25rem' } }
+                            }}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleTicketClick(ticket.id);
@@ -662,6 +714,10 @@ const TicketsListPage = () => {
                             <IconButton 
                               size="small" 
                               color="primary"
+                              sx={{ 
+                                padding: { xs: '4px', sm: '8px' },
+                                '& .MuiSvgIcon-root': { fontSize: { xs: '1rem', sm: '1.25rem' } }
+                              }}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigate(`/tickets/${ticket.id}/edit`);
@@ -682,7 +738,7 @@ const TicketsListPage = () => {
         
         {/* Пагинация */}
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 50]}
+          rowsPerPageOptions={isMobile ? [5, 10] : [5, 10, 25, 50]}
           component="div"
           count={totalTickets}
           rowsPerPage={rowsPerPage}
@@ -693,6 +749,18 @@ const TicketsListPage = () => {
           labelDisplayedRows={({ from, to, count }) => 
             t('tickets:pagination.displayedRows', '{{from}}-{{to}} / {{count}}', { from, to, count })
           }
+          sx={{
+            '.MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows': {
+              fontSize: { xs: '0.75rem', sm: '0.875rem' },
+              margin: { xs: 0 }
+            },
+            '.MuiTablePagination-select': {
+              fontSize: { xs: '0.75rem', sm: '0.875rem' }
+            },
+            '.MuiTablePagination-actions': {
+              marginLeft: { xs: 0, sm: 2 }
+            }
+          }}
         />
       </Paper>
     </Box>

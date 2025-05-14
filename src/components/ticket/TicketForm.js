@@ -268,7 +268,7 @@ const TicketForm = ({ onSubmitSuccess }) => {
       </Typography>
       
       <Grid container spacing={3} mb={3}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} sm={6}>
           <TextField
             required
             fullWidth
@@ -280,9 +280,15 @@ const TicketForm = ({ onSubmitSuccess }) => {
             error={!!formErrors.name}
             helperText={formErrors.name}
             disabled={loading || (isAuthenticated && user)}
+            inputProps={{
+              style: {
+                fontSize: '1rem',
+                padding: '14px 12px'
+              }
+            }}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} sm={6}>
           <TextField
             required
             fullWidth
@@ -295,6 +301,12 @@ const TicketForm = ({ onSubmitSuccess }) => {
             error={!!formErrors.email}
             helperText={formErrors.email}
             disabled={loading || (isAuthenticated && user)}
+            inputProps={{
+              style: {
+                fontSize: '1rem',
+                padding: '14px 12px'
+              }
+            }}
           />
         </Grid>
         <Grid item xs={12}>
@@ -308,6 +320,12 @@ const TicketForm = ({ onSubmitSuccess }) => {
             error={!!formErrors.phone}
             helperText={formErrors.phone}
             disabled={loading}
+            inputProps={{
+              style: {
+                fontSize: '1rem',
+                padding: '14px 12px'
+              }
+            }}
           />
         </Grid>
       </Grid>
@@ -333,7 +351,7 @@ const TicketForm = ({ onSubmitSuccess }) => {
             disabled={loading}
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <FormControl fullWidth error={!!formErrors.type} disabled={loading}>
             <InputLabel id="type-label">{t('tickets:create.ticketType', 'Тип заявки')}</InputLabel>
             <Select
@@ -343,6 +361,7 @@ const TicketForm = ({ onSubmitSuccess }) => {
               value={formData.type}
               onChange={handleChange}
               label={t('tickets:create.ticketType', 'Тип заявки')}
+              MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
             >
               {ticketTypes.map((type) => (
                 <MenuItem key={type.id} value={type.id}>{type.name}</MenuItem>
@@ -351,7 +370,7 @@ const TicketForm = ({ onSubmitSuccess }) => {
             {formErrors.type && <FormHelperText>{formErrors.type}</FormHelperText>}
           </FormControl>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <FormControl fullWidth error={!!formErrors.category} disabled={loading}>
             <InputLabel id="category-label">{t('form.category', 'Категория')}</InputLabel>
             <Select
@@ -361,6 +380,7 @@ const TicketForm = ({ onSubmitSuccess }) => {
               value={formData.category}
               onChange={handleChange}
               label={t('form.category', 'Категория')}
+              MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
             >
               {categories.map((category) => (
                 <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
@@ -369,7 +389,7 @@ const TicketForm = ({ onSubmitSuccess }) => {
             {formErrors.category && <FormHelperText>{formErrors.category}</FormHelperText>}
           </FormControl>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} sm={12} md={4}>
           <FormControl fullWidth disabled={loading}>
             <InputLabel id="priority-label">{t('form.priority', 'Приоритет')}</InputLabel>
             <Select
@@ -379,6 +399,7 @@ const TicketForm = ({ onSubmitSuccess }) => {
               value={formData.priority}
               onChange={handleChange}
               label={t('form.priority', 'Приоритет')}
+              MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
             >
               <MenuItem value="low">{t('tickets:priority.low', 'Низкий')}</MenuItem>
               <MenuItem value="medium">{t('tickets:priority.medium', 'Средний')}</MenuItem>
@@ -404,18 +425,31 @@ const TicketForm = ({ onSubmitSuccess }) => {
           />
         </Grid>
         <Grid item xs={12}>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            size="large"
-            disabled={loading}
-            startIcon={loading ? <CircularProgress size={24} color="inherit" /> : <SendIcon />}
-          >
-            {loading 
-              ? t('form.sending', 'Отправка...') 
-              : t('form.submit', 'Отправить заявку')}
-          </Button>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: { xs: 'center', sm: 'flex-start' },
+            mt: 2 
+          }}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              size="large"
+              disabled={loading}
+              startIcon={loading ? <CircularProgress size={24} color="inherit" /> : <SendIcon />}
+              sx={{ 
+                py: { xs: 1.5, sm: 1 },
+                px: { xs: 3, sm: 2 },
+                fontSize: { xs: '1rem', sm: 'inherit' },
+                width: { xs: '100%', sm: 'auto' },
+                maxWidth: '400px'
+              }}
+            >
+              {loading 
+                ? t('form.sending', 'Отправка...') 
+                : t('form.submit', 'Отправить заявку')}
+            </Button>
+          </Box>
         </Grid>
       </Grid>
     </Box>

@@ -154,8 +154,8 @@ const StaffDashboardPage = () => {
   }
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ p: 3 }}>
+    <Container maxWidth="lg" disableGutters sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+      <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>
         <Grid container spacing={3}>
           {/* Шапка */}
           <Grid item xs={12}>
@@ -170,51 +170,53 @@ const StaffDashboardPage = () => {
               }}
             >
               <Box>
-                <Typography variant="h4" gutterBottom>
+                <Typography variant="h4" gutterBottom sx={{ 
+                  fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' },
+                  mt: { xs: 1, sm: 0 },
+                  fontWeight: { xs: 'bold', sm: 'bold' }
+                }}>
                   {t('dashboard:title', 'Басқару тақтасы')}
                 </Typography>
-                <Typography variant="subtitle1">
+                <Typography variant="subtitle1" sx={{ 
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  mb: { xs: 1, sm: 0 }
+                }}>
                   {t('dashboard:welcome.greeting', 'Қош келдіңіз, {{name}}!', { name: user?.first_name || user?.email })}
                 </Typography>
               </Box>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<AddCircleOutline />}
-                onClick={handleCreateTicket}
-                sx={{ 
-                  height: 'fit-content',
-                  py: 1.5,
-                  px: 3,
-                  fontWeight: 'bold',
-                  boxShadow: (theme) => theme.shadows[4],
-                  '&:hover': {
-                    boxShadow: (theme) => theme.shadows[8],
-                  },
-                  fontSize: '1rem',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                {t('dashboard:createTicket', 'Жаңа өтініш')}
-              </Button>
             </Box>
           </Grid>
           
           {/* Статистика заявок */}
           <Grid item xs={12}>
-            <Paper elevation={2} sx={{ p: 2, borderRadius: 2 }}>
-              <Typography variant="h6" gutterBottom>
+            <Paper elevation={2} sx={{ p: { xs: 1.5, sm: 2 }, borderRadius: 2 }}>
+              <Typography variant="h6" gutterBottom sx={{ 
+                fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                fontWeight: { xs: 'bold', sm: 'medium' },
+                mb: { xs: 1, sm: 2 }
+              }}>
                 {t('dashboard:stats.title', 'Статистика')}
               </Typography>
-              <Grid container spacing={2}>
+              <Grid container spacing={{ xs: 1, sm: 2 }}>
                 {/* Всего заявок */}
                 <Grid item xs={6} sm={3}>
-                  <Card sx={{ bgcolor: 'primary.light', color: 'white' }}>
-                    <CardContent>
-                      <Typography variant="h4" align="center">
+                  <Card sx={{ 
+                    bgcolor: 'primary.light', 
+                    color: 'white',
+                    borderRadius: { xs: 1, sm: 2 },
+                    boxShadow: 2
+                  }}>
+                    <CardContent sx={{ padding: { xs: '8px 12px', sm: '16px' } }}>
+                      <Typography variant="h4" align="center" sx={{ 
+                        fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' },
+                        fontWeight: 'bold'
+                      }}>
                         {ticketStats.total}
                       </Typography>
-                      <Typography variant="body2" align="center">
+                      <Typography variant="body2" align="center" sx={{ 
+                        fontSize: { xs: '0.7rem', sm: '0.875rem' },
+                        mt: { xs: 0.5, sm: 1 }
+                      }}>
                         {t('dashboard:stats.totalTickets', 'Всего заявок')}
                       </Typography>
                     </CardContent>
@@ -223,12 +225,23 @@ const StaffDashboardPage = () => {
                 
                 {/* Новые заявки */}
                 <Grid item xs={6} sm={3}>
-                  <Card sx={{ bgcolor: 'error.light', color: 'white' }}>
-                    <CardContent>
-                      <Typography variant="h4" align="center">
+                  <Card sx={{ 
+                    bgcolor: 'error.light', 
+                    color: 'white',
+                    borderRadius: { xs: 1, sm: 2 },
+                    boxShadow: 2
+                  }}>
+                    <CardContent sx={{ padding: { xs: '8px 12px', sm: '16px' } }}>
+                      <Typography variant="h4" align="center" sx={{ 
+                        fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' },
+                        fontWeight: 'bold'
+                      }}>
                         {ticketStats.new}
                       </Typography>
-                      <Typography variant="body2" align="center">
+                      <Typography variant="body2" align="center" sx={{ 
+                        fontSize: { xs: '0.7rem', sm: '0.875rem' },
+                        mt: { xs: 0.5, sm: 1 }
+                      }}>
                         {t('dashboard:stats.newTickets', 'Новые')}
                       </Typography>
                     </CardContent>
@@ -237,12 +250,23 @@ const StaffDashboardPage = () => {
                 
                 {/* В работе */}
                 <Grid item xs={6} sm={3}>
-                  <Card sx={{ bgcolor: 'warning.light', color: 'white' }}>
-                    <CardContent>
-                      <Typography variant="h4" align="center">
+                  <Card sx={{ 
+                    bgcolor: 'warning.light', 
+                    color: 'white',
+                    borderRadius: { xs: 1, sm: 2 },
+                    boxShadow: 2
+                  }}>
+                    <CardContent sx={{ padding: { xs: '8px 12px', sm: '16px' } }}>
+                      <Typography variant="h4" align="center" sx={{ 
+                        fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' },
+                        fontWeight: 'bold'
+                      }}>
                         {ticketStats.inProgress}
                       </Typography>
-                      <Typography variant="body2" align="center">
+                      <Typography variant="body2" align="center" sx={{ 
+                        fontSize: { xs: '0.7rem', sm: '0.875rem' },
+                        mt: { xs: 0.5, sm: 1 }
+                      }}>
                         {t('dashboard:stats.inProgressTickets', 'В работе')}
                       </Typography>
                     </CardContent>
@@ -251,12 +275,23 @@ const StaffDashboardPage = () => {
                 
                 {/* Решенные */}
                 <Grid item xs={6} sm={3}>
-                  <Card sx={{ bgcolor: 'success.light', color: 'white' }}>
-                    <CardContent>
-                      <Typography variant="h4" align="center">
+                  <Card sx={{ 
+                    bgcolor: 'success.light', 
+                    color: 'white',
+                    borderRadius: { xs: 1, sm: 2 },
+                    boxShadow: 2
+                  }}>
+                    <CardContent sx={{ padding: { xs: '8px 12px', sm: '16px' } }}>
+                      <Typography variant="h4" align="center" sx={{ 
+                        fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' },
+                        fontWeight: 'bold'
+                      }}>
                         {ticketStats.resolved}
                       </Typography>
-                      <Typography variant="body2" align="center">
+                      <Typography variant="body2" align="center" sx={{ 
+                        fontSize: { xs: '0.7rem', sm: '0.875rem' },
+                        mt: { xs: 0.5, sm: 1 }
+                      }}>
                         {t('dashboard:stats.resolvedTickets', 'Решенные')}
                       </Typography>
                     </CardContent>
@@ -268,8 +303,12 @@ const StaffDashboardPage = () => {
           
           {/* Список заявок */}
           <Grid item xs={12}>
-            <Paper elevation={2} sx={{ p: 2, borderRadius: 2 }}>
-              <Typography variant="h6" gutterBottom>
+            <Paper elevation={2} sx={{ p: { xs: 1.5, sm: 2 }, borderRadius: 2 }}>
+              <Typography variant="h6" gutterBottom sx={{ 
+                fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                fontWeight: { xs: 'bold', sm: 'medium' },
+                mb: { xs: 1, sm: 2 }
+              }}>
                 {t('dashboard:recentTickets.title', 'Последние заявки')}
               </Typography>
               
@@ -280,13 +319,18 @@ const StaffDashboardPage = () => {
                       <ListItem 
                         button 
                         onClick={() => handleTicketClick(ticket.id)}
-                        sx={{ borderRadius: 1, '&:hover': { bgcolor: 'action.hover' } }}
+                        sx={{ 
+                          borderRadius: 1, 
+                          '&:hover': { bgcolor: 'action.hover' },
+                          py: { xs: 1, sm: 1.5 },
+                          px: { xs: 1, sm: 2 }
+                        }}
                       >
                         <ListItemText 
-                          primary={ticket.subject}
+                          primary={<Typography sx={{ fontSize: { xs: '0.875rem', sm: '1rem' }, fontWeight: 'medium' }}>{ticket.subject}</Typography>}
                           secondary={
                             <>
-                              <Typography component="span" variant="body2" color="text.primary">
+                              <Typography component="span" variant="body2" color="text.primary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                                 #{ticket.id} • 
                               </Typography>{' '}
                               {formatDate(ticket.created_at)}
@@ -297,7 +341,12 @@ const StaffDashboardPage = () => {
                           label={getStatusText(ticket.status)} 
                           color={getStatusColor(ticket.status)}
                           size="small"
-                          sx={{ ml: 1 }}
+                          sx={{ 
+                            ml: 1,
+                            fontSize: { xs: '0.625rem', sm: '0.75rem' },
+                            height: { xs: 24, sm: 32 },
+                            '& .MuiChip-label': { px: { xs: 0.75, sm: 1.5 } } 
+                          }}
                         />
                       </ListItem>
                       {index < tickets.length - 1 && <Divider />}
@@ -308,26 +357,6 @@ const StaffDashboardPage = () => {
                     <Typography variant="body1" gutterBottom>
                       {t('dashboard:recentTickets.noTickets', 'У вас пока нет заявок')}
                     </Typography>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      startIcon={<AddCircleOutline />}
-                      onClick={handleCreateTicket}
-                      sx={{ 
-                        mt: 2,
-                        py: 1.5,
-                        px: 3,
-                        fontWeight: 'bold',
-                        boxShadow: (theme) => theme.shadows[4],
-                        '&:hover': {
-                          boxShadow: (theme) => theme.shadows[8],
-                        },
-                        fontSize: '1rem',
-                        transition: 'all 0.3s ease'
-                      }}
-                    >
-                      {t('dashboard:createFirstTicket', 'Создать первую заявку')}
-                    </Button>
                   </Box>
                 )}
               </List>

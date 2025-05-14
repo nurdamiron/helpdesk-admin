@@ -200,26 +200,6 @@ const ModeratorDashboardPage = () => {
           </Typography>
         </Box>
         
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddCircleOutline />}
-          onClick={handleCreateTicket}
-          sx={{ 
-            py: 1.5,
-            px: 3,
-            fontWeight: 'bold',
-            boxShadow: (theme) => theme.shadows[4],
-            '&:hover': {
-              boxShadow: (theme) => theme.shadows[8],
-            },
-            fontSize: '1rem',
-            transition: 'all 0.3s ease',
-            borderRadius: '8px'
-          }}
-        >
-          {t('tickets:list.newTicket', 'Жаңа өтініш')}
-        </Button>
       </Box>
       
       <Grid container spacing={3}>

@@ -178,7 +178,7 @@ const PublicHeader = () => {
               textDecoration: 'none',
             }}
           >
-            {t('header:helpdesk', 'HelpDesk')}
+            {t('header:helpdesk', '')}
           </Typography>
 
           {/* Spacer for desktop */}
@@ -188,7 +188,7 @@ const PublicHeader = () => {
               to="/"
               sx={{ my: 2, color: 'inherit', display: 'block' }}
             >
-              {t('header:home', 'Главная')}
+              {t('header:home', '')}
             </Button>
           </Box>
 

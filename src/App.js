@@ -105,18 +105,28 @@ function App() {
                 {/* Дашборд в зависимости от роли (маршрутизация внутри компонента) */}
                 <Route path="/dashboard" element={<DashboardPage />} />
                 
-                {/* Маршруты для заявок - требуют разных прав доступа */}
+                {/* Маршруты для заявок - доступны всем авторизованным пользователям */}
                 <Route path="/tickets" element={
-                  <ProtectedRoute requiredPermission="view_all_tickets" redirectToHome={true}>
+                  <ProtectedRoute>
                     <TicketsListPage />
                   </ProtectedRoute>
                 } />
                 
-                <Route path="/tickets/create" element={<CreateTicketPage />} />
+                <Route path="/tickets/create" element={
+                  <ProtectedRoute requiredRole="user" redirectToHome={true}>
+                    <CreateTicketPage />
+                  </ProtectedRoute>
+                } />
                 
                 <Route path="/tickets/:id" element={
                   <ProtectedRoute>
                     <TicketDetailPage />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/tickets/:id/edit" element={
+                  <ProtectedRoute>
+                    <TicketDetailPage editMode={true} />
                   </ProtectedRoute>
                 } />
                 

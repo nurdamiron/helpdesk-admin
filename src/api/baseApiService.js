@@ -1,5 +1,6 @@
 import api from './index';
-import { authService } from './authService';
+// Remove the circular dependency
+// We'll get authService instance from params
 
 /**
  * Базовый класс для API-сервисов
@@ -26,11 +27,12 @@ export class BaseApiService {
    * @param {string|null} options.requiredRole - Необходимая роль для выполнения запроса
    * @param {number} options.retries - Количество повторных попыток (по умолчанию 1)
    * @param {Object} options.errorOptions - Опции для обработчика ошибок
+   * @param {Object} options.authService - Сервис аутентификации (для избежания циклической зависимости)
    * @returns {Promise} - Результат запроса
    */
-  async request({ method, url, data = null, requiredRole = null, retries = 1, errorOptions = {} }) {
+  async request({ method, url, data = null, requiredRole = null, retries = 1, errorOptions = {}, authService = null }) {
     // Проверяем права доступа, если указана необходимая роль
-    if (requiredRole) {
+    if (requiredRole && authService) {
       const user = authService.getCurrentUser();
       if (!user || !authService.checkPermission(user, requiredRole)) {
         const error = new Error('Недостаточно прав для выполнения этой операции');
@@ -80,7 +82,8 @@ export class BaseApiService {
           data, 
           requiredRole, 
           retries: retries - 1,
-          errorOptions
+          errorOptions,
+          authService
         });
       }
       

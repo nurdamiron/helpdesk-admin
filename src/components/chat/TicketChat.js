@@ -22,11 +22,6 @@ import {
 import { alpha, styled } from '@mui/material/styles';
 import {
   Send as SendIcon,
-  Paperclip as PaperclipIcon,
-  Image as ImageIcon,
-  File as FileIcon,
-  Download as DownloadIcon,
-  X as XIcon,
   Wifi as WifiIcon,
   WifiOff as WifiOffIcon,
   CheckCircle,
@@ -58,27 +53,58 @@ const MessageBubble = styled(Box)(({ theme, isOwn }) => ({
   borderTopRightRadius: isOwn ? '0.3rem' : '1rem',
   wordBreak: 'break-word',
   hyphens: 'auto',
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: '95%',
+    padding: '0.7rem 0.8rem',
+  },
 }));
 
 // Компонент статуса сообщения
 const MessageStatus = ({ status }) => {
+  // Используем useState и useEffect для реактивного изменения размера иконок
+  const [iconSize, setIconSize] = useState(14);
+  const [marginOffset, setMarginOffset] = useState(-5);
+  const theme = useTheme();
+  
+  // Обновляем размеры при изменении размера окна
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < theme.breakpoints.values.sm) {
+        setIconSize(12);
+        setMarginOffset(-4);
+      } else {
+        setIconSize(14);
+        setMarginOffset(-5);
+      }
+    };
+    
+    // Устанавливаем начальные значения
+    handleResize();
+    
+    // Добавляем слушатель событий
+    window.addEventListener('resize', handleResize);
+    
+    // Удаляем слушатель при размонтировании
+    return () => window.removeEventListener('resize', handleResize);
+  }, [theme.breakpoints.values.sm]);
+  
   switch(status) {
     case 'sending':
-      return <Clock size={14} color="#9e9e9e" />;
+      return <Clock size={iconSize} color="#9e9e9e" />;
     case 'sent':
-      return <CheckCircle size={14} color="#9e9e9e" />;
+      return <CheckCircle size={iconSize} color="#9e9e9e" />;
     case 'delivered':
       return (
         <Box sx={{ display: 'flex' }}>
-          <CheckCircle size={14} color="#2196f3" />
-          <CheckCircle size={14} color="#2196f3" style={{ marginLeft: -5 }} />
+          <CheckCircle size={iconSize} color="#2196f3" />
+          <CheckCircle size={iconSize} color="#2196f3" style={{ marginLeft: marginOffset }} />
         </Box>
       );
     case 'read':
       return (
         <Box sx={{ display: 'flex' }}>
-          <CheckCircle size={14} color="#4caf50" />
-          <CheckCircle size={14} color="#4caf50" style={{ marginLeft: -5 }} />
+          <CheckCircle size={iconSize} color="#4caf50" />
+          <CheckCircle size={iconSize} color="#4caf50" style={{ marginLeft: marginOffset }} />
         </Box>
       );
     default:
@@ -94,7 +120,6 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
   const [sending, setSending] = useState(false);
   const [newMessage, setNewMessage] = useState('');
   const [error, setError] = useState(null);
-  const [attachments, setAttachments] = useState([]);
   const [sendToEmail, setSendToEmail] = useState(true); // По умолчанию включено
   const [sendSuccess, setSendSuccess] = useState(false);
   const [wsConnected, setWsConnected] = useState(false);
@@ -104,7 +129,6 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
   const [offlineMessages, setOfflineMessages] = useState([]);
   
   const messagesEndRef = useRef(null);
-  const fileInputRef = useRef(null);
   const wsRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
@@ -137,12 +161,31 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
       // Подписываемся на новые сообщения
       const unsubscribeMessages = wsRef.current.subscribeToMessages(ticketId, (newMessage) => {
         console.log('Получено новое сообщение через WebSocket:', newMessage);
+        
+        const now = Date.now();
+        
         setMessages(prev => {
-          // Избегаем дублирования сообщений
-          if (!prev.some(msg => msg.id === newMessage.id)) {
-            return [...prev, newMessage];
+          // Проверяем, есть ли сообщение уже в массиве
+          const existingIndex = prev.findIndex(msg => msg.id === newMessage.id);
+          
+          // Если сообщение уже существует
+          if (existingIndex !== -1) {
+            // Если оно было получено через HTTP в течение последней секунды,
+            // проигнорируем версию WebSocket
+            const existingMsg = prev[existingIndex];
+            if (existingMsg._receivedViaHttp && now - existingMsg._httpTimestamp < 1000) {
+              console.log('Игнорируем дубликат сообщения из WebSocket, так как оно уже получено через HTTP');
+              return prev;
+            }
+            
+            // Иначе обновляем существующее сообщение
+            const updatedMessages = [...prev];
+            updatedMessages[existingIndex] = { ...newMessage };
+            return updatedMessages;
           }
-          return prev;
+          
+          // Иначе добавляем новое сообщение
+          return [...prev, newMessage];
         });
         
         // Если сообщение не от нас, отмечаем как прочитанное
@@ -209,12 +252,71 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
     }
   };
 
+  // Загрузка офлайн сообщений из localStorage
+  useEffect(() => {
+    if (!ticketId) return;
+    
+    // Загружаем сохраненные офлайн сообщения при запуске
+    try {
+      const savedMessages = localStorage.getItem(`offlineMessages_${ticketId}`);
+      if (savedMessages) {
+        const parsedMessages = JSON.parse(savedMessages);
+        if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
+          console.log(`Загружено ${parsedMessages.length} офлайн сообщений из localStorage`);
+          setOfflineMessages(parsedMessages);
+          
+          // Добавляем офлайн сообщения в интерфейс для показа
+          setMessages(prev => [
+            ...prev,
+            ...parsedMessages.map(msg => ({
+              id: msg.id,
+              content: msg.content,
+              created_at: msg.created_at,
+              sender: {
+                id: user?.id,
+                name: user?.displayName || user?.email,
+                type: 'staff'
+              },
+              status: 'sending',
+              isOfflineMessage: true
+            }))
+          ]);
+          
+          // Если мы онлайн, начнем отправку
+          if (wsConnected) {
+            sendOfflineMessages();
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке офлайн сообщений:', error);
+    }
+  }, [ticketId]);
+  
+  // Сохраняем офлайн сообщения в localStorage при изменении
+  useEffect(() => {
+    if (!ticketId || offlineMessages.length === 0) return;
+    
+    try {
+      localStorage.setItem(`offlineMessages_${ticketId}`, JSON.stringify(offlineMessages));
+    } catch (error) {
+      console.error('Ошибка при сохранении офлайн сообщений:', error);
+    }
+  }, [offlineMessages, ticketId]);
+  
   // Отправка офлайн сообщений
   const sendOfflineMessages = async () => {
     if (offlineMessages.length === 0) return;
     
     const messagesToSend = [...offlineMessages];
     setOfflineMessages([]);
+    
+    // Очищаем localStorage
+    try {
+      localStorage.removeItem(`offlineMessages_${ticketId}`);
+    } catch (error) {
+      console.error('Ошибка при очистке localStorage:', error);
+    }
     
     for (const message of messagesToSend) {
       try {
@@ -275,9 +377,9 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     
-    // Проверяем, есть ли текст или вложения
-    if (!newMessage.trim() && attachments.length === 0) {
-      setError('Добавьте текст сообщения или вложение');
+    // Проверяем, есть ли текст сообщения
+    if (!newMessage.trim()) {
+      setError('Добавьте текст сообщения');
       return;
     }
     
@@ -288,47 +390,56 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
       if (offlineMode || !wsConnected) {
         // Добавляем сообщение локально
         const tempId = Date.now().toString();
+        const currentTimestamp = new Date().toISOString();
+        
         const offlineMessage = {
           id: tempId,
           content: newMessage,
-          created_at: new Date().toISOString(),
+          created_at: currentTimestamp,
           sender: {
             id: user.id,
             name: user.displayName || user.email,
             type: 'staff'
           },
           status: 'sending',
-          notifyRequester: sendToEmail
+          notifyRequester: sendToEmail,
+          isOfflineMessage: true
+        };
+        
+        // Сохраняем для отправки позже
+        const messageToStore = { 
+          id: tempId, 
+          content: newMessage, 
+          notifyRequester: sendToEmail,
+          created_at: currentTimestamp,
+          ticket_id: ticketId
         };
         
         // Добавляем в локальный массив сообщений
         setMessages(prev => [...prev, offlineMessage]);
-        setOfflineMessages(prev => [...prev, { 
-          id: tempId, 
-          content: newMessage, 
-          notifyRequester: sendToEmail 
-        }]);
+        setOfflineMessages(prev => {
+          const newMessages = [...prev, messageToStore];
+          
+          // Сохраняем в localStorage
+          try {
+            localStorage.setItem(`offlineMessages_${ticketId}`, JSON.stringify(newMessages));
+          } catch (error) {
+            console.error('Ошибка при сохранении офлайн сообщения в localStorage:', error);
+          }
+          
+          return newMessages;
+        });
         
         // Очищаем форму
         setNewMessage('');
-        setAttachments([]);
         setSendSuccess(true);
       } else {
         // Если онлайн - отправляем через API
-        const messageData = new FormData();
-        messageData.append('content', newMessage);
-        messageData.append('sender_type', 'staff');
-        messageData.append('notify_requester', sendToEmail);
-        
-        // Добавляем вложения, если есть
-        attachments.forEach((file, index) => {
-          messageData.append(`attachments[${index}]`, file);
-        });
-        
-        const response = await api.post(`/tickets/${ticketId}/messages`, messageData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+        // Используем тип "admin" вместо "staff" для совместимости с бекендом
+        const response = await api.post(`/tickets/${ticketId}/messages`, {
+          content: newMessage,
+          sender_type: 'admin', // Изменяем с "staff" на "admin" для совместимости
+          notify_requester: sendToEmail
         });
         
         console.log('Ответ API при отправке сообщения:', response.data);
@@ -350,7 +461,6 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
         
         // Очищаем форму
         setNewMessage('');
-        setAttachments([]);
         setSendSuccess(true);
       }
     } catch (err) {
@@ -359,26 +469,6 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
     } finally {
       setSending(false);
     }
-  };
-
-  // Обработчик клика на кнопку прикрепления файла
-  const handleAttachmentClick = () => {
-    fileInputRef.current.click();
-  };
-
-  // Обработчик выбора файла
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length > 0) {
-      setAttachments(prev => [...prev, ...files]);
-      // Сбрасываем input
-      e.target.value = null;
-    }
-  };
-
-  // Удаление вложения
-  const removeAttachment = (index) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
   // Закрытие уведомления об успешной отправке
@@ -391,6 +481,30 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
     return (senderType === 'staff' && user && (senderId === user.id || senderId === user.email));
   };
 
+  // Состояние попыток подключения
+  const [reconnectInfo, setReconnectInfo] = useState({ attempts: 0, maxAttempts: 5, nextAttemptTime: null });
+  
+  // Обновляем информацию о подключении
+  useEffect(() => {
+    if (!wsRef.current) return;
+    
+    const updateReconnectInfo = () => {
+      if (wsRef.current) {
+        setReconnectInfo({
+          attempts: wsRef.current.reconnectAttempts || 0,
+          maxAttempts: wsRef.current.maxReconnectAttempts || 5,
+          nextAttemptTime: wsRef.current.reconnectTimeout ? Date.now() + 5000 : null
+        });
+      }
+    };
+    
+    const intervalId = setInterval(updateReconnectInfo, 1000);
+    
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [wsConnected]);
+  
   // Отображение статуса соединения
   const renderConnectionStatus = () => {
     if (offlineMode) {
@@ -406,34 +520,96 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
         }}>
           <WifiOffIcon size={16} style={{ marginRight: 8 }} />
           <Typography variant="body2" fontWeight={500}>
-            Офлайн режим - байланыс қалпына келгенде хабарламалар жіберіледі
+            Офлайн режим - байланыс қалпына келгенде хабарламалар жіберіледі ({offlineMessages.length} сообщений)
           </Typography>
         </Box>
       );
     }
     
     if (!wsConnected) {
+      // Показываем разные сообщения в зависимости от статуса подключения
+      let statusMessage = 'Сервермен байланыс жоқ';
+      let statusColor = 'error.light';
+      let showReconnectButton = true;
+      
+      if (reconnectInfo.attempts >= reconnectInfo.maxAttempts) {
+        statusMessage = 'Максимальное количество попыток подключения исчерпано';
+        statusColor = 'error.dark';
+      } else if (reconnectInfo.attempts > 0) {
+        const nextAttemptIn = reconnectInfo.nextAttemptTime ? Math.ceil((reconnectInfo.nextAttemptTime - Date.now()) / 1000) : 0;
+        statusMessage = `Попытка подключения ${reconnectInfo.attempts} из ${reconnectInfo.maxAttempts}${nextAttemptIn > 0 ? ` (следующая через ${nextAttemptIn} сек)` : ''}`;
+        statusColor = 'warning.dark';
+      }
+      
       return (
         <Box sx={{ 
           display: 'flex', 
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: 'error.light',
-          color: 'error.contrastText',
+          bgcolor: statusColor,
+          color: 'white',
           py: 1,
           px: 2
         }}>
           <WifiOffIcon size={16} style={{ marginRight: 8 }} />
           <Typography variant="body2" fontWeight={500}>
-            Сервермен байланыс жоқ
+            {statusMessage}
+          </Typography>
+          {showReconnectButton && (
+            <Button 
+              size="small" 
+              variant="contained" 
+              sx={{ ml: 2, minWidth: 0, px: 1, bgcolor: 'white', color: 'text.primary' }}
+              onClick={() => {
+                // Принудительно сбрасываем счетчик попыток и переподключаемся
+                if (wsRef.current) {
+                  wsRef.current.reconnectAttempts = 0;
+                  wsRef.current.reconnect();
+                }
+              }}
+            >
+              <RefreshCw size={16} />
+            </Button>
+          )}
+          {offlineMessages.length > 0 && (
+            <Badge color="warning" badgeContent={offlineMessages.length} sx={{ ml: 1 }}>
+              <Button
+                size="small"
+                variant="outlined"
+                sx={{ ml: 1, minWidth: 0, px: 1, bgcolor: 'white', color: 'text.primary' }}
+                onClick={toggleOfflineMode}
+              >
+                Офлайн режим
+              </Button>
+            </Badge>
+          )}
+        </Box>
+      );
+    }
+    
+    // Показываем статус онлайн только если есть офлайн сообщения
+    if (wsConnected && offlineMessages.length > 0) {
+      return (
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          justifyContent: 'center',
+          bgcolor: 'success.light',
+          color: 'success.contrastText',
+          py: 1,
+          px: 2
+        }}>
+          <WifiIcon size={16} style={{ marginRight: 8 }} />
+          <Typography variant="body2" fontWeight={500}>
+            Онлайн - готовы отправить {offlineMessages.length} неотправленных сообщений
           </Typography>
           <Button 
             size="small" 
             variant="contained" 
             sx={{ ml: 2, minWidth: 0, px: 1 }}
-            onClick={() => wsRef.current?.reconnect()}
+            onClick={sendOfflineMessages}
           >
-            <RefreshCw size={16} />
+            Отправить
           </Button>
         </Box>
       );
@@ -480,17 +656,28 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
       
       {/* Header */}
       <Box sx={{ 
-        p: 2, 
+        p: { xs: 1.5, sm: 2 }, 
         display: 'flex', 
+        flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between',
         borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
         mb: 2
       }}>
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+        <Typography variant="h6" sx={{ 
+          fontWeight: 600,
+          fontSize: { xs: '1rem', sm: '1.25rem' },
+          mb: { xs: 1, sm: 0 }
+        }}>
           Өтінішті талқылау #{ticketId}
         </Typography>
         
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 1,
+          flexWrap: 'wrap',
+          justifyContent: { xs: 'center', sm: 'flex-end' }
+        }}>
           <Chip 
             label={offlineMode ? "Офлайн" : "Онлайн"} 
             color={offlineMode ? "warning" : "success"}
@@ -519,7 +706,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
         sx={{ 
           flex: 1, 
           overflow: 'auto',
-          p: 2,
+          p: { xs: 1, sm: 2 },
           display: 'flex',
           flexDirection: 'column',
           bgcolor: alpha('#f5f5f5', 0.3)
@@ -575,14 +762,18 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
                     >
                       <Chip 
                         label={messageDate.toLocaleDateString('kk-KZ', { 
-                          weekday: 'long', 
+                          weekday: { xs: undefined, sm: 'long' }, 
                           day: 'numeric', 
-                          month: 'long', 
+                          month: { xs: 'short', sm: 'long' }, 
                           year: 'numeric' 
                         })}
                         size="small"
                         variant="outlined"
-                        sx={{ fontWeight: 500, bgcolor: 'background.paper' }}
+                        sx={{ 
+                          fontWeight: 500, 
+                          bgcolor: 'background.paper',
+                          fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                        }}
                       />
                     </Box>
                   )}
@@ -600,11 +791,11 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
                     {!isOwn && showAvatar && (
                       <Avatar 
                         sx={{ 
-                          width: 32, 
-                          height: 32, 
-                          mr: 1,
+                          width: { xs: 28, sm: 32 }, 
+                          height: { xs: 28, sm: 32 }, 
+                          mr: { xs: 0.5, sm: 1 },
                           bgcolor: message.sender?.type === 'requester' ? 'primary.main' : 'secondary.main',
-                          fontSize: '0.875rem'
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' }
                         }}
                       >
                         {message.sender?.name?.charAt(0).toUpperCase() || '?'}
@@ -612,20 +803,28 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
                     )}
                     
                     {!isOwn && !showAvatar && (
-                      <Box sx={{ width: 32, mr: 1 }} />
+                      <Box sx={{ width: { xs: 28, sm: 32 }, mr: { xs: 0.5, sm: 1 } }} />
                     )}
                     
-                    <Box sx={{ maxWidth: '80%' }}>
+                    <Box sx={{ maxWidth: { xs: '90%', sm: '80%' } }}>
                       {/* Имя отправителя */}
                       {!isOwn && showAvatar && (
-                        <Typography variant="caption" sx={{ ml: 1, mb: 0.5, display: 'block', fontWeight: 500 }}>
+                        <Typography variant="caption" sx={{ 
+                          ml: { xs: 0.5, sm: 1 }, 
+                          mb: 0.5, 
+                          display: 'block', 
+                          fontWeight: 500,
+                          fontSize: { xs: '0.65rem', sm: '0.75rem' }
+                        }}>
                           {message.sender?.name || 'Пользователь'}
                         </Typography>
                       )}
                       
                       {/* Пузырек сообщения */}
                       <MessageBubble isOwn={isOwn}>
-                        <Typography variant="body2" component="div">
+                        <Typography variant="body2" component="div" sx={{ 
+                          fontSize: { xs: '0.875rem', sm: '1rem' } 
+                        }}>
                           {message.content}
                         </Typography>
                         
@@ -638,10 +837,12 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
                             mt: 0.5,
                             gap: 0.5,
                             opacity: 0.7,
-                            fontSize: '0.7rem'
+                            fontSize: { xs: '0.65rem', sm: '0.7rem' }
                           }}
                         >
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" color="text.secondary" sx={{
+                            fontSize: 'inherit'
+                          }}>
                             {messageDate.toLocaleTimeString('kk-KZ', { 
                               hour: '2-digit', 
                               minute: '2-digit' 
@@ -653,41 +854,6 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
                           )}
                         </Box>
                       </MessageBubble>
-                      
-                      {/* Вложения */}
-                      {message.attachments && message.attachments.length > 0 && (
-                        <Box sx={{ mt: 1, ml: isOwn ? 0 : 1 }}>
-                          {message.attachments.map((attachment, index) => (
-                            <Box 
-                              key={index} 
-                              sx={{ 
-                                display: 'flex', 
-                                alignItems: 'center',
-                                p: 1,
-                                bgcolor: isOwn ? alpha(theme.palette.primary.main, 0.05) : '#f0f0f0',
-                                borderRadius: 1,
-                                mb: 0.5
-                              }}
-                            >
-                              <FileIcon size={16} style={{ marginRight: 8 }} />
-                              <Typography variant="body2" sx={{ flex: 1, fontWeight: 500 }}>
-                                {attachment.filename || 'Файл'}
-                              </Typography>
-                              <Tooltip title="Жүктеп алу">
-                                <IconButton 
-                                  size="small"
-                                  component="a"
-                                  href={attachment.url}
-                                  download
-                                  target="_blank"
-                                >
-                                  <DownloadIcon size={16} />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
-                          ))}
-                        </Box>
-                      )}
                     </Box>
                   </Box>
                 </React.Fragment>
@@ -717,44 +883,14 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
         component="form" 
         onSubmit={handleSendMessage}
         sx={{ 
-          p: 2, 
+          p: { xs: 1.5, sm: 2 }, 
           borderTop: `1px solid ${theme.palette.divider}`,
           bgcolor: 'background.paper',
           position: 'relative'
         }}
       >
-        {/* Вложения */}
-        {attachments.length > 0 && (
-          <Box sx={{ mb: 2 }}>
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                alignItems: 'center',
-                mb: 1
-              }}
-            >
-              <Typography variant="subtitle2" sx={{ fontWeight: 500 }}>
-                Тіркемелер:
-              </Typography>
-            </Box>
-            
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {attachments.map((file, index) => (
-                <Chip
-                  key={index}
-                  label={file.name}
-                  onDelete={() => removeAttachment(index)}
-                  icon={<FileIcon size={16} />}
-                  variant="outlined"
-                  size="small"
-                />
-              ))}
-            </Box>
-          </Box>
-        )}
-        
         {/* Строка ввода и кнопки */}
-        <Box sx={{ display: 'flex', gap: 2 }}>
+        <Box sx={{ display: 'flex', gap: { xs: 1, sm: 2 } }}>
           <TextField
             fullWidth
             placeholder="Хабарламаңызды жазыңыз..."
@@ -765,29 +901,24 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
             disabled={sending}
             multiline
             maxRows={4}
-            sx={{ bgcolor: 'background.paper' }}
+            sx={{ 
+              bgcolor: 'background.paper',
+              '& .MuiOutlinedInput-root': {
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                padding: { xs: '8px 10px', sm: '8px 14px' }
+              }
+            }}
           />
-          
-          {/* Кнопка добавления вложений */}
-          <Tooltip title="Файл тіркеу">
-            <IconButton 
-              type="button" 
-              onClick={handleAttachmentClick}
-              disabled={sending}
-              sx={{ color: 'primary.main' }}
-            >
-              <PaperclipIcon size={20} />
-            </IconButton>
-          </Tooltip>
           
           {/* Кнопка отправки */}
           <Button
             variant="contained"
             type="submit"
-            disabled={sending || (!newMessage.trim() && attachments.length === 0)}
+            disabled={sending || !newMessage.trim()}
             sx={{ 
               borderRadius: 2,
-              minWidth: 'auto',
+              minWidth: { xs: '40px', sm: 'auto' },
+              padding: { xs: '6px', sm: '8px 16px' },
               fontWeight: 500,
               boxShadow: 'none',
               '&:hover': {
@@ -801,15 +932,6 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
               <SendIcon size={20} />
             )}
           </Button>
-          
-          {/* Скрытый input для выбора файлов */}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
-            multiple
-          />
         </Box>
         
         {/* Опция отправки на email */}
@@ -823,7 +945,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
               />
             }
             label={
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                 Клиентке email арқылы хабарлау ({requesterEmail || 'email көрсетілмеген'})
               </Typography>
             }

@@ -80,27 +80,44 @@ const LanguageSwitcher = () => {
 
   return (
     <Box>
-      <IconButton
-        size="large"
-        color="inherit"
-        aria-label="language"
-        aria-controls={open ? 'language-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}
-      >
-        <Badge
-          badgeContent={currentLanguage.toUpperCase()}
-          color="primary"
-          overlap="circular"
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
+      <Tooltip title={t('common:language.select', 'Тілді таңдау')}>
+        <IconButton
+          size="medium"
+          color="inherit"
+          aria-label="language"
+          aria-controls={open ? 'language-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          onClick={handleClick}
+          sx={{ 
+            padding: { xs: '6px', sm: '8px' },
+            backgroundColor: open ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.15)'
+            }
           }}
         >
-          <Globe size={22} />
-        </Badge>
-      </IconButton>
+          <Badge
+            badgeContent={currentLanguage.toUpperCase()}
+            color="primary"
+            overlap="circular"
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            sx={{
+              '& .MuiBadge-badge': {
+                fontSize: { xs: '9px', sm: '10px' },
+                height: { xs: '16px', sm: '18px' },
+                minWidth: { xs: '16px', sm: '18px' },
+                padding: { xs: '0 4px', sm: '0 5px' }
+              }
+            }}
+          >
+            <Globe size={theme.breakpoints.down('sm') ? 18 : 22} />
+          </Badge>
+        </IconButton>
+      </Tooltip>
       
       <Menu
         id="language-menu"
@@ -109,12 +126,16 @@ const LanguageSwitcher = () => {
         onClose={handleClose}
         MenuListProps={{
           'aria-labelledby': 'language-button',
+          dense: theme.breakpoints.down('sm') ? true : false
         }}
         PaperProps={{
           elevation: 3,
           sx: {
-            minWidth: 150,
+            minWidth: { xs: 120, sm: 150 },
             mt: 1,
+            '& .MuiMenuItem-root': {
+              minHeight: { xs: '36px', sm: '42px' }
+            }
           }
         }}
       >
@@ -124,8 +145,9 @@ const LanguageSwitcher = () => {
             onClick={() => changeLanguage(lang.code)}
             selected={currentLanguage === lang.code}
             sx={{ 
-              py: 1, 
-              minHeight: 'auto',
+              py: { xs: 0.75, sm: 1 }, 
+              px: { xs: 1.5, sm: 2 },
+              minHeight: { xs: '36px', sm: 'auto' },
               '&.Mui-selected': {
                 bgcolor: 'action.selected',
               }
@@ -134,6 +156,9 @@ const LanguageSwitcher = () => {
             <Typography 
               variant="body2" 
               fontWeight={currentLanguage === lang.code ? 'bold' : 'normal'}
+              sx={{ 
+                fontSize: { xs: '0.8125rem', sm: '0.875rem' }
+              }}
             >
               {lang.name}
             </Typography>

@@ -166,20 +166,24 @@ const UserDashboardPage = () => {
   }
 
   return (
-    <Box sx={{ px: 4, py: 3, maxWidth: 1600, mx: 'auto' }}>
+    <Box sx={{ px: { xs: 2, sm: 3, md: 4 }, py: { xs: 2, sm: 3 }, maxWidth: 1600, mx: 'auto' }}>
       {/* Заголовок страницы */}
       <Box
         sx={{
-          mb: 4,
+          mb: { xs: 2, sm: 3, md: 4 },
           display: 'flex',
           flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'space-between',
           alignItems: { xs: 'flex-start', sm: 'center' },
-          gap: 2
+          gap: { xs: 1.5, sm: 2 }
         }}
       >
         <Box>
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
+          <Typography variant="h4" gutterBottom sx={{ 
+            fontWeight: 'bold', 
+            color: theme.palette.primary.main,
+            fontSize: { xs: '1.75rem', sm: '2rem', md: '2.125rem' }
+          }}>
             {t('user:dashboard.title', 'Пайдаланушы тақтасы')}
           </Typography>
           
@@ -210,16 +214,16 @@ const UserDashboardPage = () => {
         </Button>
       </Box>
       
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, sm: 3 }}>
         {/* Статистика заявок */}
         <Grid item xs={12} md={8}>
-          <Paper elevation={2} sx={{ p: 3, borderRadius: 2, height: '100%' }}>
+          <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2, height: '100%' }}>
             <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: theme.palette.text.primary, mb: 2 }}>
               {t('user:dashboard.yourTickets', 'Сіздің өтініштеріңіз')}
             </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={{ xs: 1, sm: 2 }}>
               {/* Все заявки */}
-              <Grid item xs={6} md={4}>
+              <Grid item xs={6} sm={4} md={4}>
                 <Card sx={{ 
                   bgcolor: 'primary.main', 
                   color: 'white', 
@@ -243,7 +247,7 @@ const UserDashboardPage = () => {
               </Grid>
               
               {/* Активные заявки */}
-              <Grid item xs={6} md={4}>
+              <Grid item xs={6} sm={4} md={4}>
                 <Card sx={{ 
                   bgcolor: 'warning.main', 
                   color: 'white',
@@ -267,7 +271,7 @@ const UserDashboardPage = () => {
               </Grid>
               
               {/* Решенные заявки */}
-              <Grid item xs={6} md={4}>
+              <Grid item xs={6} sm={4} md={4}>
                 <Card sx={{ 
                   bgcolor: 'success.main', 
                   color: 'white',
@@ -296,7 +300,7 @@ const UserDashboardPage = () => {
         {/* Боковая информационная панель */}
         <Grid item xs={12} md={4}>
           <Paper elevation={2} sx={{ 
-            p: 3, 
+            p: { xs: 2, sm: 3 }, 
             borderRadius: 2, 
             height: '100%',
             display: 'flex',
@@ -315,7 +319,7 @@ const UserDashboardPage = () => {
                 color: 'white', 
                 p: 2, 
                 borderRadius: 2,
-                mt: 2
+                mt: { xs: 1.5, sm: 2 }
               }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
                   {t('user:dashboard.info.needHelp', 'Көмек керек пе?')}
@@ -335,9 +339,10 @@ const UserDashboardPage = () => {
               startIcon={<AssignmentIcon />}
               onClick={handleViewAllTickets}
               sx={{ 
-                mt: 3,
+                mt: { xs: 2, sm: 3 },
                 borderRadius: '8px',
-                py: 1.5,
+                py: { xs: 1.2, sm: 1.5 },
+                width: { xs: '100%', sm: 'auto' },
                 boxShadow: theme.shadows[1],
                 '&:hover': {
                   boxShadow: theme.shadows[2],
@@ -351,7 +356,7 @@ const UserDashboardPage = () => {
         
         {/* Таблица последних заявок */}
         <Grid item xs={12}>
-          <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+          <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.text.primary }}>
                 {t('user:dashboard.recentTickets', 'Соңғы өтініштер')}
@@ -366,8 +371,16 @@ const UserDashboardPage = () => {
               </Button>
             </Box>
             
-            <TableContainer sx={{ maxHeight: 350, mt: 1 }}>
-              <Table stickyHeader size="small">
+            <TableContainer sx={{ 
+              maxHeight: { xs: 300, sm: 350 }, 
+              mt: 1,
+              overflowX: 'auto'
+            }}>
+              <Table 
+                stickyHeader 
+                size="small"
+                sx={{ minWidth: { xs: 550, sm: 650 } }}
+              >
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 'bold' }}>ID</TableCell>
@@ -393,7 +406,10 @@ const UserDashboardPage = () => {
                       >
                         <TableCell>{ticket.id}</TableCell>
                         <TableCell>
-                          <Typography variant="body2" noWrap sx={{ maxWidth: 150 }}>
+                          <Typography variant="body2" noWrap sx={{ 
+                            maxWidth: { xs: 80, sm: 120, md: 150 },
+                            fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                          }}>
                             {ticket.subject}
                           </Typography>
                         </TableCell>
@@ -412,7 +428,10 @@ const UserDashboardPage = () => {
                             />
                           )}
                         </TableCell>
-                        <TableCell>{formatDate(ticket.created_at)}</TableCell>
+                        <TableCell sx={{ 
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                        display: { xs: 'none', sm: 'table-cell' }
+                      }}>{formatDate(ticket.created_at)}</TableCell>
                         <TableCell align="right">
                           <Tooltip title={t('tickets:actions.view', 'Қарау')}>
                             <IconButton 
@@ -431,7 +450,7 @@ const UserDashboardPage = () => {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={5} align="center">
+                      <TableCell colSpan={5} align="center" sx={{ py: { xs: 4, sm: 5 } }}>
                         <Box sx={{ py: 4, textAlign: 'center' }}>
                           <Typography variant="body1" gutterBottom color="text.secondary">
                             {t('user:dashboard.noTickets', 'Сізде әлі өтініштер жоқ')}
@@ -443,10 +462,11 @@ const UserDashboardPage = () => {
                             onClick={handleCreateTicket}
                             sx={{ 
                               mt: 2,
-                              py: 1.5,
-                              px: 3,
+                              py: { xs: 1.2, sm: 1.5 },
+                              px: { xs: 2, sm: 3 },
                               fontWeight: 'bold',
                               borderRadius: '8px',
+                              width: { xs: '100%', sm: 'auto' },
                               boxShadow: theme.shadows[3],
                               '&:hover': {
                                 boxShadow: theme.shadows[5],

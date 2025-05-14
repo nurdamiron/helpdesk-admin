@@ -47,23 +47,31 @@ const MobileWelcomeCard = ({ name }) => {
   return (
     <Paper
       sx={{
-        p: 2,
-        mb: 3,
-        borderRadius: 2,
+        p: { xs: 1.5, sm: 2.5 },
+        mb: { xs: 2, sm: 3 },
+        borderRadius: { xs: 1.5, sm: 2 },
         background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.04)} 0%, ${alpha(theme.palette.primary.light, 0.08)} 100%)`,
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
+        width: '100%'
       }}
     >
       <Box sx={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
-        alignItems: 'center'
+        alignItems: { xs: 'center', sm: 'center' },
+        flexDirection: { xs: 'row', sm: 'row' },
+        gap: { xs: 1, sm: 1 },
+        flexWrap: { xs: 'wrap', sm: 'nowrap' }
       }}>
-        <Box>
+        <Box sx={{ flex: 1, minWidth: '60%' }}>
           <Typography 
             variant="h5" 
             fontWeight={600}
-            sx={{ mb: 0.5 }}
+            sx={{ 
+              mb: { xs: 0.2, sm: 0.75 },
+              fontSize: { xs: '1.25rem', sm: '1.5rem' },
+              lineHeight: 1.2
+            }}
           >
             {getGreeting()}
           </Typography>
@@ -71,6 +79,11 @@ const MobileWelcomeCard = ({ name }) => {
           <Typography 
             variant="body2" 
             color="text.secondary"
+            sx={{
+              fontSize: { xs: '0.8rem', sm: '0.875rem' },
+              lineHeight: 1.3,
+              fontWeight: { xs: 400, sm: 400 }
+            }}
           >
             {name && `${name}, `}
             {t('welcome.message', 'мы рады сообщить о вашем входе в систему')}
@@ -78,15 +91,18 @@ const MobileWelcomeCard = ({ name }) => {
         </Box>
         
         <Chip
-          icon={<Clock size={14} />}
+          icon={<Clock size={12} />}
           label={formattedTime}
           color="primary"
           variant="outlined"
           sx={{ 
             fontWeight: 500,
             '& .MuiChip-label': {
-              px: 1
-            }
+              px: { xs: 0.75, sm: 1.25 }
+            },
+            height: { xs: 28, sm: 34 },
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
           }}
         />
       </Box>

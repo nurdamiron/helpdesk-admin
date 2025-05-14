@@ -65,7 +65,7 @@ const Sidebar = () => {
         path: '/users', 
         label: t('users:managementTitle', 'Управление пользователями'), 
         icon: <Users size={isMobile ? 22 : 24} />,
-        visible: canManageUsers
+        visible: true // Admin should always see this menu item
       });
     }
 
@@ -92,7 +92,8 @@ const Sidebar = () => {
         component={Link}
         to={item.path}
         sx={{
-          padding: isMobile ? '12px 16px' : '12px 24px',
+          padding: isMobile ? '16px 20px' : '14px 24px',
+          minHeight: isMobile ? '60px' : '48px',
           color: isActive(item.path) ? 'primary.main' : 'text.primary',
           bgcolor: isActive(item.path) ? 'rgba(25, 118, 210, 0.08)' : 'transparent',
           borderLeft: isActive(item.path) ? '4px solid' : '4px solid transparent',
@@ -100,8 +101,13 @@ const Sidebar = () => {
           '&:hover': {
             bgcolor: isActive(item.path) ? 'rgba(25, 118, 210, 0.12)' : 'rgba(0, 0, 0, 0.04)',
           },
+          '&:active': {
+            bgcolor: 'rgba(25, 118, 210, 0.16)',
+          },
           textDecoration: 'none',
-          transition: 'all 0.2s ease'
+          transition: 'all 0.2s ease',
+          my: 0.5,
+          borderRadius: 1
         }}
       >
         <ListItemIcon sx={{ 
@@ -195,42 +201,7 @@ const Sidebar = () => {
         {menuItems.map(item => renderMenuItem(item))}
       </List>
 
-      <Box sx={{ mt: 'auto', mb: 2, px: 2 }}>
-        <Divider sx={{ my: 2 }} />
-        <Tooltip title={t('nav.backToSite', 'Публичный сайт')}>
-          <ListItem
-            component={Link}
-            to="/public"
-            sx={{
-              padding: isMobile ? '12px 16px' : '12px 24px',
-              color: 'text.primary',
-              bgcolor: 'transparent',
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: 1,
-              '&:hover': {
-                bgcolor: 'rgba(0, 0, 0, 0.04)',
-              },
-              textDecoration: 'none',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            <ListItemIcon sx={{ 
-              minWidth: isMobile ? 40 : 40,
-              color: 'text.secondary'
-            }}>
-              <ExternalLink size={20} />
-            </ListItemIcon>
-            <ListItemText 
-              primary={t('nav.publicSite', 'Публичный сайт')} 
-              primaryTypographyProps={{ 
-                fontWeight: 400,
-                fontSize: isMobile ? '0.95rem' : '0.9rem'
-              }}
-            />
-          </ListItem>
-        </Tooltip>
-      </Box>
+      
     </Paper>
   );
 };

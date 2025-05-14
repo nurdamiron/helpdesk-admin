@@ -30,8 +30,8 @@ class WebSocketService {
     let backendHost = '';
     
     if (isLocalDevelopment) {
-      // Обновляем порт сервера на 5003, согласно актуальной конфигурации
-      backendHost = 'localhost:5003';
+      // Обновляем порт сервера на 5002, согласно актуальной конфигурации в server.js
+      backendHost = 'localhost:5002';
       console.warn('Режим разработки: используем WebSocket сервер на', backendHost);
     } else {
       // В проде используем текущий хост
@@ -179,105 +179,51 @@ class WebSocketService {
       const url = `${this.baseUrl}?userId=${encodeURIComponent(this.userId)}&userType=${encodeURIComponent(this.userType)}&t=${timestamp}`;
       console.log(`Подключение к WebSocket: ${url}`);
       
-      // Проверяем доступность сервера с помощью HTTP запроса
-      this.checkServerAvailability(url)
-        .then(available => {
-          if (!available) {
-            console.warn('WebSocket server is not available via HTTP check');
-            // Продолжаем попытку подключения, но с осторожностью
+      // Создаем таймаут для соединения
+      const connectTimeoutId = setTimeout(() => {
+        if (this.socket && this.socket.readyState !== WebSocket.OPEN) {
+          console.warn('WebSocket соединение не установлено в течение 10 секунд');
+          if (this.socket) {
+            this.socket.close(4000, "Таймаут соединения");
           }
-          
-          // Создаем таймаут для соединения
-          const connectTimeoutId = setTimeout(() => {
-            if (this.socket && this.socket.readyState !== WebSocket.OPEN) {
-              console.warn('WebSocket соединение не установлено в течение 10 секунд');
-              if (this.socket) {
-                this.socket.close(4000, "Таймаут соединения");
-              }
-              this.scheduleReconnect();
-            }
-          }, 10000); // 10 секунд на соединение
-          
-          // Создаем новое соединение с обработкой ошибок
-          try {
-            this.socket = new WebSocket(url);
-            
-            if (this.debug) {
-              console.log('WebSocket создан с состоянием:', this.socket.readyState);
-              console.log('Время начала подключения:', new Date().toISOString());
-              
-              // Мониторинг состояния подключения
-              setTimeout(() => {
-                if (this.socket && this.socket.readyState !== WebSocket.OPEN) {
-                  console.warn('WebSocket не подключился в течение 5 секунд, текущее состояние:', this.socket.readyState);
-                }
-              }, 5000);
-            }
-
-            // Установка обработчиков событий
-            this.socket.onopen = (event) => {
-              clearTimeout(connectTimeoutId);
-              this.handleOpen(event);
-            };
-            this.socket.onmessage = this.handleMessage.bind(this);
-            this.socket.onerror = this.handleError.bind(this);
-            this.socket.onclose = this.handleClose.bind(this);
-          } catch (socketError) {
-            clearTimeout(connectTimeoutId);
-            console.error('Error creating WebSocket:', socketError);
-            this.notifyConnectionStatus(false, socketError.message);
-            this.scheduleReconnect();
-          }
-        })
-        .catch(error => {
-          console.error('Error checking server availability:', error);
-          // Продолжаем попытку подключения, но с осторожностью
           this.scheduleReconnect();
-        });
+        }
+      }, 10000); // 10 секунд на соединение
+      
+      // Создаем новое соединение с обработкой ошибок
+      try {
+        this.socket = new WebSocket(url);
+        
+        if (this.debug) {
+          console.log('WebSocket создан с состоянием:', this.socket.readyState);
+          console.log('Время начала подключения:', new Date().toISOString());
+          
+          // Мониторинг состояния подключения
+          setTimeout(() => {
+            if (this.socket && this.socket.readyState !== WebSocket.OPEN) {
+              console.warn('WebSocket не подключился в течение 5 секунд, текущее состояние:', this.socket.readyState);
+            }
+          }, 5000);
+        }
+
+        // Установка обработчиков событий
+        this.socket.onopen = (event) => {
+          clearTimeout(connectTimeoutId);
+          this.handleOpen(event);
+        };
+        this.socket.onmessage = this.handleMessage.bind(this);
+        this.socket.onerror = this.handleError.bind(this);
+        this.socket.onclose = this.handleClose.bind(this);
+      } catch (socketError) {
+        clearTimeout(connectTimeoutId);
+        console.error('Error creating WebSocket:', socketError);
+        this.notifyConnectionStatus(false, socketError.message);
+        this.scheduleReconnect();
+      }
     } catch (error) {
       console.error('Ошибка WebSocket подключения:', error);
       this.notifyConnectionStatus(false, error.message);
       this.scheduleReconnect();
-    }
-  }
-
-  /**
-   * Проверка доступности WebSocket сервера с помощью HTTP запроса
-   * HTTP сұранысы арқылы WebSocket серверінің қолжетімділігін тексеру
-   * 
-   * @param {string} wsUrl - URL для WebSocket соединения
-   * @returns {Promise<boolean>} - Доступен ли сервер
-   */
-  async checkServerAvailability(wsUrl) {
-    try {
-      // Заменяем WebSocket протокол на HTTP
-      const httpUrl = wsUrl.replace('ws:', 'http:').replace('wss:', 'https:');
-      
-      // Выполняем проверочный HTTP запрос
-      const response = await fetch(httpUrl, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'X-Client': 'AdminWebSocketService',
-          'X-Client-Version': '1.0'
-        },
-        // Предотвращаем 30-секундный таймаут по умолчанию
-        signal: AbortSignal.timeout(5000) // Ограничиваем время ожидания 5 секундами
-      });
-      
-      if (!response.ok) {
-        console.warn(`WebSocket HTTP check failed with status: ${response.status}`);
-        return false;
-      }
-      
-      // Пытаемся получить JSON ответ
-      const data = await response.json();
-      console.log('WebSocket server availability check:', data);
-      
-      return data && data.available === true;
-    } catch (error) {
-      console.error('WebSocket server availability check failed:', error);
-      return false;
     }
   }
 
@@ -331,37 +277,142 @@ class WebSocketService {
   }
 
   /**
-   * Обработчик ошибок соединения
-   * Байланыс қателерін өңдеуші
+   * Обработчик сообщений
+   * Хабарламаларды өңдеуші
+   * 
+   * @param {MessageEvent} event - Событие сообщения
    */
+  handleMessage(event) {
+    try {
+      const data = JSON.parse(event.data);
+      
+      // Обновляем время последнего heartbeat
+      this.updateHeartbeat();
+      
+      if (this.debug) {
+        console.log('Получено сообщение WebSocket:', data);
+      }
+      
+      // Обрабатываем разные типы сообщений
+      switch (data.type) {
+        case 'pong':
+        case 'heartbeat_ack':
+          // Пинг-понг для поддержания соединения
+          break;
+          
+        case 'new_message':
+          // Новое сообщение в чате
+          this.handleNewMessage(data);
+          break;
+          
+        case 'message_status':
+          // Обновление статуса сообщения
+          this.handleStatusUpdate(data);
+          break;
+          
+        case 'typing_indicator':
+          // Индикатор набора текста
+          this.handleTypingIndicator(data);
+          break;
+          
+        case 'connection_established':
+          // Подтверждение подключения
+          console.log('Соединение подтверждено сервером:', data);
+          break;
+          
+        default:
+          console.log('Получено неизвестное сообщение:', data.type);
+      }
+    } catch (error) {
+      console.error('Ошибка при обработке сообщения WebSocket:', error, 'Сырые данные:', event.data);
+    }
+  }
+
+  /**
+   * Обработчик ошибок подключения
+   * Байланыс қателерін өңдеуші
+   * 
+   * @param {string} errorType - Тип ошибки (например, 'timeout', 'network', 'server')
+   * @param {Object} errorDetails - Дополнительная информация об ошибке
+   */
+  handleConnectionError(errorType, errorDetails = {}) {
+    console.error(`WebSocket connection error: ${errorType}`, errorDetails);
+    
+    // Записываем информацию об ошибке
+    this.lastConnectionError = {
+      type: errorType,
+      details: errorDetails,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Оповещаем о проблеме
+    this.notifyConnectionStatus(false, `Connection error: ${errorType}`);
+    
+    // Разные стратегии в зависимости от типа ошибки
+    switch (errorType) {
+      case 'timeout':
+        // При таймауте пытаемся переподключиться сразу
+        this.reconnect();
+        break;
+        
+      case 'authentication':
+        // При ошибке аутентификации не пытаемся переподключаться
+        // Это может означать проблемы с токеном или правами доступа
+        if (this.reconnectTimeout) {
+          clearTimeout(this.reconnectTimeout);
+          this.reconnectTimeout = null;
+        }
+        this.isConnected = false;
+        break;
+        
+      case 'server':
+      case 'network':
+      default:
+        // Для других ошибок используем стандартный механизм переподключения
+        this.scheduleReconnect();
+    }
+  }
+
   handleError(error) {
     console.error('WebSocket error occurred:', error);
     
     // Статус и сообщение для детального логирования
     let errorStatus = 'unknown';
     let errorMessage = 'Unknown WebSocket error';
+    let errorType = 'unknown';
     
     if (error && error.target && error.target.readyState) {
       switch (error.target.readyState) {
         case WebSocket.CONNECTING:
           errorStatus = 'connecting';
           errorMessage = 'Error while connecting to server';
+          errorType = 'connection';
           break;
         case WebSocket.CLOSING:
           errorStatus = 'closing';
           errorMessage = 'Connection is closing';
+          errorType = 'closing';
           break;
         case WebSocket.CLOSED:
           errorStatus = 'closed';
           errorMessage = 'Connection is closed';
+          errorType = 'closed';
           break;
       }
     }
     
     console.error(`WebSocket error status: ${errorStatus}, message: ${errorMessage}`);
     
-    // Уведомляем о проблеме подключения
-    this.notifyConnectionStatus(false, errorMessage);
+    // Детальный анализ ошибки
+    const errorDetails = {
+      readyState: error.target?.readyState,
+      status: errorStatus,
+      message: errorMessage,
+      originalError: error.message || 'No detailed error message'
+    };
+    
+    // Используем новый обработчик с более детальной информацией
+    this.handleConnectionError(errorType, errorDetails);
   }
 
   /**
@@ -486,7 +537,6 @@ class WebSocketService {
       this.socket = null;
     }
     
-    this.reconnectAttempts = 0;
     this.isConnected = false;
     
     // Уведомляем о начале переподключения
@@ -599,17 +649,24 @@ class WebSocketService {
    * 
    * @param {string|number} ticketId - ID тикета
    * @param {string} content - Текст сообщения
-   * @param {Array} attachmentIds - ID вложений
    * @returns {boolean} - Результат отправки
    */
-  sendChatMessage(ticketId, content, attachmentIds = []) {
+  sendChatMessage(ticketId, content) {
+    // Преобразуем тип пользователя для совместимости с бэкендом
+    // На бэкенде ожидается sender_type: admin, moderator или requester
+    // А в WebSocket используется staff или requester
+    let backendUserType = this.userType;
+    if (this.userType === 'staff') {
+      // По умолчанию отправляем как администратор, если система присылает staff
+      backendUserType = 'admin';
+    }
+    
     return this.sendData({
       type: 'chat_message',
       ticket_id: ticketId,
       content,
-      attachments: attachmentIds,
       sender_id: this.userId,
-      sender_type: this.userType,
+      sender_type: backendUserType,
       sender_name: 'Администратор',
       timestamp: new Date().toISOString()
     });
@@ -872,4 +929,4 @@ class WebSocketService {
 // Создаем единственный экземпляр сервиса (Singleton)
 const wsService = new WebSocketService();
 
-export default wsService; 
+export default wsService;
