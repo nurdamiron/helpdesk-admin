@@ -6,7 +6,7 @@
       "use": "@vercel/static-build",
       "config": {
         "installCommand": "npm install --legacy-peer-deps --force",
-        "buildCommand": "npm run prebuild && SKIP_PREFLIGHT_CHECK=true CI=false npm run build",
+        "buildCommand": "./vercel-build.sh",
         "nodeVersion": "18.x",
         "outputDirectory": "build"
       }
