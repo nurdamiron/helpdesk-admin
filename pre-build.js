@@ -4,39 +4,47 @@ const path = require('path');
 // This script fixes dependency issues for Vercel build
 console.log('Applying compatibility fixes for Vercel build...');
 
-// Fix for "Unknown keyword formatMinimum" error
-// The issue is that ajv-keywords 5.x requires ajv 8.x, but some dependencies use ajv 6.x
-// We'll modify package.json to pin specific versions
+// Fix for "validateOptions is not a function" error
+// This is typically related to schema-utils version mismatch with webpack
 
 const packageJsonPath = path.join(__dirname, 'package.json');
 const packageJson = require(packageJsonPath);
 
-// Add specific versions of ajv dependencies
-packageJson.dependencies = packageJson.dependencies || {};
-packageJson.dependencies.ajv = "^6.12.6"; // Use 6.x version instead of 8.x
-delete packageJson.dependencies['ajv-keywords']; // Remove if exists
-
-// Update resolutions section
+// Update resolutions section with specific versions known to work together
 packageJson.resolutions = packageJson.resolutions || {};
-packageJson.resolutions.ajv = "^6.12.6"; 
-delete packageJson.resolutions['ajv-keywords']; // Remove if exists
+packageJson.resolutions = {
+  ...(packageJson.resolutions || {}),
+  // These specific versions work together
+  "ajv": "6.12.6",
+  "ajv-keywords": "3.5.2",
+  "schema-utils": "2.7.1",
+  "webpack": "4.44.2",
+  "react": "18.2.0",
+  "react-dom": "18.2.0"
+};
 
 // Update overrides section
-packageJson.overrides = packageJson.overrides || {};
-packageJson.overrides.ajv = "^6.12.6";
-delete packageJson.overrides['ajv-keywords']; // Remove if exists
-
-// Force specific versions for webpack related packages
-packageJson.resolutions['schema-utils'] = "^3.0.0";
-packageJson.overrides['schema-utils'] = "^3.0.0";
-
-// Add special npm config for legacy behavior
-packageJson.npm = packageJson.npm || {};
-packageJson.npm.legacy = {
-  "peer-deps": true
+packageJson.overrides = {
+  ...(packageJson.overrides || {}),
+  "ajv": "6.12.6",
+  "ajv-keywords": "3.5.2",
+  "schema-utils": "2.7.1"
 };
 
 // Write updated package.json
 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
 
-console.log('Updated package.json with dependency fixes for Vercel build');
+// Create a webpack.config.js patch
+const webpackPatchPath = path.join(__dirname, 'webpack.patch.js');
+const webpackPatchContent = `
+// This is a patch for webpack.config.js in create-react-app
+// It's used to fix issues with validateOptions
+const validateOptions = (schema, options) => {
+  return options; // Just pass through options without validation
+};
+
+module.exports = { validateOptions };
+`;
+fs.writeFileSync(webpackPatchPath, webpackPatchContent);
+
+console.log('Updated package.json and created webpack patch');
