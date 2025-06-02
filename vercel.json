@@ -45,6 +45,7 @@
     "GENERATE_SOURCEMAP": "false",
     "NODE_OPTIONS": "--max-old-space-size=4096",
     "CI": "false",
-    "INLINE_RUNTIME_CHUNK": "false"
+    "INLINE_RUNTIME_CHUNK": "false",
+    "DISABLE_NEW_JSX_TRANSFORM": "true"
   }
 }
