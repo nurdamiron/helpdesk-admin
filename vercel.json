@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node custom-build.js",
+  "buildCommand": "node vite-build.js",
   "outputDirectory": "build",
   "framework": null,
   "rewrites": [
