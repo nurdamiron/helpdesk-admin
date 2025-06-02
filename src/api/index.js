@@ -1,17 +1,6 @@
 // src/api/index.js
 import axios from 'axios';
-
-// Определение базового URL для API в зависимости от среды
-let API_URL;
-
-// Проверяем режим работы (разработка или продакшн)
-if (process.env.NODE_ENV === 'production') {
-  // Используем переменную окружения из .env файла, или URL для продакшна по умолчанию
-  API_URL = process.env.REACT_APP_API_URL || 'https://helpdesk-backend-ycoo.onrender.com/api';
-} else {
-  // В режиме разработки используем локальный сервер
-  API_URL = 'http://localhost:5002/api';
-}
+import { API_URL } from '../config/api';
 
 console.log(`Using API URL (${process.env.NODE_ENV} mode):`, API_URL);
 

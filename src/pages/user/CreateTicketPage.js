@@ -61,7 +61,6 @@ const CreateTicketPage = () => {
   const [success, setSuccess] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [createdTicketId, setCreatedTicketId] = useState(null);
-  const [whatsappUrl, setWhatsappUrl] = useState(null);
   
   // Категории заявок для службы поддержки сотрудников
   const categories = [
@@ -188,9 +187,10 @@ const CreateTicketPage = () => {
         
         setSuccess(true);
         setLoading(false);
-        setCreatedTicketId(response.id);
-        setWhatsappUrl(whatsappUrl);
-        setShowSuccessModal(true);
+        
+        // Сразу открываем WhatsApp и перенаправляем на главную
+        window.open(whatsappUrl, '_blank');
+        navigate('/');
         
       } else {
         // Обычная отправка через Email
@@ -940,7 +940,6 @@ const CreateTicketPage = () => {
       onClose={() => setShowSuccessModal(false)}
       ticketData={formData}
       ticketId={createdTicketId}
-      whatsappUrl={whatsappUrl}
     />
     </>
   );

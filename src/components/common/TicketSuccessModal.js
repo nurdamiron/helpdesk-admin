@@ -21,7 +21,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-const TicketSuccessModal = ({ open, onClose, ticketData, ticketId, whatsappUrl }) => {
+const TicketSuccessModal = ({ open, onClose, ticketData, ticketId }) => {
   const { t } = useTranslation(['tickets', 'common']);
   const navigate = useNavigate();
 
@@ -30,17 +30,11 @@ const TicketSuccessModal = ({ open, onClose, ticketData, ticketId, whatsappUrl }
   };
 
   const handleContinue = () => {
-    if (whatsappUrl) {
-      window.open(whatsappUrl, '_blank');
-    }
     onClose();
     navigate('/');
   };
 
   const handleClose = () => {
-    if (whatsappUrl) {
-      window.open(whatsappUrl, '_blank');
-    }
     onClose();
     navigate('/');
   };
@@ -132,24 +126,13 @@ const TicketSuccessModal = ({ open, onClose, ticketData, ticketId, whatsappUrl }
           </>
         )}
 
-        {ticketData?.communicationChannel === 'whatsapp' && (
-          <Alert 
-            severity="info" 
-            sx={{ mb: 2, textAlign: 'left' }}
-          >
-            {t('tickets:success.whatsappSent', 'Заявка создана. Пожалуйста, отправьте сообщение в WhatsApp для завершения процесса.')}
-          </Alert>
-        )}
-
-        {ticketData?.communicationChannel === 'email' && (
-          <Alert 
-            icon={<EmailIcon />} 
-            severity="info" 
-            sx={{ mb: 2, textAlign: 'left' }}
-          >
-            {t('tickets:success.emailSent', 'Информация о заявке отправлена на ваш email.')}
-          </Alert>
-        )}
+        <Alert 
+          icon={<EmailIcon />} 
+          severity="info" 
+          sx={{ mb: 2, textAlign: 'left' }}
+        >
+          {t('tickets:success.emailSent', 'Информация о заявке отправлена на ваш email.')}
+        </Alert>
 
         {ticketData && (
           <>
@@ -205,10 +188,7 @@ const TicketSuccessModal = ({ open, onClose, ticketData, ticketId, whatsappUrl }
           onClick={handleContinue}
           size="large"
         >
-          {whatsappUrl 
-            ? t('tickets:success.openWhatsApp', 'Открыть WhatsApp') 
-            : t('common:actions.goToHome', 'Перейти на главную')
-          }
+          {t('common:actions.goToHome', 'Перейти на главную')}
         </Button>
       </DialogActions>
     </Dialog>
