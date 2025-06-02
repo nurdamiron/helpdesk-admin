@@ -5,81 +5,19 @@ export const authService = {
   // Авторизация по email и паролю
   login: async (email, password) => {
     try {
-      // Для разработки: имитируем ответ сервера с mock-пользователями
-      const isDevelopment = process.env.NODE_ENV === 'development';
+      // Запрос к API
+      const response = await api.post('/auth/login', { email, password });
       
-      // Всегда используем настоящие данные API
-      // const isDevelopment = false; // Отключаем мок-данные
-      if (false) { // Всегда используем API, даже в режиме разработки
-        // Проверяем тестовые учетные данные
-        const mockUsers = [
-          { email: 'admin@example.com', password: 'admin123', role: 'admin', first_name: 'Админ', last_name: 'Системы', id: 1 },
-          { email: 'support@example.com', password: 'support123', role: 'support', first_name: 'Поддержка', last_name: 'Клиентов', id: 2 },
-          { email: 'manager@example.com', password: 'manager123', role: 'manager', first_name: 'Менеджер', last_name: 'Отдела', id: 3 },
-          { email: 'user@example.com', password: 'user123', role: 'user', first_name: 'Обычный', last_name: 'Пользователь', id: 4 }
-        ];
-        
-        // Находим пользователя по email и password
-        const user = mockUsers.find(u => u.email === email && u.password === password);
-        
-        if (user) {
-          console.log('Mock login success:', user);
-          
-          // Имитируем задержку запроса
-          await new Promise(resolve => setTimeout(resolve, 800));
-          
-          // Возвращаем успешный ответ
-          const responseData = {
-            status: 'success',
-            user: {
-              id: user.id,
-              email: user.email,
-              first_name: user.first_name,
-              last_name: user.last_name,
-              role: user.role
-            }
-          };
-          
-          // Имитируем JWT токен для разработки, включая в него роль пользователя
-          const role = user.role || 'user';
-          const mockToken = `mock-jwt-token-${role}-` + Math.random().toString(36).substring(2);
-          responseData.token = mockToken;
-          
-          // Сохраняем токен и данные пользователя в localStorage
-          localStorage.setItem('token', mockToken);
-          localStorage.setItem('user', JSON.stringify(responseData.user));
-          
-          return responseData;
-        } else {
-          // Имитируем задержку запроса
-          await new Promise(resolve => setTimeout(resolve, 800));
-          
-          // Имитируем ошибку аутентификации
-          const error = new Error('Неверные учетные данные');
-          error.response = {
-            status: 401,
-            data: {
-              status: 'error',
-              error: 'Неверный email или пароль'
-            }
-          };
-          throw error;
-        }
-      } else {
-        // В реальном приложении: запрос к API
-        const response = await api.post('/auth/login', { email, password });
-        
-        // Сохраняем токен и данные пользователя в localStorage
-        if (response.data.token) {
-          localStorage.setItem('token', response.data.token);
-        }
-        
-        if (response.data.user) {
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-        }
-        
-        return response.data;
+      // Сохраняем токен и данные пользователя в localStorage
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
       }
+      
+      if (response.data.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
+      
+      return response.data;
     } catch (error) {
       console.error('Login error:', error);
       throw error;

@@ -49,7 +49,7 @@ const Footer = () => {
               {t('footer:address', 'Адрес: ул. Примерная, 123')}
             </Typography>
             <Typography variant="body2" color="text.secondary" paragraph>
-              {t('footer:email', 'Email: support@example.com')}
+              {t('footer:email', 'Email: Свяжитесь с администратором')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {t('footer:phone', 'Телефон: +7 (123) 456-7890')}

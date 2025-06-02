@@ -139,5 +139,30 @@
   },
   "rowsPerPage": "Rows per page:",
   "of": "of",
-  "copyright": "All rights reserved."
+  "copyright": "All rights reserved.",
+  "form": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "invalidPhone": "Invalid phone number",
+    "authRequired": "Staff members must be authenticated to create tickets.",
+    "submitError": "Error submitting form. Please try again later.",
+    "staffAuthRequired": "Authentication Required for Staff",
+    "staffAuthMessage": "Staff members must log in to create tickets.",
+    "login": "Log In",
+    "error": "Error",
+    "contactInfo": "Contact Information",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone (optional)",
+    "ticketDetails": "Ticket Information",
+    "subject": "Subject",
+    "category": "Category",
+    "priority": "Priority",
+    "message": "Message",
+    "sending": "Sending...",
+    "submit": "Submit Ticket"
+  },
+  "support": {
+    "title": "24/7 Support"
+  }
 }

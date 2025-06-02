@@ -22,6 +22,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import TicketForm from '../../components/ticket/TicketForm';
 import { ticketService } from '../../api/ticketService';
+import SupportIllustration from '../../components/common/SupportIllustration';
 
 // Компонент с принципами работы
 const PrincipleItem = ({ title, description }) => {
@@ -237,17 +238,15 @@ const HomePage = () => {
             </Grid>
             
             <Grid item xs={12} md={5} sx={{ order: { xs: 1, md: 2 } }}>
-              <Box sx={{ position: 'relative', width: '100%', height: { xs: 200, sm: 300, md: 400 } }}>
-                <img 
-                  src="/images/support.svg" 
-                  alt="Support" 
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'contain', 
-                    objectPosition: 'center',
-                    maxWidth: '100%',
-                  }}
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center',
+                height: { xs: 250, sm: 350, md: 400 } 
+              }}>
+                <SupportIllustration 
+                  width={isMobile ? 280 : isTablet ? 320 : 380} 
+                  height={isMobile ? 280 : isTablet ? 320 : 380} 
                 />
               </Box>
             </Grid>

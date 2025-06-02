@@ -95,5 +95,33 @@
       "phone": "+1 (555) 123-4567",
       "workHours": "Working hours: Mon-Fri from 9:00 to 18:00"
     }
+  },
+  "homePage": {
+    "title": "Technical Support Service",
+    "description": "Create a ticket or check the status of an existing one. We are always ready to help you.",
+    "createTicket": "Create Ticket",
+    "findTicket": "Find Ticket",
+    "principlesTitle": "Our Working Principles",
+    "principles": {
+      "speed": {
+        "title": "Speed",
+        "description": "We strive to process tickets as quickly as possible to resolve your issues in the shortest time."
+      },
+      "quality": {
+        "title": "Quality",
+        "description": "We pay special attention to service quality and strive to provide the best solutions."
+      },
+      "transparency": {
+        "title": "Transparency",
+        "description": "You are always aware of your ticket status, and the resolution process is completely transparent."
+      }
+    },
+    "createTicketTab": "Create Ticket",
+    "findTicketTab": "Find Ticket",
+    "findTicketHeading": "Find Existing Ticket",
+    "findTicketDescription": "Enter the ticket number to check its status.",
+    "ticketNumber": "Ticket Number",
+    "findButton": "Find",
+    "invalidTicketId": "Invalid ticket ID"
   }
 } 

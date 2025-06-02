@@ -185,9 +185,8 @@ const HelpPage = () => {
               variant="text" 
               color="primary" 
               startIcon={<ExternalLink size={16} />}
-              href="https://helpdesk-docs.example.com"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#"
+              disabled
             >
               {t('help:documentation', 'Документация')}
             </Button>
@@ -195,9 +194,8 @@ const HelpPage = () => {
               variant="text" 
               color="primary" 
               startIcon={<ExternalLink size={16} />}
-              href="https://helpdesk-training.example.com"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#"
+              disabled
             >
               {t('help:training', 'Обучающие материалы')}
             </Button>
@@ -205,9 +203,8 @@ const HelpPage = () => {
               variant="text" 
               color="primary" 
               startIcon={<ExternalLink size={16} />}
-              href="https://helpdesk-support.example.com"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#"
+              disabled
             >
               {t('help:support', 'Техническая поддержка')}
             </Button>

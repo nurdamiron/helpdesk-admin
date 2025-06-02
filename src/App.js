@@ -122,8 +122,13 @@ function App() {
                 <Route path="/access-denied" element={<AccessDeniedPage />} />
               </Route>
               
-              {/* Маршрут для перенаправления на главную страницу по умолчанию */}
-              <Route path="/" element={<RoleBasedRedirect />} />
+              {/* Главная страница по умолчанию */}
+              <Route path="/" element={<PublicLayout />}>
+                <Route index element={<HomePage />} />
+              </Route>
+              
+              {/* Маршрут для перенаправления авторизованных пользователей в админку */}
+              <Route path="/admin" element={<RoleBasedRedirect />} />
               
               {/* Защищенные маршруты с общим макетом */}
               <Route element={

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
   Box, Grid, Paper, Typography, Chip, Divider, Button,
-  CircularProgress, Alert, useTheme, useMediaQuery, Tab, Tabs,
+  CircularProgress, Alert, useTheme, useMediaQuery,
   List, ListItem, ListItemAvatar, Avatar, ListItemText
 } from '@mui/material';
 import { 
@@ -12,28 +12,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { ticketService } from '../api/ticketService';
-import TicketChat from '../components/chat/TicketChat';
 
-// TabPanel component for Tabs
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`ticket-tabpanel-${index}`}
-      aria-labelledby={`ticket-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ pt: 2 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
 
 /**
  * Компонент страницы с деталями заявки
@@ -52,7 +31,6 @@ const TicketDetailPage = ({ editMode = false }) => {
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState(0);
   // Set initial edit state based on editMode prop
   const [isEditing, setIsEditing] = useState(editMode);
   const [savingStatus, setSavingStatus] = useState({
@@ -110,11 +88,6 @@ const TicketDetailPage = ({ editMode = false }) => {
     
     fetchTicket();
   }, [id, user]);
-  
-  // Обработчик изменения активной вкладки
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
   
   // Обработчик изменения статуса заявки
   const handleStatusChange = (event) => {
@@ -445,35 +418,14 @@ const TicketDetailPage = ({ editMode = false }) => {
             )}
           </Paper>
           
-          {/* Вкладки с чатом и историей */}
+          {/* История изменений */}
           <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-              <Tabs 
-                value={activeTab} 
-                onChange={handleTabChange}
-                variant={isMobile ? "scrollable" : "standard"}
-                scrollButtons={isMobile ? "auto" : false}
-              >
-                <Tab label={t('tickets:tabs.discussion', 'Обсуждение')} />
-                <Tab label={t('tickets:tabs.history', 'История')} />
-              </Tabs>
-            </Box>
-            
-            {/* Вкладка обсуждения */}
-            <TabPanel value={activeTab} index={0}>
-              <TicketChat 
-                ticketId={ticket.id}
-                messages={ticket.messages}
-                userRole={user?.role}
-              />
-            </TabPanel>
-            
-            {/* Вкладка истории */}
-            <TabPanel value={activeTab} index={1}>
-              <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
-                {t('tickets:tabs.historyComingSoon', 'История изменений будет доступна в ближайшее время')}
-              </Typography>
-            </TabPanel>
+            <Typography variant="h6" gutterBottom>
+              {t('tickets:tabs.history', 'История изменений')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+              {t('tickets:tabs.historyComingSoon', 'История изменений будет доступна в ближайшее время')}
+            </Typography>
           </Paper>
         </Grid>
         

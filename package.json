@@ -2,8 +2,10 @@
   "name": "helpdesk-admin",
   "version": "0.1.0",
   "private": true,
+  "overrides": {
+    "schema-utils": "^2.7.1"
+  },
   "dependencies": {
-    "@craco/craco": "^7.1.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.11",
@@ -13,8 +15,6 @@
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
     "@testing-library/user-event": "^13.5.0",
-    "ajv": "6.12.6",
-    "ajv-keywords": "3.5.2",
     "axios": "^1.8.2",
     "i18next": "^24.0.0",
     "i18next-browser-languagedetector": "^7.2.0",
@@ -26,7 +26,6 @@
     "react-i18next": "^14.0.0",
     "react-router-dom": "^6.20.0",
     "react-scripts": "5.0.1",
-    "schema-utils": "2.7.1",
     "socket.io-client": "^4.8.1",
     "web-vitals": "^2.1.4",
     "workbox-background-sync": "^7.0.0",
@@ -43,20 +42,16 @@
     "workbox-streams": "^7.0.0"
   },
   "scripts": {
-    "prestart": "node patch-dependencies.js",
-    "start": "craco start",
-    "dev": "craco start",
-    "start:prod": "REACT_APP_ENV=production craco start",
-    "build": "SKIP_PREFLIGHT_CHECK=true CI=false REACT_APP_ENV=production craco build",
-    "build:dev": "SKIP_PREFLIGHT_CHECK=true CI=false REACT_APP_ENV=development craco build",
-    "build:static": "node static-build.js",
+    "start": "node bypass-validation.js",
+    "dev": "node bypass-validation.js",
+    "start:prod": "REACT_APP_ENV=production node bypass-validation.js",
+    "build": "REACT_APP_ENV=production react-scripts build",
+    "build:dev": "REACT_APP_ENV=development react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "postinstall": "echo 'Running with legacy peer deps' && npm ls",
-    "prebuild": "node pre-build.js"
+    "eject": "react-scripts eject"
   },
   "engines": {
-    "node": "18.x"
+    "node": ">=18.x"
   },
   "eslintConfig": {
     "extends": [
@@ -75,18 +70,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "resolutions": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "ajv": "6.12.6",
-    "ajv-keywords": "3.5.2",
-    "schema-utils": "2.7.1",
-    "webpack": "4.44.2"
-  },
-  "overrides": {
-    "ajv": "6.12.6",
-    "ajv-keywords": "3.5.2",
-    "schema-utils": "2.7.1"
   }
 }

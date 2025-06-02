@@ -38,12 +38,8 @@ const TicketAssignSelect = ({ value, onChange }) => {
     return <Typography color="error" variant="caption">{error}</Typography>;
   }
 
-  // Mock users if empty array (for development)
-  const displayUsers = users.length > 0 ? users : [
-    { id: 1, name: 'Иванов Иван', email: 'ivanov@example.com', role: 'support' },
-    { id: 2, name: 'Петров Петр', email: 'petrov@example.com', role: 'admin' },
-    { id: 3, name: 'Сидоров Сидор', email: 'sidorov@example.com', role: 'support' }
-  ];
+  // Use actual users from the API
+  const displayUsers = users;
 
   return (
     <FormControl fullWidth size="small">

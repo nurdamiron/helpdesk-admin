@@ -33,20 +33,21 @@ const TicketForm = ({ onSubmitSuccess }) => {
     phone: '',
     subject: '',
     category: '',
-    type: 'construction', // Установим строительный тип по умолчанию
+    type: 'support_request', // Установим тип по умолчанию для службы поддержки
     message: '',
-    priority: 'normal',
+    priority: 'medium',
+    communicationChannel: 'email', // Канал связи по умолчанию
   });
   
-  // Типы заявок для строительной тематики
+  // Типы заявок для службы поддержки сотрудников
   const ticketTypes = [
-    { id: 'construction', name: t('tickets:type.construction', 'Строительные работы') },
-    { id: 'repair', name: t('tickets:type.repair', 'Ремонт и отделка') },
-    { id: 'breakdown', name: t('tickets:type.breakdown', 'Устранение неисправностей') },
-    { id: 'consultation', name: t('tickets:type.consultation', 'Консультация специалиста') },
-    { id: 'inspection', name: t('tickets:type.inspection', 'Технический осмотр') },
-    { id: 'material', name: t('tickets:type.material', 'Доставка материалов') },
-    { id: 'emergency', name: t('tickets:type.emergency', 'Аварийная ситуация') },
+    { id: 'support_request', name: t('tickets:type.support_request', 'Запрос поддержки') },
+    { id: 'incident', name: t('tickets:type.incident', 'Инцидент') },
+    { id: 'complaint', name: t('tickets:type.complaint', 'Жалоба') },
+    { id: 'suggestion', name: t('tickets:type.suggestion', 'Предложение по улучшению') },
+    { id: 'access_request', name: t('tickets:type.access_request', 'Запрос доступа') },
+    { id: 'information_request', name: t('tickets:type.information_request', 'Запрос информации') },
+    { id: 'emergency', name: t('tickets:type.emergency', 'Срочная проблема') },
     { id: 'other', name: t('tickets:type.other', 'Другое') }
   ];
   
@@ -76,16 +77,21 @@ const TicketForm = ({ onSubmitSuccess }) => {
         setCategories(data);
       } catch (err) {
         console.error('Ошибка при загрузке категорий:', err);
-        // Установим строительные категории на случай ошибки
+        // Установим категории службы поддержки на случай ошибки
         setCategories([
-          { id: 'foundation', name: t('tickets:category.foundation', 'Фундаментные работы') },
-          { id: 'framing', name: t('tickets:category.framing', 'Каркасное строительство') },
-          { id: 'roofing', name: t('tickets:category.roofing', 'Кровельные работы') },
-          { id: 'plumbing', name: t('tickets:category.plumbing', 'Сантехнические работы') },
-          { id: 'electrical', name: t('tickets:category.electrical', 'Электромонтажные работы') },
-          { id: 'painting', name: t('tickets:category.painting', 'Малярные работы') },
-          { id: 'flooring', name: t('tickets:category.flooring', 'Напольные покрытия') },
-          { id: 'materials', name: t('tickets:category.materials', 'Поставка стройматериалов') },
+          { id: 'technical', name: t('tickets:category.technical', 'Техническая проблема') },
+          { id: 'billing', name: t('tickets:category.billing', 'Биллинг и расчеты') },
+          { id: 'general', name: t('tickets:category.general', 'Общие вопросы') },
+          { id: 'it_support', name: t('tickets:category.it_support', 'IT поддержка') },
+          { id: 'equipment_issue', name: t('tickets:category.equipment_issue', 'Проблемы с оборудованием') },
+          { id: 'software_issue', name: t('tickets:category.software_issue', 'Проблемы с ПО') },
+          { id: 'access_request', name: t('tickets:category.access_request', 'Запрос доступа') },
+          { id: 'complaint', name: t('tickets:category.complaint', 'Жалоба') },
+          { id: 'suggestion', name: t('tickets:category.suggestion', 'Предложение') },
+          { id: 'hr_question', name: t('tickets:category.hr_question', 'Вопрос по HR') },
+          { id: 'safety_issue', name: t('tickets:category.safety_issue', 'Вопрос безопасности') },
+          { id: 'training_request', name: t('tickets:category.training_request', 'Запрос на обучение') },
+          { id: 'policy_question', name: t('tickets:category.policy_question', 'Вопрос по политикам') },
           { id: 'other', name: t('tickets:category.other', 'Другое') }
         ]);
       }
@@ -161,40 +167,93 @@ const TicketForm = ({ onSubmitSuccess }) => {
     setLoading(true);
     
     try {
-      // Преобразуем данные формы в формат, ожидаемый API
-      const ticketData = {
-        subject: formData.subject,
-        description: formData.message, // Преобразуем message в description
-        category: formData.category,
-        priority: formData.priority,
-        user_id: isAuthenticated && user ? user.id : null,
-        metadata: {
-          type: formData.type, // Используем выбранный тип заявки
-          contactPreference: 'email' // По умолчанию предпочтительный способ связи
-        },
-        requester_metadata: {
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          full_name: formData.name // Добавляем full_name для совместимости с emailService
+      // Если выбран WhatsApp, обрабатываем особым образом
+      if (formData.communicationChannel === 'whatsapp') {
+        // Подготовка текста сообщения для WhatsApp
+        const message = `🎫 *НОВАЯ ЗАЯВКА В СЛУЖБУ ПОДДЕРЖКИ*\n\n` +
+          `👤 *Сотрудник:* ${formData.name}\n` +
+          `📧 *Email:* ${formData.email}\n` +
+          `📱 *Телефон:* ${formData.phone || 'Не указан'}\n\n` +
+          `📋 *Тема обращения:* ${formData.subject}\n` +
+          `🏷️ *Тип заявки:* ${ticketTypes.find(t => t.id === formData.type)?.name || formData.type}\n` +
+          `📂 *Категория:* ${categories.find(c => c.id === formData.category)?.name || formData.category}\n` +
+          `⚡ *Приоритет:* ${formData.priority === 'low' ? 'Низкий' : formData.priority === 'medium' ? 'Средний' : formData.priority === 'high' ? 'Высокий' : 'Срочный'}\n\n` +
+          `📝 *Описание проблемы:*\n${formData.message}\n\n` +
+          `#поддержка #helpdesk #сотрудник`;
+        
+        // Создаем WhatsApp URL
+        const whatsappNumber = '77770131838'; // Номер без + и пробелов
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+        
+        // Сохраняем заявку в системе со статусом 'whatsapp_pending'
+        const ticketData = {
+          subject: formData.subject,
+          description: formData.message,
+          type: formData.type,
+          category: formData.category,
+          priority: formData.priority,
+          status: 'whatsapp_pending',
+          user_id: isAuthenticated && user ? user.id : null,
+          metadata: {
+            contactPreference: 'email',
+            communicationChannel: 'whatsapp',
+            whatsappSent: false
+          },
+          requester_metadata: {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            full_name: formData.name
+          }
+        };
+        
+        // Отправляем данные на сервер
+        const response = await ticketService.createTicket(ticketData);
+        const newTicket = response.ticket || response;
+        
+        // Открываем WhatsApp в новом окне
+        window.open(whatsappUrl, '_blank');
+        
+        // Вызываем функцию обработки успешной отправки
+        if (onSubmitSuccess) {
+          onSubmitSuccess(newTicket);
         }
-      };
-      
-      // Если это сотрудник, сохраняем информацию в метаданных
-      if (isAuthenticated && user && user.role === 'staff') {
-        ticketData.metadata.is_staff = true;
-        ticketData.metadata.staff_id = user.id;
-      }
-      
-      // Отправляем данные на сервер
-      const response = await ticketService.createTicket(ticketData);
-      
-      // Извлекаем ticket из ответа
-      const newTicket = response.ticket || response;
-      
-      // Вызываем функцию обработки успешной отправки
-      if (onSubmitSuccess) {
-        onSubmitSuccess(newTicket);
+        
+        // Показываем специальное сообщение для WhatsApp
+        setError(null);
+        alert(t('tickets:create.whatsappSuccess', 'Заявка создана! Пожалуйста, отправьте сообщение в WhatsApp для завершения процесса.'));
+        
+      } else {
+        // Обычная отправка через Email
+        const ticketData = {
+          subject: formData.subject,
+          description: formData.message,
+          type: formData.type,
+          category: formData.category,
+          priority: formData.priority,
+          user_id: isAuthenticated && user ? user.id : null,
+          metadata: {
+            type: formData.type,
+            contactPreference: 'email',
+            communicationChannel: 'email'
+          },
+          requester_metadata: {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            full_name: formData.name
+          }
+        };
+        
+        // Отправляем данные на сервер
+        const response = await ticketService.createTicket(ticketData);
+        const newTicket = response.ticket || response;
+        
+        // Вызываем функцию обработки успешной отправки
+        if (onSubmitSuccess) {
+          onSubmitSuccess(newTicket);
+        }
       }
       
       // Очищаем форму после успешной отправки
@@ -205,9 +264,10 @@ const TicketForm = ({ onSubmitSuccess }) => {
           phone: '',
           subject: '',
           category: '',
-          type: 'construction',
+          type: 'support_request',
           message: '',
-          priority: 'normal',
+          priority: 'medium',
+          communicationChannel: 'email',
         });
       } else {
         // Для авторизованных пользователей очищаем только поля заявки
@@ -215,9 +275,10 @@ const TicketForm = ({ onSubmitSuccess }) => {
           ...prev,
           subject: '',
           category: '',
-          type: 'construction',
+          type: 'support_request',
           message: '',
-          priority: 'normal',
+          priority: 'medium',
+          communicationChannel: 'email',
         }));
       }
       
@@ -423,6 +484,37 @@ const TicketForm = ({ onSubmitSuccess }) => {
             helperText={formErrors.message}
             disabled={loading}
           />
+        </Grid>
+        <Grid item xs={12}>
+          <FormControl component="fieldset" fullWidth>
+            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 500 }}>
+              {t('tickets:create.communicationChannel', 'Способ подачи заявки')}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+              <Button
+                variant={formData.communicationChannel === 'email' ? 'contained' : 'outlined'}
+                onClick={() => setFormData(prev => ({ ...prev, communicationChannel: 'email' }))}
+                sx={{ flex: 1, minWidth: '200px' }}
+                disabled={loading}
+              >
+                Email
+              </Button>
+              <Button
+                variant={formData.communicationChannel === 'whatsapp' ? 'contained' : 'outlined'}
+                onClick={() => setFormData(prev => ({ ...prev, communicationChannel: 'whatsapp' }))}
+                sx={{ flex: 1, minWidth: '200px' }}
+                disabled={loading}
+              >
+                WhatsApp
+              </Button>
+            </Box>
+            <Typography variant="caption" sx={{ mt: 1, color: 'text.secondary' }}>
+              {formData.communicationChannel === 'whatsapp' 
+                ? t('tickets:create.whatsappHint', 'Заявка будет отправлена через WhatsApp на номер службы поддержки +7 777 013 1838. Дальнейшая работа ведется по email.')
+                : t('tickets:create.emailHint', 'Заявка будет зарегистрирована в системе поддержки и вы получите уведомление на email')
+              }
+            </Typography>
+          </FormControl>
         </Grid>
         <Grid item xs={12}>
           <Box sx={{ 

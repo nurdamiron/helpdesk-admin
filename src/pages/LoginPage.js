@@ -199,60 +199,6 @@ const LoginPage = () => {
                 {loading || authLoading ? <CircularProgress size={24} /> : t('auth:loginButton', 'Войти')}
               </Button>
             </form>
-            
-            {/* Тестовые данные для входа */}
-            <Box sx={{ mt: 3, bgcolor: 'background.paper', p: 2, borderRadius: 1, border: '1px dashed #ccc' }}>
-              <Typography variant="subtitle2" gutterBottom>
-                {t('auth:demo.title', 'Тестовые данные для входа:')}
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Button 
-                    size="small" 
-                    variant="outlined" 
-                    sx={{ minWidth: 100, mr: 1 }}
-                    onClick={() => {
-                      setEmail('admin@example.com');
-                      setPassword('admin123');
-                    }}
-                  >
-                    {t('auth:demo.adminButton', 'Админ')}
-                  </Button>
-                  <Typography variant="caption">admin@example.com / admin123</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Button 
-                    size="small" 
-                    variant="outlined" 
-                    sx={{ minWidth: 100, mr: 1 }}
-                    onClick={() => {
-                      setEmail('moderator@example.com');
-                      setPassword('moderator123');
-                    }}
-                  >
-                    {t('auth:demo.moderatorButton', 'Модератор')}
-                  </Button>
-                  <Typography variant="caption">moderator@example.com / moderator123</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Button 
-                    size="small" 
-                    variant="outlined" 
-                    sx={{ minWidth: 100, mr: 1 }}
-                    onClick={() => {
-                      setEmail('user@example.com');
-                      setPassword('user123');
-                    }}
-                  >
-                    {t('auth:demo.userButton', 'Пользователь')}
-                  </Button>
-                  <Typography variant="caption">user@example.com / user123</Typography>
-                </Box>
-              </Box>
-              <Typography variant="caption" sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
-                {t('auth:demo.instruction', 'Нажмите на кнопку, чтобы автоматически заполнить поля для соответствующей роли.')}
-              </Typography>
-            </Box>
 
             <Box mt={3} textAlign="center">
               <Link href="/" variant="body2" sx={{ textDecoration: 'none', display: 'block', mb: 2 }}>
