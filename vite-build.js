@@ -27,6 +27,7 @@ export default defineConfig({
     }
   },
   resolve: {
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
     alias: {
       '@': resolve(__dirname, 'src')
     }
@@ -65,6 +66,49 @@ const indexHtml = `
 `;
 
 fs.writeFileSync(path.join(__dirname, 'index.html'), indexHtml);
+
+// Rename all .js files containing JSX to .jsx
+console.log('🔄 Converting .js files with JSX to .jsx...');
+
+function findAndRenameJsxFiles(dir) {
+  let renamedCount = 0;
+  
+  const files = fs.readdirSync(dir);
+  files.forEach(file => {
+    const fullPath = path.join(dir, file);
+    const stat = fs.statSync(fullPath);
+    
+    if (stat.isDirectory()) {
+      renamedCount += findAndRenameJsxFiles(fullPath);
+    } else if (file.endsWith('.js') && !file.includes('.min.')) {
+      try {
+        const content = fs.readFileSync(fullPath, 'utf8');
+        if (content.includes('<') && (content.includes('React') || content.includes('jsx') || content.includes('Component'))) {
+          const newPath = fullPath.replace('.js', '.jsx');
+          fs.renameSync(fullPath, newPath);
+          console.log(`📝 Renamed ${fullPath} to ${newPath}`);
+          renamedCount++;
+        }
+      } catch (e) {
+        // Skip files that can't be read
+      }
+    }
+  });
+  
+  return renamedCount;
+}
+
+try {
+  const srcDir = path.join(__dirname, 'src');
+  const renamedCount = findAndRenameJsxFiles(srcDir);
+  console.log(`✅ Converted ${renamedCount} files to .jsx`);
+  
+  // Update HTML to point to .jsx
+  const updatedHtml = indexHtml.replace('/src/index.js', '/src/index.jsx');
+  fs.writeFileSync(path.join(__dirname, 'index.html'), updatedHtml);
+} catch (error) {
+  console.log('⚠️ Could not auto-convert files:', error.message);
+}
 
 console.log('📦 Installing Vite...');
 
@@ -145,6 +189,9 @@ module.exports = {
 `;
     
     fs.writeFileSync(path.join(__dirname, 'webpack.minimal.js'), minimalWebpack);
+    
+    // Install webpack-cli
+    execSync('npm install --no-save webpack-cli', { stdio: 'inherit' });
     
     // Create minimal HTML
     const minimalHtml = `<!DOCTYPE html>
