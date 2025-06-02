@@ -18,10 +18,11 @@ import {
   Divider,
   Paper
 } from '@mui/material';
-import { Send as SendIcon, Login as LoginIcon } from '@mui/icons-material';
+import { Send as SendIcon, Login as LoginIcon, Email as EmailIcon } from '@mui/icons-material';
 import { ticketService } from '../../api/ticketService';
 import { useAuth } from '../../contexts/AuthContext';
 import SuccessNotification from '../common/SuccessNotification';
+import WhatsAppIcon from '../common/WhatsAppIcon';
 
 const TicketForm = ({ onSubmitSuccess }) => {
   const { t } = useTranslation(['common', 'pages', 'tickets']);
@@ -506,7 +507,16 @@ const TicketForm = ({ onSubmitSuccess }) => {
               <Button
                 variant={formData.communicationChannel === 'email' ? 'contained' : 'outlined'}
                 onClick={() => setFormData(prev => ({ ...prev, communicationChannel: 'email' }))}
-                sx={{ flex: 1, minWidth: '200px' }}
+                startIcon={<EmailIcon />}
+                sx={{ 
+                  flex: 1, 
+                  minWidth: '200px',
+                  py: 1.5,
+                  ...(formData.communicationChannel === 'email' ? {
+                    bgcolor: 'primary.main',
+                    '&:hover': { bgcolor: 'primary.dark' }
+                  } : {})
+                }}
                 disabled={loading}
               >
                 Email
@@ -514,7 +524,24 @@ const TicketForm = ({ onSubmitSuccess }) => {
               <Button
                 variant={formData.communicationChannel === 'whatsapp' ? 'contained' : 'outlined'}
                 onClick={() => setFormData(prev => ({ ...prev, communicationChannel: 'whatsapp' }))}
-                sx={{ flex: 1, minWidth: '200px' }}
+                startIcon={<WhatsAppIcon />}
+                sx={{ 
+                  flex: 1, 
+                  minWidth: '200px',
+                  py: 1.5,
+                  ...(formData.communicationChannel === 'whatsapp' ? {
+                    bgcolor: '#25D366',
+                    color: 'white',
+                    '&:hover': { bgcolor: '#1DA851' }
+                  } : {
+                    borderColor: '#25D366',
+                    color: '#25D366',
+                    '&:hover': { 
+                      borderColor: '#1DA851',
+                      bgcolor: 'rgba(37, 211, 102, 0.04)'
+                    }
+                  })
+                }}
                 disabled={loading}
               >
                 WhatsApp
