@@ -5,14 +5,6 @@ const { execSync } = require('child_process');
 
 console.log('Starting simple Vercel build...');
 
-// First patch webpack dependencies
-try {
-  console.log('Patching webpack dependencies...');
-  execSync('node patch-webpack.js', { stdio: 'inherit' });
-} catch (error) {
-  console.warn('Warning: Patching failed, continuing with build...');
-}
-
 // Set environment variables
 process.env.SKIP_PREFLIGHT_CHECK = 'true';
 process.env.DISABLE_ESLINT_PLUGIN = 'true';

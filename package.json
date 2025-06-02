@@ -52,6 +52,8 @@
     "start:mobile": "node scripts/start-mobile.js",
     "start:mobile:generated": "HOST=0.0.0.0 PORT=3000 node bypass-validation.js",
     "start:mobile:manual": "HOST=0.0.0.0 PORT=3000 react-scripts --env=.env.mobile start",
+    "start:mobile:full": "node scripts/start-full-mobile.js",
+    "start:backend:mobile": "node scripts/start-backend-mobile.js",
     "get-ip": "node scripts/get-local-ip.js",
     "start:prod": "REACT_APP_ENV=production node bypass-validation.js",
     "build": "node vercel-simple-build.js",
