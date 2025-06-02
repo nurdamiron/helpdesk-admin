@@ -200,41 +200,6 @@ const LoginPage = () => {
                 }}
               />
 
-              {/* Quick login buttons for testing */}
-              <Box sx={{ mt: 2, mb: 2 }}>
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 1, textAlign: 'center' }}>
-                  Быстрый вход для тестирования:
-                </Typography>
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
-                  {testUsers.map((user, index) => {
-                    const IconComponent = user.icon;
-                    return (
-                      <Button
-                        key={index}
-                        variant="outlined"
-                        size="small"
-                        onClick={() => quickLogin(user.email, user.password)}
-                        disabled={loading || authLoading}
-                        sx={{ 
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 1,
-                          py: 1,
-                          borderColor: user.color,
-                          color: user.color,
-                          '&:hover': {
-                            borderColor: user.color,
-                            backgroundColor: `${user.color}15`
-                          }
-                        }}
-                      >
-                        <IconComponent size={16} />
-                        {user.role}
-                      </Button>
-                    );
-                  })}
-                </Box>
-              </Box>
 
               <Button
                 type="submit"

@@ -39,7 +39,8 @@
     "workbox-streams": "^7.0.0"
   },
   "devDependencies": {
-    "webpack": "^5.75.0"
+    "webpack": "^5.75.0",
+    "webpack-manifest-plugin": "^4.1.1"
   },
   "scripts": {
     "start": "react-scripts start",

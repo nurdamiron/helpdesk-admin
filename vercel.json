@@ -43,7 +43,8 @@
     "SKIP_PREFLIGHT_CHECK": "true",
     "DISABLE_ESLINT_PLUGIN": "true",
     "GENERATE_SOURCEMAP": "false",
-    "NODE_OPTIONS": "--openssl-legacy-provider --max-old-space-size=4096",
-    "CI": "false"
+    "NODE_OPTIONS": "--max-old-space-size=4096",
+    "CI": "false",
+    "INLINE_RUNTIME_CHUNK": "false"
   }
 }
