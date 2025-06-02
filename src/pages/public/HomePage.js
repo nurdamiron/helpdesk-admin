@@ -102,16 +102,9 @@ const HomePage = () => {
     }, 100);
   };
 
-  // Обработчик успешной отправки заявки
+  // Обработчик успешной отправки заявки (больше не используется)
   const handleSubmitSuccess = (ticket) => {
-    // Перенаправляем на страницу успеха с данными о заявке
-    navigate(`/success/${ticket.id}`, { 
-      state: { 
-        ticket,
-        authorized: true,
-        emailSent: ticket.email_sent 
-      }
-    });
+    // Логика перенесена в TicketForm компонент
   };
 
   // Обработчик поиска заявки по ID

@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "overrides": {
-    "schema-utils": "3.1.1",
-    "terser-webpack-plugin": "5.2.5"
+    "schema-utils": "2.7.1",
+    "terser-webpack-plugin": "4.2.3",
+    "css-minimizer-webpack-plugin": "3.4.1",
+    "mini-css-extract-plugin": "2.4.7"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -45,11 +47,13 @@
   "scripts": {
     "start": "node bypass-validation.js",
     "dev": "node bypass-validation.js",
+    "start:local": "REACT_APP_API_URL=http://localhost:5002/api REACT_APP_WS_URL=ws://localhost:5002/ws node bypass-validation.js",
     "start:network": "HOST=0.0.0.0 node bypass-validation.js",
     "start:prod": "REACT_APP_ENV=production node bypass-validation.js",
     "build": "node vercel-simple-build.js",
     "build:simple": "SKIP_PREFLIGHT_CHECK=true DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-scripts build",
     "build:dev": "REACT_APP_ENV=development react-scripts build",
+    "build:local": "REACT_APP_API_URL=http://localhost:5002/api REACT_APP_WS_URL=ws://localhost:5002/ws react-scripts build",
     "build:vercel": "node vercel-build.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

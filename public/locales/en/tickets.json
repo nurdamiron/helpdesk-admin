@@ -200,5 +200,18 @@
   },
   "alerts": {
     "saveSuccess": "Changes saved successfully"
+  },
+  "success": {
+    "title": "Ticket submitted successfully!",
+    "description": "Your ticket has been received and will be processed shortly.",
+    "ticketId": "Ticket Number",
+    "saveNumber": "Save this number to track your ticket status.",
+    "emailSent": "Ticket information has been sent to your email.",
+    "ticketDetails": "Ticket Information",
+    "viewTicket": "View Ticket",
+    "whatsappRedirect": "Ticket created! WhatsApp will now open to send the message.",
+    "emailSuccess": "Ticket submitted successfully! Information sent to your email.",
+    "redirecting": "Redirecting to home page...",
+    "openWhatsApp": "Open WhatsApp"
   }
 }

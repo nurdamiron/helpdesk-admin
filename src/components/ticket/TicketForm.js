@@ -21,6 +21,7 @@ import {
 import { Send as SendIcon, Login as LoginIcon } from '@mui/icons-material';
 import { ticketService } from '../../api/ticketService';
 import { useAuth } from '../../contexts/AuthContext';
+import SuccessNotification from '../common/SuccessNotification';
 
 const TicketForm = ({ onSubmitSuccess }) => {
   const { t } = useTranslation(['common', 'pages', 'tickets']);
@@ -55,6 +56,9 @@ const TicketForm = ({ onSubmitSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [successType, setSuccessType] = useState('email');
+  const [createdTicketId, setCreatedTicketId] = useState(null);
   
   // Если пользователь авторизован, заполняем его данные
   useEffect(() => {
@@ -215,14 +219,11 @@ const TicketForm = ({ onSubmitSuccess }) => {
         // Открываем WhatsApp в новом окне
         window.open(whatsappUrl, '_blank');
         
-        // Вызываем функцию обработки успешной отправки
-        if (onSubmitSuccess) {
-          onSubmitSuccess(newTicket);
-        }
-        
-        // Показываем специальное сообщение для WhatsApp
+        // Показываем уведомление об успехе
         setError(null);
-        alert(t('tickets:create.whatsappSuccess', 'Заявка создана! Пожалуйста, отправьте сообщение в WhatsApp для завершения процесса.'));
+        setSuccessType('whatsapp');
+        setCreatedTicketId(newTicket.id);
+        setShowSuccessNotification(true);
         
       } else {
         // Обычная отправка через Email
@@ -250,10 +251,11 @@ const TicketForm = ({ onSubmitSuccess }) => {
         const response = await ticketService.createTicket(ticketData);
         const newTicket = response.ticket || response;
         
-        // Вызываем функцию обработки успешной отправки
-        if (onSubmitSuccess) {
-          onSubmitSuccess(newTicket);
-        }
+        // Показываем уведомление об успехе
+        setError(null);
+        setSuccessType('email');
+        setCreatedTicketId(newTicket.id);
+        setShowSuccessNotification(true);
       }
       
       // Очищаем форму после успешной отправки
@@ -316,7 +318,17 @@ const TicketForm = ({ onSubmitSuccess }) => {
   }
   
   return (
-    <Box component="form" onSubmit={handleSubmit} noValidate>
+    <>
+      <SuccessNotification
+        open={showSuccessNotification}
+        onClose={() => setShowSuccessNotification(false)}
+        type={successType}
+        ticketId={createdTicketId}
+        autoRedirect={true}
+        redirectDelay={3000}
+      />
+      
+      <Box component="form" onSubmit={handleSubmit} noValidate>
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
           <AlertTitle>{t('form.error', 'Ошибка')}</AlertTitle>
@@ -545,6 +557,7 @@ const TicketForm = ({ onSubmitSuccess }) => {
         </Grid>
       </Grid>
     </Box>
+    </>
   );
 };
 

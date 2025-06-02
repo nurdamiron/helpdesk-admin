@@ -64,11 +64,14 @@ export const API_URL = getApiUrl();
 export const WS_URL = getWsUrl();
 
 // Для отладки
-console.log('API Configuration:', {
+console.log('🔧 API Configuration:', {
   hostname: window.location.hostname,
   protocol: window.location.protocol,
-  apiUrl: API_URL,
-  wsUrl: WS_URL
+  nodeEnv: process.env.NODE_ENV,
+  envApiUrl: process.env.REACT_APP_API_URL,
+  envWsUrl: process.env.REACT_APP_WS_URL,
+  calculatedApiUrl: API_URL,
+  calculatedWsUrl: WS_URL
 });
 
 export default {
