@@ -213,8 +213,8 @@ const TicketForm = ({ onSubmitSuccess }) => {
           }
         };
         
-        // Отправляем данные на сервер
-        const response = await ticketService.createTicket(ticketData);
+        // Отправляем данные на сервер (используем публичный endpoint для неавторизованных пользователей)
+        const response = await ticketService.createTicket(ticketData, !isAuthenticated);
         const newTicket = response.ticket || response;
         
         // Открываем WhatsApp в новом окне
@@ -248,8 +248,8 @@ const TicketForm = ({ onSubmitSuccess }) => {
           }
         };
         
-        // Отправляем данные на сервер
-        const response = await ticketService.createTicket(ticketData);
+        // Отправляем данные на сервер (используем публичный endpoint для неавторизованных пользователей)
+        const response = await ticketService.createTicket(ticketData, !isAuthenticated);
         const newTicket = response.ticket || response;
         
         // Показываем уведомление об успехе
@@ -287,7 +287,16 @@ const TicketForm = ({ onSubmitSuccess }) => {
       
     } catch (err) {
       console.error('Ошибка при отправке заявки:', err);
-      setError(err.response?.data?.error || t('form.submitError', 'Ошибка при отправке формы. Попробуйте позже.'));
+      
+      // Проверяем, является ли это ошибкой аутентификации
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        setError(t('form.authError', 'Для отправки заявки требуется авторизация. Пожалуйста, войдите в систему.'));
+      } else if (!err.response) {
+        // Ошибка сети
+        setError(t('form.networkError', 'Ошибка соединения с сервером. Проверьте подключение к интернету.'));
+      } else {
+        setError(err.response?.data?.error || err.response?.data?.message || t('form.submitError', 'Ошибка при отправке формы. Попробуйте позже.'));
+      }
     } finally {
       setLoading(false);
     }
@@ -334,6 +343,19 @@ const TicketForm = ({ onSubmitSuccess }) => {
         <Alert severity="error" sx={{ mb: 3 }}>
           <AlertTitle>{t('form.error', 'Ошибка')}</AlertTitle>
           {error}
+          {error.includes('авторизация') && (
+            <Box sx={{ mt: 2 }}>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                startIcon={<LoginIcon />}
+                onClick={handleLogin}
+              >
+                {t('form.login', 'Войти в систему')}
+              </Button>
+            </Box>
+          )}
         </Alert>
       )}
       

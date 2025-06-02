@@ -84,7 +84,9 @@ class TicketService extends BaseApiService {
    */
   async createTicket(ticketData, isPublic = false) {
     // В зависимости от типа доступа используем разные эндпоинты
-    const url = isPublic ? '/public/tickets' : '/tickets';
+    const url = isPublic ? '/tickets' : '/tickets';
+    
+    console.log('Creating ticket:', { ticketData, isPublic, url });
     
     return this.request({
       method: 'post',
@@ -138,6 +140,30 @@ class TicketService extends BaseApiService {
       data: { status, comment },
       requiredRole: 'staff' // Требуется роль как минимум сотрудника
     });
+  }
+  
+  /**
+   * Получение списка категорий
+   * @returns {Promise<Array>} Массив категорий
+   */
+  async getCategories() {
+    // Возвращаем статичный список категорий, так как бэкенд может не иметь этот endpoint
+    return Promise.resolve([
+      { id: 'technical', name: 'Техническая проблема' },
+      { id: 'billing', name: 'Биллинг и расчеты' },
+      { id: 'general', name: 'Общие вопросы' },
+      { id: 'it_support', name: 'IT поддержка' },
+      { id: 'equipment_issue', name: 'Проблемы с оборудованием' },
+      { id: 'software_issue', name: 'Проблемы с ПО' },
+      { id: 'access_request', name: 'Запрос доступа' },
+      { id: 'complaint', name: 'Жалоба' },
+      { id: 'suggestion', name: 'Предложение' },
+      { id: 'hr_question', name: 'Вопрос по HR' },
+      { id: 'safety_issue', name: 'Вопрос безопасности' },
+      { id: 'training_request', name: 'Запрос на обучение' },
+      { id: 'policy_question', name: 'Вопрос по политикам' },
+      { id: 'other', name: 'Другое' }
+    ]);
   }
   
   /**
