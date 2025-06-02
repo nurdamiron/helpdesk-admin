@@ -6,7 +6,9 @@
     "schema-utils": "2.7.1",
     "terser-webpack-plugin": "4.2.3",
     "css-minimizer-webpack-plugin": "3.4.1",
-    "mini-css-extract-plugin": "2.4.7"
+    "mini-css-extract-plugin": "2.4.7",
+    "ajv": "6.12.6",
+    "ajv-keywords": "3.5.2"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -56,7 +58,7 @@
     "start:backend:mobile": "node scripts/start-backend-mobile.js",
     "get-ip": "node scripts/get-local-ip.js",
     "start:prod": "REACT_APP_ENV=production node bypass-validation.js",
-    "build": "node vercel-simple-build.js",
+    "build": "node vercel-final-build.js",
     "build:simple": "SKIP_PREFLIGHT_CHECK=true DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-scripts build",
     "build:dev": "REACT_APP_ENV=development react-scripts build",
     "build:local": "REACT_APP_API_URL=http://localhost:5002/api REACT_APP_WS_URL=ws://localhost:5002/ws react-scripts build",
@@ -85,5 +87,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "resolutions": {
+    "schema-utils": "2.7.1",
+    "terser-webpack-plugin": "4.2.3",
+    "ajv": "6.12.6",
+    "ajv-keywords": "3.5.2"
   }
 }

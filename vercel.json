@@ -1,5 +1,5 @@
 {
-  "buildCommand": "bash build.sh",
+  "buildCommand": "node vercel-final-build.js",
   "outputDirectory": "build",
   "framework": null,
   "rewrites": [
@@ -41,6 +41,9 @@
     "REACT_APP_WS_URL": "wss://helpdesk-backend-ycoo.onrender.com/ws",
     "REACT_APP_ENV": "production",
     "SKIP_PREFLIGHT_CHECK": "true",
-    "DISABLE_ESLINT_PLUGIN": "true"
+    "DISABLE_ESLINT_PLUGIN": "true",
+    "GENERATE_SOURCEMAP": "false",
+    "NODE_OPTIONS": "--openssl-legacy-provider --max-old-space-size=4096",
+    "CI": "false"
   }
 }
