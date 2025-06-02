@@ -106,6 +106,33 @@ try {
   // Update HTML to point to .jsx
   const updatedHtml = indexHtml.replace('/src/index.js', '/src/index.jsx');
   fs.writeFileSync(path.join(__dirname, 'index.html'), updatedHtml);
+  
+  // Fix imports in all .jsx files
+  console.log('🔧 Updating imports in .jsx files...');
+  function updateImports(dir) {
+    const files = fs.readdirSync(dir);
+    files.forEach(file => {
+      const fullPath = path.join(dir, file);
+      const stat = fs.statSync(fullPath);
+      
+      if (stat.isDirectory()) {
+        updateImports(fullPath);
+      } else if (file.endsWith('.jsx')) {
+        try {
+          let content = fs.readFileSync(fullPath, 'utf8');
+          // Update relative imports from .js to .jsx
+          content = content.replace(/from\s+['"`]([^'"`]+)\.js['"`]/g, "from '$1.jsx'");
+          content = content.replace(/import\s+['"`]([^'"`]+)\.js['"`]/g, "import '$1.jsx'");
+          fs.writeFileSync(fullPath, content);
+        } catch (e) {
+          // Skip files that can't be processed
+        }
+      }
+    });
+  }
+  
+  updateImports(srcDir);
+  console.log('✅ Updated imports in JSX files');
 } catch (error) {
   console.log('⚠️ Could not auto-convert files:', error.message);
 }
