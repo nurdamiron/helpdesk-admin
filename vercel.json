@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node build-patch.js",
+  "buildCommand": "node custom-build.js",
   "outputDirectory": "build",
   "framework": null,
   "rewrites": [
