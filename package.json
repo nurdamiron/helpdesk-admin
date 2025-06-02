@@ -2,23 +2,15 @@
   "name": "helpdesk-admin",
   "version": "0.1.0",
   "private": true,
-  "overrides": {
-    "schema-utils": "2.7.1",
-    "terser-webpack-plugin": "4.2.3",
-    "css-minimizer-webpack-plugin": "3.4.1",
-    "mini-css-extract-plugin": "2.4.7",
-    "ajv": "6.12.6",
-    "ajv-keywords": "3.5.2"
-  },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.11",
     "@mui/lab": "^6.0.0-beta.30",
     "@mui/material": "^6.4.11",
-    "@testing-library/dom": "^9.3.4",
-    "@testing-library/jest-dom": "^6.1.5",
-    "@testing-library/react": "^14.1.2",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.8.2",
     "i18next": "^24.0.0",
@@ -26,10 +18,10 @@
     "i18next-http-backend": "^2.5.0",
     "lucide-react": "^0.479.0",
     "notistack": "^3.0.2",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-i18next": "^14.0.0",
-    "react-router-dom": "^6.20.0",
+    "react-router-dom": "^7.3.0",
     "react-scripts": "5.0.1",
     "socket.io-client": "^4.8.1",
     "web-vitals": "^2.1.4",
@@ -47,28 +39,10 @@
     "workbox-streams": "^7.0.0"
   },
   "scripts": {
-    "start": "node bypass-validation.js",
-    "dev": "node bypass-validation.js",
-    "start:local": "REACT_APP_API_URL=http://localhost:5002/api REACT_APP_WS_URL=ws://localhost:5002/ws node bypass-validation.js",
-    "start:network": "HOST=0.0.0.0 node bypass-validation.js",
-    "start:mobile": "node scripts/start-mobile.js",
-    "start:mobile:generated": "HOST=0.0.0.0 PORT=3000 node bypass-validation.js",
-    "start:mobile:manual": "HOST=0.0.0.0 PORT=3000 react-scripts --env=.env.mobile start",
-    "start:mobile:full": "node scripts/start-full-mobile.js",
-    "start:backend:mobile": "node scripts/start-backend-mobile.js",
-    "get-ip": "node scripts/get-local-ip.js",
-    "start:prod": "REACT_APP_ENV=production node bypass-validation.js",
-    "build": "node vercel-final-build.js",
-    "build:simple": "SKIP_PREFLIGHT_CHECK=true DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-scripts build",
-    "build:dev": "REACT_APP_ENV=development react-scripts build",
-    "build:local": "REACT_APP_API_URL=http://localhost:5002/api REACT_APP_WS_URL=ws://localhost:5002/ws react-scripts build",
-    "build:mobile": "react-scripts --env=.env.mobile build",
-    "build:vercel": "node vercel-build.js",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-  },
-  "engines": {
-    "node": "18.x"
   },
   "eslintConfig": {
     "extends": [
@@ -88,10 +62,8 @@
       "last 1 safari version"
     ]
   },
-  "resolutions": {
-    "schema-utils": "2.7.1",
-    "terser-webpack-plugin": "4.2.3",
-    "ajv": "6.12.6",
-    "ajv-keywords": "3.5.2"
+  "overrides": {
+    "ajv": "^6.12.6",
+    "ajv-keywords": "^3.5.2"
   }
 }
