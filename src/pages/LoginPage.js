@@ -15,7 +15,7 @@ import {
   CardContent,
   Link
 } from '@mui/material';
-import { Lock, Mail, Eye, EyeOff, Construction } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, Construction, User, Shield, Users, Settings } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext'; // Используем контекст авторизации
 import { useTranslation } from 'react-i18next';
 
@@ -46,6 +46,19 @@ const LoginPage = () => {
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, from]); // Добавлен from в зависимости
+
+  // Quick login functions for test users
+  const quickLogin = (userEmail, userPassword) => {
+    setEmail(userEmail);
+    setPassword(userPassword);
+  };
+
+  const testUsers = [
+    { email: 'admin@localhost', password: 'admin', role: 'Админ', icon: Settings, color: '#f44336' },
+    { email: 'support@localhost', password: 'support', role: 'Поддержка', icon: Shield, color: '#2196f3' },
+    { email: 'manager@localhost', password: 'manager', role: 'Менеджер', icon: Users, color: '#ff9800' },
+    { email: 'user@localhost', password: 'user', role: 'Пользователь', icon: User, color: '#4caf50' }
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -187,6 +200,42 @@ const LoginPage = () => {
                 }}
               />
 
+              {/* Quick login buttons for testing */}
+              <Box sx={{ mt: 2, mb: 2 }}>
+                <Typography variant="body2" color="textSecondary" sx={{ mb: 1, textAlign: 'center' }}>
+                  Быстрый вход для тестирования:
+                </Typography>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
+                  {testUsers.map((user, index) => {
+                    const IconComponent = user.icon;
+                    return (
+                      <Button
+                        key={index}
+                        variant="outlined"
+                        size="small"
+                        onClick={() => quickLogin(user.email, user.password)}
+                        disabled={loading || authLoading}
+                        sx={{ 
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          py: 1,
+                          borderColor: user.color,
+                          color: user.color,
+                          '&:hover': {
+                            borderColor: user.color,
+                            backgroundColor: `${user.color}15`
+                          }
+                        }}
+                      >
+                        <IconComponent size={16} />
+                        {user.role}
+                      </Button>
+                    );
+                  })}
+                </Box>
+              </Box>
+
               <Button
                 type="submit"
                 fullWidth
@@ -194,7 +243,7 @@ const LoginPage = () => {
                 color="primary"
                 size="large"
                 disabled={loading || authLoading}
-                sx={{ mt: 3, mb: 2, py: 1.5 }}
+                sx={{ mt: 2, mb: 2, py: 1.5 }}
               >
                 {loading || authLoading ? <CircularProgress size={24} /> : t('auth:loginButton', 'Войти')}
               </Button>
