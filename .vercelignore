@@ -1,0 +1,9 @@
+# Vercel ignore file
+node_modules
+.git
+.gitignore
+README.md
+TROUBLESHOOTING.md
+DEPLOYMENT.md
+.env*
+!.env.production
