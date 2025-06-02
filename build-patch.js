@@ -2,35 +2,36 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔧 Patching terser-webpack-plugin...');
+console.log('🔧 Creating custom webpack config...');
 
-// Find and patch the problematic file
-const terserPluginPath = path.join(__dirname, 'node_modules/react-scripts/node_modules/terser-webpack-plugin/dist/index.js');
+// Create a webpack config override
+const webpackConfigOverride = `
+const webpack = require('webpack');
+const path = require('path');
 
-if (fs.existsSync(terserPluginPath)) {
-  let content = fs.readFileSync(terserPluginPath, 'utf8');
+module.exports = function override(config, env) {
+  // Remove terser plugin to avoid validation issues
+  config.optimization.minimize = false;
+  config.optimization.minimizer = [];
   
-  // Replace the problematic validation call
-  content = content.replace(
-    '(0, _schemaUtils.validate)(_options.default, options, {',
-    '// Patched validation\n    if (typeof _schemaUtils.validate === "function") {\n      (0, _schemaUtils.validate)(_options.default, options, {'
-  );
-  
-  // Add closing bracket for the if statement
-  content = content.replace(
-    'name: PLUGIN_NAME\n    });',
-    'name: PLUGIN_NAME\n      });\n    }'
-  );
-  
-  fs.writeFileSync(terserPluginPath, content);
-  console.log('✅ Patched terser-webpack-plugin successfully');
-} else {
-  console.log('⚠️ terser-webpack-plugin not found, skipping patch');
-}
+  return config;
+};
+`;
 
-console.log('🚀 Running build...');
+// Write the override file
+fs.writeFileSync(path.join(__dirname, 'config-overrides.js'), webpackConfigOverride);
+
+console.log('🚀 Running build with custom config...');
 try {
-  execSync('react-scripts build', { 
+  // Install react-app-rewired if not present
+  try {
+    require.resolve('react-app-rewired');
+  } catch (e) {
+    console.log('Installing react-app-rewired...');
+    execSync('npm install --no-save react-app-rewired', { stdio: 'inherit' });
+  }
+  
+  execSync('npx react-app-rewired build', { 
     stdio: 'inherit',
     env: {
       ...process.env,
@@ -41,6 +42,20 @@ try {
   });
   console.log('✅ Build completed successfully');
 } catch (error) {
-  console.error('❌ Build failed:', error.message);
-  process.exit(1);
+  console.log('⚠️ react-app-rewired failed, trying regular build...');
+  try {
+    execSync('react-scripts build', { 
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        SKIP_PREFLIGHT_CHECK: 'true',
+        DISABLE_ESLINT_PLUGIN: 'true',
+        GENERATE_SOURCEMAP: 'false'
+      }
+    });
+    console.log('✅ Build completed successfully');
+  } catch (finalError) {
+    console.error('❌ Build failed:', finalError.message);
+    process.exit(1);
+  }
 }
