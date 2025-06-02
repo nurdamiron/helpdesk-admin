@@ -2,36 +2,47 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔧 Creating custom webpack config...');
+console.log('🔧 Creating CRACO config...');
 
-// Create a webpack config override
-const webpackConfigOverride = `
-const webpack = require('webpack');
-const path = require('path');
-
-module.exports = function override(config, env) {
-  // Remove terser plugin to avoid validation issues
-  config.optimization.minimize = false;
-  config.optimization.minimizer = [];
-  
-  return config;
+// Create a CRACO config that completely removes optimization
+const cracoConfig = `
+module.exports = {
+  webpack: {
+    configure: (webpackConfig, { env, paths }) => {
+      // Disable optimization completely to avoid terser issues
+      webpackConfig.optimization = {
+        ...webpackConfig.optimization,
+        minimize: false,
+        minimizer: []
+      };
+      
+      // Remove any existing terser plugins
+      if (webpackConfig.optimization.minimizer) {
+        webpackConfig.optimization.minimizer = webpackConfig.optimization.minimizer.filter(
+          plugin => !plugin.constructor.name.includes('Terser')
+        );
+      }
+      
+      return webpackConfig;
+    }
+  }
 };
 `;
 
-// Write the override file
-fs.writeFileSync(path.join(__dirname, 'config-overrides.js'), webpackConfigOverride);
+// Write the CRACO config
+fs.writeFileSync(path.join(__dirname, 'craco.config.js'), cracoConfig);
 
-console.log('🚀 Running build with custom config...');
+console.log('🚀 Running build with CRACO...');
 try {
-  // Install react-app-rewired if not present
+  // Install CRACO if not present
   try {
-    require.resolve('react-app-rewired');
+    require.resolve('@craco/craco');
   } catch (e) {
-    console.log('Installing react-app-rewired...');
-    execSync('npm install --no-save react-app-rewired', { stdio: 'inherit' });
+    console.log('Installing @craco/craco...');
+    execSync('npm install --no-save @craco/craco', { stdio: 'inherit' });
   }
   
-  execSync('npx react-app-rewired build', { 
+  execSync('npx craco build', { 
     stdio: 'inherit',
     env: {
       ...process.env,
@@ -42,20 +53,23 @@ try {
   });
   console.log('✅ Build completed successfully');
 } catch (error) {
-  console.log('⚠️ react-app-rewired failed, trying regular build...');
+  console.log('⚠️ CRACO failed, trying simple build without minification...');
+  
+  // Last resort: try to build with NODE_ENV=development to avoid minification
   try {
     execSync('react-scripts build', { 
       stdio: 'inherit',
       env: {
         ...process.env,
+        NODE_ENV: 'development',
         SKIP_PREFLIGHT_CHECK: 'true',
         DISABLE_ESLINT_PLUGIN: 'true',
         GENERATE_SOURCEMAP: 'false'
       }
     });
-    console.log('✅ Build completed successfully');
+    console.log('✅ Build completed successfully (development mode)');
   } catch (finalError) {
-    console.error('❌ Build failed:', finalError.message);
+    console.error('❌ All build methods failed:', finalError.message);
     process.exit(1);
   }
 }
