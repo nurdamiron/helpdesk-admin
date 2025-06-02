@@ -120,9 +120,24 @@ try {
       } else if (file.endsWith('.jsx')) {
         try {
           let content = fs.readFileSync(fullPath, 'utf8');
-          // Update relative imports from .js to .jsx
-          content = content.replace(/from\s+['"`]([^'"`]+)\.js['"`]/g, "from '$1.jsx'");
-          content = content.replace(/import\s+['"`]([^'"`]+)\.js['"`]/g, "import '$1.jsx'");
+          // Update relative imports from .js to .jsx only if the target file was actually renamed
+          content = content.replace(/from\s+['"`]([^'"`]+)\.js['"`]/g, (match, filePath) => {
+            // Check if the target file exists as .jsx
+            const possibleJsxPath = path.resolve(path.dirname(fullPath), filePath + '.jsx');
+            if (fs.existsSync(possibleJsxPath)) {
+              return `from '${filePath}.jsx'`;
+            }
+            return match; // Keep original if .jsx doesn't exist
+          });
+          
+          content = content.replace(/import\s+['"`]([^'"`]+)\.js['"`]/g, (match, filePath) => {
+            // Check if the target file exists as .jsx
+            const possibleJsxPath = path.resolve(path.dirname(fullPath), filePath + '.jsx');
+            if (fs.existsSync(possibleJsxPath)) {
+              return `import '${filePath}.jsx'`;
+            }
+            return match; // Keep original if .jsx doesn't exist
+          });
           fs.writeFileSync(fullPath, content);
         } catch (e) {
           // Skip files that can't be processed
