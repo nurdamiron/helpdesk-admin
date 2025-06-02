@@ -1,6 +1,5 @@
 {
-  "installCommand": "npm install --legacy-peer-deps && node patch-for-vercel.js",
-  "buildCommand": "npm run build:vercel",
+  "buildCommand": "bash build.sh",
   "outputDirectory": "build",
   "framework": null,
   "rewrites": [
@@ -36,5 +35,12 @@
         }
       ]
     }
-  ]
+  ],
+  "env": {
+    "REACT_APP_API_URL": "https://helpdesk-backend-ycoo.onrender.com/api",
+    "REACT_APP_WS_URL": "wss://helpdesk-backend-ycoo.onrender.com/ws",
+    "REACT_APP_ENV": "production",
+    "SKIP_PREFLIGHT_CHECK": "true",
+    "DISABLE_ESLINT_PLUGIN": "true"
+  }
 }

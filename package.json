@@ -52,7 +52,7 @@
     "eject": "react-scripts eject"
   },
   "engines": {
-    "node": ">=18.x"
+    "node": "18.x"
   },
   "eslintConfig": {
     "extends": [

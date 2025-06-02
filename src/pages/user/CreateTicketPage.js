@@ -24,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ticketService } from '../../api/ticketService';
 import { useTranslation } from 'react-i18next';
+import TicketSuccessModal from '../../components/common/TicketSuccessModal';
 
 /**
  * Компонент страницы создания заявки для пользователя
@@ -58,6 +59,9 @@ const CreateTicketPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [createdTicketId, setCreatedTicketId] = useState(null);
+  const [whatsappUrl, setWhatsappUrl] = useState(null);
   
   // Категории заявок для службы поддержки сотрудников
   const categories = [
@@ -182,22 +186,11 @@ const CreateTicketPage = () => {
         // Создаем тикет в системе
         const response = await ticketService.createTicket(ticketData);
         
-        // Открываем WhatsApp в новом окне
-        window.open(whatsappUrl, '_blank');
-        
         setSuccess(true);
         setLoading(false);
-        
-        // Показываем сообщение об успехе
-        setTimeout(() => {
-          navigate('/dashboard', { 
-            state: { 
-              ticketCreated: true,
-              whatsappSent: true,
-              message: 'Заявка создана. Пожалуйста, отправьте сообщение в WhatsApp для завершения процесса.'
-            } 
-          });
-        }, 2000);
+        setCreatedTicketId(response.id);
+        setWhatsappUrl(whatsappUrl);
+        setShowSuccessModal(true);
         
       } else {
         // Обычная отправка через Email
@@ -224,11 +217,8 @@ const CreateTicketPage = () => {
         console.log('Ticket created successfully:', response);
         setSuccess(true);
         setLoading(false);
-        
-        // Перенаправление на страницу успешного создания через 2 секунды
-        setTimeout(() => {
-          navigate('/dashboard', { state: { ticketCreated: true } });
-        }, 2000);
+        setCreatedTicketId(response.id);
+        setShowSuccessModal(true);
       }
       
     } catch (err) {
@@ -791,36 +781,37 @@ const CreateTicketPage = () => {
   };
   
   return (
-    <Container maxWidth="md">
-      <Box sx={{ p: { xs: 2, sm: 3 } }}>
-        <Box 
-          display="flex" 
-          alignItems={{ xs: "flex-start", sm: "center" }}
-          mb={3}
-          flexDirection={{ xs: "column", sm: "row" }}
-          gap={{ xs: 1, sm: 0 }}
-        >
-          <Button 
-            startIcon={<ArrowBack />} 
-            onClick={handleCancel}
-            sx={{ 
-              mr: { xs: 0, sm: 2 },
-              fontSize: { xs: '0.875rem', sm: '1rem' }
-            }}
-            size="medium"
+    <>
+      <Container maxWidth="md">
+        <Box sx={{ p: { xs: 2, sm: 3 } }}>
+          <Box 
+            display="flex" 
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            mb={3}
+            flexDirection={{ xs: "column", sm: "row" }}
+            gap={{ xs: 1, sm: 0 }}
           >
-            {t('tickets:create.back', 'Назад')}
-          </Button>
-          <Typography 
-            variant="h4" 
-            sx={{ 
-              fontSize: { xs: '1.5rem', sm: '2rem' },
-              fontWeight: 'bold'
-            }}
-          >
-            {t('tickets:create.title', 'Создание заявки')}
-          </Typography>
-        </Box>
+            <Button 
+              startIcon={<ArrowBack />} 
+              onClick={handleCancel}
+              sx={{ 
+                mr: { xs: 0, sm: 2 },
+                fontSize: { xs: '0.875rem', sm: '1rem' }
+              }}
+              size="medium"
+            >
+              {t('tickets:create.back', 'Назад')}
+            </Button>
+            <Typography 
+              variant="h4" 
+              sx={{ 
+                fontSize: { xs: '1.5rem', sm: '2rem' },
+                fontWeight: 'bold'
+              }}
+            >
+              {t('tickets:create.title', 'Создание заявки')}
+            </Typography>
+          </Box>
         
         <Paper 
           elevation={2} 
@@ -943,6 +934,15 @@ const CreateTicketPage = () => {
         </Paper>
       </Box>
     </Container>
+    
+    <TicketSuccessModal
+      open={showSuccessModal}
+      onClose={() => setShowSuccessModal(false)}
+      ticketData={formData}
+      ticketId={createdTicketId}
+      whatsappUrl={whatsappUrl}
+    />
+    </>
   );
 };
 

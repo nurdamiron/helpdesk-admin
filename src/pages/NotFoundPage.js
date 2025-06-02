@@ -40,7 +40,7 @@ const NotFoundPage = () => {
         
         <Button 
             component={Link} 
-            to="/dashboard" 
+            to="/" 
           variant="contained" 
           color="primary" 
           size="large"
