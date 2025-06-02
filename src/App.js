@@ -34,6 +34,19 @@ import UsersManagementPage from './pages/UsersManagementPage';
 // Import user pages
 import CreateTicketPage from './pages/user/CreateTicketPage';
 
+// Компонент для автоматического перенаправления с главной страницы
+const DefaultRedirect = () => {
+  const { user, isAuthenticated } = useAuth();
+  
+  // Если пользователь авторизован, перенаправляем в админку
+  if (isAuthenticated && user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  // Если не авторизован, перенаправляем на страницу входа
+  return <Navigate to="/login" replace />;
+};
+
 // Компонент, который перенаправляет в зависимости от роли
 const RoleBasedRedirect = () => {
   const { isAdmin, isModerator, isUser, user } = useAuth();
@@ -122,10 +135,8 @@ function App() {
                 <Route path="/access-denied" element={<AccessDeniedPage />} />
               </Route>
               
-              {/* Главная страница по умолчанию */}
-              <Route path="/" element={<PublicLayout />}>
-                <Route index element={<HomePage />} />
-              </Route>
+              {/* Автоматическое перенаправление с главной страницы */}
+              <Route path="/" element={<DefaultRedirect />} />
               
               {/* Маршрут для перенаправления авторизованных пользователей в админку */}
               <Route path="/admin" element={<RoleBasedRedirect />} />
@@ -189,7 +200,7 @@ function App() {
                 <Route path="/help" element={<HelpPage />} />
               </Route>
               
-              {/* Публичные маршруты для отображения заявок */}
+              {/* Публичные маршруты */}
               <Route path="/public" element={<PublicLayout />}>
                 <Route index element={<HomePage />} />
                 <Route path="tickets/:id" element={<TicketDetailPublicPage />} />
