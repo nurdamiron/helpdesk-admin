@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "node build-patch.js",
   "outputDirectory": "build",
   "framework": null,
   "rewrites": [
