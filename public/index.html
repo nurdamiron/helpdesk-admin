@@ -26,6 +26,35 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>HelpDesk Admin</title>
+    <!-- Cache busting для принудительного обновления -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <script>
+      // Принудительное обновление Service Worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.update();
+          }
+        });
+      }
+      
+      // Очистка localStorage для принудительного обновления конфигурации
+      const currentVersion = 'v2.0.0';
+      const savedVersion = localStorage.getItem('appVersion');
+      if (savedVersion !== currentVersion) {
+        console.log('🔄 Обновление приложения, очистка кеша');
+        localStorage.clear();
+        sessionStorage.clear();
+        localStorage.setItem('appVersion', currentVersion);
+        
+        // Принудительная перезагрузка без кеша
+        if (savedVersion) {
+          window.location.reload(true);
+        }
+      }
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

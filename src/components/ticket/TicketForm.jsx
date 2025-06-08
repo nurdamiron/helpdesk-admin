@@ -217,8 +217,20 @@ const TicketForm = ({ onSubmitSuccess }) => {
         const response = await ticketService.createTicket(ticketData, !isAuthenticated);
         const newTicket = response.ticket || response;
         
-        // Открываем WhatsApp в новом окне
-        window.open(whatsappUrl, '_blank');
+        // Открываем WhatsApp (оптимизировано для мобильных)
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+          // На мобильных устройствах используем прямой переход
+          window.location.href = whatsappUrl;
+        } else {
+          // На десктопе открываем в новом окне
+          const newWindow = window.open(whatsappUrl, '_blank');
+          if (!newWindow) {
+            // Если заблокировано всплывающее окно, используем прямой переход
+            window.location.href = whatsappUrl;
+          }
+        }
         
         // Показываем уведомление об успехе
         setError(null);

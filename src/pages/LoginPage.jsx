@@ -74,7 +74,10 @@ const LoginPage = () => {
     } catch (err) {
       console.error('Login error:', err);
       
-      if (err.response && err.response.data && err.response.data.error) {
+      // Специальная обработка для мобильных сетевых ошибок
+      if (err.isMobileNetworkError) {
+        setError('Проблема с подключением к серверу. Проверьте интернет-соединение и попробуйте снова.');
+      } else if (err.response && err.response.data && err.response.data.error) {
         // Более подробные ошибки от сервера
         const serverError = err.response.data.error;
         
@@ -84,6 +87,14 @@ const LoginPage = () => {
           setError(serverError.message);
         } else {
           setError(t('auth:errors.loginFailed', 'Ошибка авторизации. Пожалуйста, попробуйте снова.'));
+        }
+      } else if (err.code === 'NETWORK_ERROR' || err.message === 'Network Error') {
+        // Сетевые ошибки
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+          setError('Не удается подключиться к серверу. Проверьте интернет-соединение и попробуйте снова.');
+        } else {
+          setError('Ошибка сети. Проверьте подключение к интернету.');
         }
       } else if (err.message) {
         // Ошибки от клиента или сети
@@ -225,18 +236,7 @@ const LoginPage = () => {
                   </Button>
                   <Typography variant="caption">admin@localhost / admin</Typography>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Button 
-                    size="small" 
-                    variant="outlined" 
-                    sx={{ minWidth: 100, mr: 1 }}
-                    onClick={() => quickLogin('support@localhost', 'support')}
-                    disabled={loading || authLoading}
-                  >
-                    {t('auth:demo.supportButton', 'Поддержка')}
-                  </Button>
-                  <Typography variant="caption">support@localhost / support</Typography>
-                </Box>
+                
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   <Button 
                     size="small" 
@@ -273,6 +273,9 @@ const LoginPage = () => {
               </Link>
               <Typography variant="body2" color="textSecondary">
                 © {new Date().getFullYear()} {t('app.title', 'Строительная Помощь')}. {t('common:copyright', 'Все права защищены.')}
+              </Typography>
+              <Typography variant="caption" color="textSecondary" sx={{ display: 'block', mt: 1 }}>
+                v2.0.0 | {process.env.NODE_ENV} | {new Date().toLocaleString()}
               </Typography>
             </Box>
           </CardContent>

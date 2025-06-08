@@ -64,15 +64,46 @@ export const API_URL = getApiUrl();
 export const WS_URL = getWsUrl();
 
 // Для отладки
-console.log('🔧 API Configuration:', {
+const debugInfo = {
   hostname: window.location.hostname,
   protocol: window.location.protocol,
   nodeEnv: process.env.NODE_ENV,
   envApiUrl: process.env.REACT_APP_API_URL,
   envWsUrl: process.env.REACT_APP_WS_URL,
   calculatedApiUrl: API_URL,
-  calculatedWsUrl: WS_URL
-});
+  calculatedWsUrl: WS_URL,
+  userAgent: navigator.userAgent,
+  isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+  isOnline: navigator.onLine,
+  connectionType: navigator.connection?.effectiveType || 'unknown'
+};
+
+console.log('🔧 API Configuration:', debugInfo);
+
+// Проверка доступности API для мобильных устройств
+if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+  // Простая проверка доступности API
+  fetch(API_URL + '/health', { 
+    method: 'GET', 
+    timeout: 5000,
+    headers: {
+      'Accept': 'application/json'
+    }
+  })
+    .then(response => {
+      console.log('✅ API Health Check:', response.status);
+    })
+    .catch(error => {
+      console.error('❌ API Health Check Failed:', error.message);
+      console.error('🔥 Возможные проблемы:', {
+        'CORS': 'Сервер может блокировать запросы с мобильных устройств',
+        'Network': 'Проблемы с интернет-соединением',
+        'DNS': 'Не удается разрешить имя сервера',
+        'SSL': 'Проблемы с SSL сертификатом',
+        'Timeout': 'Сервер не отвечает в течение 5 секунд'
+      });
+    });
+}
 
 export default {
   API_URL,
