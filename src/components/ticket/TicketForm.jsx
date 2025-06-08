@@ -419,10 +419,11 @@ const TicketForm = ({ onSubmitSuccess }) => {
         </Grid>
         <Grid item xs={12}>
           <TextField
+          required
             fullWidth
             id="phone"
             name="phone"
-            label={t('form.phone', 'Телефон (необязательно)')}
+            label={t('form.phone', 'Телефон')}
             value={formData.phone}
             onChange={handleChange}
             error={!!formErrors.phone}

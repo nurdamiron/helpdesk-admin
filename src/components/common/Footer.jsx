@@ -59,7 +59,7 @@ const Footer = () => {
         
         <Box sx={{ mt: 5, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
-            © {currentYear} {t('app.title', 'HelpDesk')}. {t('common:copyright', 'Все права защищены.')}
+            © {currentYear} {t('app.title', 'HelpDesk')}. {t('common:copyright')}
           </Typography>
         </Box>
       </Container>
