@@ -188,8 +188,25 @@ const TicketForm = ({ onSubmitSuccess }) => {
         const response = await ticketService.createTicket(ticketData, !isAuthenticated);
         const newTicket = response.ticket || response;
         
+<<<<<<< HEAD
         // Открываем мессенджер в новом окне
         window.open(messengerUrl, '_blank');
+=======
+        // Открываем WhatsApp (оптимизировано для мобильных)
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+          // На мобильных устройствах используем прямой переход
+          window.location.href = whatsappUrl;
+        } else {
+          // На десктопе открываем в новом окне
+          const newWindow = window.open(whatsappUrl, '_blank');
+          if (!newWindow) {
+            // Если заблокировано всплывающее окно, используем прямой переход
+            window.location.href = whatsappUrl;
+          }
+        }
+>>>>>>> 801ce2854997a6d5c7a6484a2dd78f66db5a6d62
         
         // Показываем уведомление об успехе
         setError(null);
@@ -375,10 +392,11 @@ const TicketForm = ({ onSubmitSuccess }) => {
         </Grid>
         <Grid item xs={12}>
           <TextField
+          required
             fullWidth
             id="phone"
             name="phone"
-            label={t('form.phone', 'Телефон (необязательно)')}
+            label={t('form.phone', 'Телефон')}
             value={formData.phone}
             onChange={handleChange}
             error={!!formErrors.phone}

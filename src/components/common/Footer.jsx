@@ -73,7 +73,11 @@ const Footer = () => {
         
         <Box sx={{ mt: 5, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
+<<<<<<< HEAD
             © {currentYear} {t('helpdesk', { ns: 'header', defaultValue: 'Қолдау Орталығы' })}. {t('copyright', { ns: 'footer', defaultValue: 'Барлық құқықтар қорғалған.' })}
+=======
+            © {currentYear} {t('app.title', 'HelpDesk')}. {t('common:copyright')}
+>>>>>>> 801ce2854997a6d5c7a6484a2dd78f66db5a6d62
           </Typography>
         </Box>
       </Container>

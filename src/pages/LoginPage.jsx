@@ -69,7 +69,10 @@ const LoginPage = () => {
     } catch (err) {
       console.error('Login error:', err);
       
-      if (err.response && err.response.data && err.response.data.error) {
+      // Специальная обработка для мобильных сетевых ошибок
+      if (err.isMobileNetworkError) {
+        setError('Проблема с подключением к серверу. Проверьте интернет-соединение и попробуйте снова.');
+      } else if (err.response && err.response.data && err.response.data.error) {
         // Более подробные ошибки от сервера
         const serverError = err.response.data.error;
         
@@ -79,6 +82,14 @@ const LoginPage = () => {
           setError(serverError.message);
         } else {
           setError(t('auth:errors.loginFailed', 'Ошибка авторизации. Пожалуйста, попробуйте снова.'));
+        }
+      } else if (err.code === 'NETWORK_ERROR' || err.message === 'Network Error') {
+        // Сетевые ошибки
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+          setError('Не удается подключиться к серверу. Проверьте интернет-соединение и попробуйте снова.');
+        } else {
+          setError('Ошибка сети. Проверьте подключение к интернету.');
         }
       } else if (err.message) {
         // Ошибки от клиента или сети
@@ -201,6 +212,58 @@ const LoginPage = () => {
                 {loading || authLoading ? <CircularProgress size={24} /> : t('auth:loginButton', 'Войти')}
               </Button>
             </form>
+<<<<<<< HEAD
+=======
+            
+            {/* Тестовые данные для входа */}
+            <Box sx={{ mt: 3, bgcolor: 'background.paper', p: 2, borderRadius: 1, border: '1px dashed #ccc' }}>
+              <Typography variant="subtitle2" gutterBottom>
+                {t('auth:demo.title', 'Тестовые данные для входа:')}
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Button 
+                    size="small" 
+                    variant="outlined" 
+                    sx={{ minWidth: 100, mr: 1 }}
+                    onClick={() => quickLogin('admin@localhost', 'admin')}
+                    disabled={loading || authLoading}
+                  >
+                    {t('auth:demo.adminButton', 'Админ')}
+                  </Button>
+                  <Typography variant="caption">admin@localhost / admin</Typography>
+                </Box>
+                
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Button 
+                    size="small" 
+                    variant="outlined" 
+                    sx={{ minWidth: 100, mr: 1 }}
+                    onClick={() => quickLogin('manager@localhost', 'manager')}
+                    disabled={loading || authLoading}
+                  >
+                    {t('auth:demo.managerButton', 'Менеджер')}
+                  </Button>
+                  <Typography variant="caption">manager@localhost / manager</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Button 
+                    size="small" 
+                    variant="outlined" 
+                    sx={{ minWidth: 100, mr: 1 }}
+                    onClick={() => quickLogin('user@localhost', 'user')}
+                    disabled={loading || authLoading}
+                  >
+                    {t('auth:demo.userButton', 'Пользователь')}
+                  </Button>
+                  <Typography variant="caption">user@localhost / user</Typography>
+                </Box>
+              </Box>
+              <Typography variant="caption" sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+                {t('auth:demo.instruction', 'Нажмите на кнопку, чтобы автоматически заполнить поля для соответствующей роли.')}
+              </Typography>
+            </Box>
+>>>>>>> 801ce2854997a6d5c7a6484a2dd78f66db5a6d62
 
             <Box mt={3} textAlign="center">
               <Link href="/" variant="body2" sx={{ textDecoration: 'none', display: 'block', mb: 2 }}>
@@ -208,6 +271,9 @@ const LoginPage = () => {
               </Link>
               <Typography variant="body2" color="textSecondary">
                 © {new Date().getFullYear()} {t('header:organization', 'Алатау Строй Инвест')}. {t('common:copyright', 'Все права защищены.')}
+              </Typography>
+              <Typography variant="caption" color="textSecondary" sx={{ display: 'block', mt: 1 }}>
+                v2.0.0 | {process.env.NODE_ENV} | {new Date().toLocaleString()}
               </Typography>
             </Box>
           </CardContent>

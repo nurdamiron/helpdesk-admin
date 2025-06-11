@@ -12,9 +12,14 @@ const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    // Добавляем мобильные заголовки
+    'User-Agent': navigator.userAgent || 'HelpDesk Mobile Client',
+    'X-Requested-With': 'XMLHttpRequest'
   },
-  // Add CORS settings
+  // CORS настройки для мобильных
   withCredentials: false,
+  timeout: 30000, // 30 секунд таймаут для медленных мобильных сетей
 });
 
 // Добавляем перехватчик запросов для добавления токена авторизации
@@ -52,12 +57,38 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('❌ Ошибка API:', {
+    // Детальная диагностика ошибок для мобильных
+    const errorInfo = {
       url: error.config?.url,
+      method: error.config?.method,
       status: error.response?.status,
       data: error.response?.data,
-      message: error.message
-    });
+      message: error.message,
+      code: error.code,
+      isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+      network: navigator.onLine ? 'online' : 'offline',
+      userAgent: navigator.userAgent
+    };
+    
+    console.error('❌ Ошибка API:', errorInfo);
+    
+    // Специальная обработка сетевых ошибок на мобильных
+    if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      if (isMobile) {
+        console.error('🔥 Мобильная сетевая ошибка:', {
+          baseURL: error.config?.baseURL,
+          timeout: error.config?.timeout,
+          headers: error.config?.headers
+        });
+        
+        // Создаем более понятную ошибку для мобильных
+        const mobileError = new Error('Не удается подключиться к серверу. Проверьте интернет-соединение.');
+        mobileError.isMobileNetworkError = true;
+        mobileError.originalError = error;
+        return Promise.reject(mobileError);
+      }
+    }
     
     // Если ошибка авторизации (401) или истек токен (403), перенаправляем на страницу входа
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
