@@ -1,8 +1,12 @@
 {
-  "helpdesk": "HelpDesk",
+  "helpdesk": "IT Служба Поддержки",
   "menu": "Меню",
   "home": "Главная",
-  "adminPanel": "Админ панель",
-  "login": "Войти",
-  "languageSelector": "Выбор языка"
+  "adminPanel": "Панель управления",
+  "login": "Войти в систему",
+  "languageSelector": "Выбор языка",
+  "support": "Техническая поддержка",
+  "organization": "Алатау Строй Инвест",
+  "welcome": "Добро пожаловать",
+  "company": "Строительная компания"
 }

@@ -16,6 +16,7 @@ import PublicLayout from './components/common/PublicLayout';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 // Import public pages (перенесенные из клиентского проекта)
+import LandingPage from './pages/public/LandingPage';
 import HomePage from './pages/public/HomePage';
 import TicketDetailPublicPage from './pages/public/TicketDetailPublicPage';
 import SubmissionSuccessPage from './pages/public/SubmissionSuccessPage';
@@ -135,9 +136,9 @@ function App() {
                 <Route path="/access-denied" element={<AccessDeniedPage />} />
               </Route>
               
-              {/* Главная страница - показываем HomePage */}
+              {/* Главная страница - показываем LandingPage */}
               <Route path="/" element={<PublicLayout />}>
-                <Route index element={<HomePage />} />
+                <Route index element={<LandingPage />} />
               </Route>
               
               {/* Маршрут для перенаправления авторизованных пользователей в админку */}
@@ -204,7 +205,6 @@ function App() {
               
               {/* Публичные маршруты */}
               <Route path="/public" element={<PublicLayout />}>
-                <Route index element={<HomePage />} />
                 <Route path="tickets/:id" element={<TicketDetailPublicPage />} />
                 <Route path="success/:id" element={<SubmissionSuccessPage />} />
               </Route>

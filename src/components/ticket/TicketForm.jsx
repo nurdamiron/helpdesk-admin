@@ -18,7 +18,7 @@ import {
   Divider,
   Paper
 } from '@mui/material';
-import { Send as SendIcon, Login as LoginIcon, Email as EmailIcon } from '@mui/icons-material';
+import { Send as SendIcon, Login as LoginIcon, Email as EmailIcon, Telegram as TelegramIcon } from '@mui/icons-material';
 import { ticketService } from '../../api/ticketService';
 import { useAuth } from '../../contexts/AuthContext';
 import SuccessNotification from '../common/SuccessNotification';
@@ -34,7 +34,6 @@ const TicketForm = ({ onSubmitSuccess }) => {
     email: '',
     phone: '',
     subject: '',
-    category: '',
     type: 'support_request', // Установим тип по умолчанию для службы поддержки
     message: '',
     priority: 'medium',
@@ -43,20 +42,14 @@ const TicketForm = ({ onSubmitSuccess }) => {
   
   // Типы заявок для службы поддержки сотрудников
   const ticketTypes = [
-    { id: 'support_request', name: t('tickets:type.support_request', 'Запрос поддержки') },
     { id: 'incident', name: t('tickets:type.incident', 'Инцидент') },
-    { id: 'complaint', name: t('tickets:type.complaint', 'Жалоба') },
-    { id: 'suggestion', name: t('tickets:type.suggestion', 'Предложение по улучшению') },
-    { id: 'access_request', name: t('tickets:type.access_request', 'Запрос доступа') },
-    { id: 'information_request', name: t('tickets:type.information_request', 'Запрос информации') },
-    { id: 'emergency', name: t('tickets:type.emergency', 'Срочная проблема') },
-    { id: 'other', name: t('tickets:type.other', 'Другое') }
+    { id: 'support_request', name: t('tickets:type.support_request', 'Запрос') },
+    { id: 'complaint', name: t('tickets:type.complaint', 'Жалоба') }
   ];
   
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [categories, setCategories] = useState([]);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [successType, setSuccessType] = useState('email');
   const [createdTicketId, setCreatedTicketId] = useState(null);
@@ -73,37 +66,6 @@ const TicketForm = ({ onSubmitSuccess }) => {
       }));
     }
   }, [isAuthenticated, user]);
-  
-  // Получение категорий с сервера
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await ticketService.getCategories();
-        setCategories(data);
-      } catch (err) {
-        console.error('Ошибка при загрузке категорий:', err);
-        // Установим категории службы поддержки на случай ошибки
-        setCategories([
-          { id: 'technical', name: t('tickets:category.technical', 'Техническая проблема') },
-          { id: 'billing', name: t('tickets:category.billing', 'Биллинг и расчеты') },
-          { id: 'general', name: t('tickets:category.general', 'Общие вопросы') },
-          { id: 'it_support', name: t('tickets:category.it_support', 'IT поддержка') },
-          { id: 'equipment_issue', name: t('tickets:category.equipment_issue', 'Проблемы с оборудованием') },
-          { id: 'software_issue', name: t('tickets:category.software_issue', 'Проблемы с ПО') },
-          { id: 'access_request', name: t('tickets:category.access_request', 'Запрос доступа') },
-          { id: 'complaint', name: t('tickets:category.complaint', 'Жалоба') },
-          { id: 'suggestion', name: t('tickets:category.suggestion', 'Предложение') },
-          { id: 'hr_question', name: t('tickets:category.hr_question', 'Вопрос по HR') },
-          { id: 'safety_issue', name: t('tickets:category.safety_issue', 'Вопрос безопасности') },
-          { id: 'training_request', name: t('tickets:category.training_request', 'Запрос на обучение') },
-          { id: 'policy_question', name: t('tickets:category.policy_question', 'Вопрос по политикам') },
-          { id: 'other', name: t('tickets:category.other', 'Другое') }
-        ]);
-      }
-    };
-    
-    fetchCategories();
-  }, [t]);
   
   // Перенаправляем на страницу логина
   const handleLogin = () => {
@@ -135,7 +97,6 @@ const TicketForm = ({ onSubmitSuccess }) => {
     if (!formData.email.trim()) errors.email = requiredMessage;
     if (!formData.subject.trim()) errors.subject = requiredMessage;
     if (!formData.message.trim()) errors.message = requiredMessage;
-    if (!formData.category) errors.category = requiredMessage;
     if (!formData.type) errors.type = requiredMessage;
     
     // Проверка email на валидность
@@ -172,8 +133,8 @@ const TicketForm = ({ onSubmitSuccess }) => {
     setLoading(true);
     
     try {
-      // Если выбран WhatsApp, обрабатываем особым образом
-      if (formData.communicationChannel === 'whatsapp') {
+      // Если выбран WhatsApp или Telegram, обрабатываем особым образом
+      if (formData.communicationChannel === 'whatsapp' || formData.communicationChannel === 'telegram') {
         // Подготовка текста сообщения для WhatsApp
         const message = `🎫 *НОВАЯ ЗАЯВКА В СЛУЖБУ ПОДДЕРЖКИ*\n\n` +
           `👤 *Сотрудник:* ${formData.name}\n` +
@@ -181,29 +142,39 @@ const TicketForm = ({ onSubmitSuccess }) => {
           `📱 *Телефон:* ${formData.phone || 'Не указан'}\n\n` +
           `📋 *Тема обращения:* ${formData.subject}\n` +
           `🏷️ *Тип заявки:* ${ticketTypes.find(t => t.id === formData.type)?.name || formData.type}\n` +
-          `📂 *Категория:* ${categories.find(c => c.id === formData.category)?.name || formData.category}\n` +
           `⚡ *Приоритет:* ${formData.priority === 'low' ? 'Низкий' : formData.priority === 'medium' ? 'Средний' : formData.priority === 'high' ? 'Высокий' : 'Срочный'}\n\n` +
           `📝 *Описание проблемы:*\n${formData.message}\n\n` +
           `#поддержка #helpdesk #сотрудник`;
         
-        // Создаем WhatsApp URL
-        const whatsappNumber = '77770131838'; // Номер без + и пробелов
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+        // Создаем URL для WhatsApp или Telegram
+        let messengerUrl;
+        let communicationChannel;
         
-        // Сохраняем заявку в системе со статусом 'whatsapp_pending'
+        if (formData.communicationChannel === 'whatsapp') {
+          const whatsappNumber = '77770131838'; // Номер без + и пробелов
+          const encodedMessage = encodeURIComponent(message);
+          messengerUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+          communicationChannel = 'whatsapp';
+        } else {
+          // Telegram
+          const telegramBotUsername = 'HelpdeskKZBot'; // Ваш реальный бот
+          const encodedMessage = encodeURIComponent(message);
+          messengerUrl = `https://t.me/${telegramBotUsername}?start=${encodedMessage}`;
+          communicationChannel = 'telegram';
+        }
+        
+        // Сохраняем заявку в системе со статусом 'messenger_pending'
         const ticketData = {
           subject: formData.subject,
           description: formData.message,
           type: formData.type,
-          category: formData.category,
           priority: formData.priority,
-          status: 'whatsapp_pending',
+          status: communicationChannel === 'whatsapp' ? 'whatsapp_pending' : 'telegram_pending',
           user_id: isAuthenticated && user ? user.id : null,
           metadata: {
             contactPreference: 'email',
-            communicationChannel: 'whatsapp',
-            whatsappSent: false
+            communicationChannel: communicationChannel,
+            messengerSent: false
           },
           requester_metadata: {
             name: formData.name,
@@ -217,12 +188,12 @@ const TicketForm = ({ onSubmitSuccess }) => {
         const response = await ticketService.createTicket(ticketData, !isAuthenticated);
         const newTicket = response.ticket || response;
         
-        // Открываем WhatsApp в новом окне
-        window.open(whatsappUrl, '_blank');
+        // Открываем мессенджер в новом окне
+        window.open(messengerUrl, '_blank');
         
         // Показываем уведомление об успехе
         setError(null);
-        setSuccessType('whatsapp');
+        setSuccessType(communicationChannel);
         setCreatedTicketId(newTicket.id);
         setShowSuccessNotification(true);
         
@@ -232,7 +203,6 @@ const TicketForm = ({ onSubmitSuccess }) => {
           subject: formData.subject,
           description: formData.message,
           type: formData.type,
-          category: formData.category,
           priority: formData.priority,
           user_id: isAuthenticated && user ? user.id : null,
           metadata: {
@@ -266,7 +236,6 @@ const TicketForm = ({ onSubmitSuccess }) => {
           email: '',
           phone: '',
           subject: '',
-          category: '',
           type: 'support_request',
           message: '',
           priority: 'medium',
@@ -277,7 +246,6 @@ const TicketForm = ({ onSubmitSuccess }) => {
         setFormData(prev => ({
           ...prev,
           subject: '',
-          category: '',
           type: 'support_request',
           message: '',
           priority: 'medium',
@@ -447,7 +415,7 @@ const TicketForm = ({ onSubmitSuccess }) => {
             disabled={loading}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid item xs={12} sm={6} md={6}>
           <FormControl fullWidth error={!!formErrors.type} disabled={loading}>
             <InputLabel id="type-label">{t('tickets:create.ticketType', 'Тип заявки')}</InputLabel>
             <Select
@@ -466,26 +434,7 @@ const TicketForm = ({ onSubmitSuccess }) => {
             {formErrors.type && <FormHelperText>{formErrors.type}</FormHelperText>}
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <FormControl fullWidth error={!!formErrors.category} disabled={loading}>
-            <InputLabel id="category-label">{t('form.category', 'Категория')}</InputLabel>
-            <Select
-              labelId="category-label"
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              label={t('form.category', 'Категория')}
-              MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
-            >
-              {categories.map((category) => (
-                <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
-              ))}
-            </Select>
-            {formErrors.category && <FormHelperText>{formErrors.category}</FormHelperText>}
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={12} md={4}>
+        <Grid item xs={12} sm={12} md={6}>
           <FormControl fullWidth disabled={loading}>
             <InputLabel id="priority-label">{t('form.priority', 'Приоритет')}</InputLabel>
             <Select
@@ -568,10 +517,37 @@ const TicketForm = ({ onSubmitSuccess }) => {
               >
                 WhatsApp
               </Button>
+              <Button
+                variant={formData.communicationChannel === 'telegram' ? 'contained' : 'outlined'}
+                onClick={() => setFormData(prev => ({ ...prev, communicationChannel: 'telegram' }))}
+                startIcon={<TelegramIcon />}
+                sx={{ 
+                  flex: 1, 
+                  minWidth: '200px',
+                  py: 1.5,
+                  ...(formData.communicationChannel === 'telegram' ? {
+                    bgcolor: '#0088cc',
+                    color: 'white',
+                    '&:hover': { bgcolor: '#006bb3' }
+                  } : {
+                    borderColor: '#0088cc',
+                    color: '#0088cc',
+                    '&:hover': { 
+                      borderColor: '#006bb3',
+                      bgcolor: 'rgba(0, 136, 204, 0.04)'
+                    }
+                  })
+                }}
+                disabled={loading}
+              >
+                Telegram
+              </Button>
             </Box>
             <Typography variant="caption" sx={{ mt: 1, color: 'text.secondary' }}>
               {formData.communicationChannel === 'whatsapp' 
                 ? t('tickets:create.whatsappHint', 'Заявка будет отправлена через WhatsApp на номер службы поддержки +7 777 013 1838. Дальнейшая работа ведется по email.')
+                : formData.communicationChannel === 'telegram'
+                ? t('tickets:create.telegramHint', 'Заявка будет отправлена через Telegram бот @HelpdeskKZBot. Дальнейшая работа ведется по email.')
                 : t('tickets:create.emailHint', 'Заявка будет зарегистрирована в системе поддержки и вы получите уведомление на email')
               }
             </Typography>

@@ -12,12 +12,16 @@ i18n
   .use(initReactI18next)
   // инициализируем i18next
   .init({
-    fallbackLng: ['kk', 'ru', 'en'],
+    fallbackLng: 'kk',
     supportedLngs: ['kk', 'ru', 'en'],
     debug: process.env.NODE_ENV === 'development',
     
     interpolation: {
       escapeValue: false, // не нужно для React
+    },
+    
+    react: {
+      useSuspense: false,
     },
     
     detection: {
@@ -30,10 +34,12 @@ i18n
     
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
+      allowMultiLoading: false,
+      crossDomain: false,
     },
     
     // общие пространства имен для админского интерфейса
-    ns: ['common', 'dashboard', 'tickets', 'settings', 'auth', 'pages', 'user'],
+    ns: ['common', 'dashboard', 'tickets', 'settings', 'auth', 'pages', 'user', 'header', 'footer', 'help', 'users'],
     defaultNS: 'common',
   });
 

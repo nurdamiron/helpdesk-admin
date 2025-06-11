@@ -8,7 +8,7 @@ const theme = createTheme({
     primary: {
       main: '#1976d2',
       light: '#42a5f5',
-      dark: '#1565c0',
+      dark: '#0d47a1',
       contrastText: '#fff',
     },
     secondary: {
@@ -136,7 +136,7 @@ const theme = createTheme({
           borderRadius: 8,
           textTransform: 'none',
           '&.MuiButton-containedPrimary:hover': {
-            backgroundColor: '#1565c0',
+            backgroundColor: '#0d47a1',
           },
         },
         sizeLarge: {

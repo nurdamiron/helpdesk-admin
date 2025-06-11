@@ -1,8 +1,12 @@
 {
-  "helpdesk": "HelpDesk",
+  "helpdesk": "IT Қолдау Қызметі",
   "menu": "Мәзір",
   "home": "Басты бет",
-  "adminPanel": "Админ панелі",
-  "login": "Кіру",
-  "languageSelector": "Тіл таңдау"
+  "adminPanel": "Басқару панелі",
+  "login": "Жүйеге кіру",
+  "languageSelector": "Тілді таңдау",
+  "support": "Техникалық қолдау",
+  "organization": "Алатау Строй Инвест",
+  "welcome": "Қош келдіңіз",
+  "company": "Құрылыс компаниясы"
 }

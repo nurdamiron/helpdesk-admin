@@ -47,11 +47,6 @@ const LoginPage = () => {
     }
   }, [isAuthenticated, navigate, from]); // Добавлен from в зависимости
 
-  // Quick login functions for test users
-  const quickLogin = (userEmail, userPassword) => {
-    setEmail(userEmail);
-    setPassword(userPassword);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -131,7 +126,7 @@ const LoginPage = () => {
                 {t('auth:login', 'Вход в систему')}
               </Typography>
               <Typography variant="body1" color="textSecondary">
-                {t('app.description', 'Строительная Помощь HelpDesk')}
+                {t('header:organization', 'Алатау Строй Инвест')} IT {t('header:support', 'Поддержка')}
               </Typography>
             </Box>
 
@@ -206,73 +201,13 @@ const LoginPage = () => {
                 {loading || authLoading ? <CircularProgress size={24} /> : t('auth:loginButton', 'Войти')}
               </Button>
             </form>
-            
-            {/* Тестовые данные для входа */}
-            <Box sx={{ mt: 3, bgcolor: 'background.paper', p: 2, borderRadius: 1, border: '1px dashed #ccc' }}>
-              <Typography variant="subtitle2" gutterBottom>
-                {t('auth:demo.title', 'Тестовые данные для входа:')}
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Button 
-                    size="small" 
-                    variant="outlined" 
-                    sx={{ minWidth: 100, mr: 1 }}
-                    onClick={() => quickLogin('admin@localhost', 'admin')}
-                    disabled={loading || authLoading}
-                  >
-                    {t('auth:demo.adminButton', 'Админ')}
-                  </Button>
-                  <Typography variant="caption">admin@localhost / admin</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Button 
-                    size="small" 
-                    variant="outlined" 
-                    sx={{ minWidth: 100, mr: 1 }}
-                    onClick={() => quickLogin('support@localhost', 'support')}
-                    disabled={loading || authLoading}
-                  >
-                    {t('auth:demo.supportButton', 'Поддержка')}
-                  </Button>
-                  <Typography variant="caption">support@localhost / support</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Button 
-                    size="small" 
-                    variant="outlined" 
-                    sx={{ minWidth: 100, mr: 1 }}
-                    onClick={() => quickLogin('manager@localhost', 'manager')}
-                    disabled={loading || authLoading}
-                  >
-                    {t('auth:demo.managerButton', 'Менеджер')}
-                  </Button>
-                  <Typography variant="caption">manager@localhost / manager</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Button 
-                    size="small" 
-                    variant="outlined" 
-                    sx={{ minWidth: 100, mr: 1 }}
-                    onClick={() => quickLogin('user@localhost', 'user')}
-                    disabled={loading || authLoading}
-                  >
-                    {t('auth:demo.userButton', 'Пользователь')}
-                  </Button>
-                  <Typography variant="caption">user@localhost / user</Typography>
-                </Box>
-              </Box>
-              <Typography variant="caption" sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
-                {t('auth:demo.instruction', 'Нажмите на кнопку, чтобы автоматически заполнить поля для соответствующей роли.')}
-              </Typography>
-            </Box>
 
             <Box mt={3} textAlign="center">
               <Link href="/" variant="body2" sx={{ textDecoration: 'none', display: 'block', mb: 2 }}>
                 {t('auth:backToSite', 'Вернуться на главную страницу')}
               </Link>
               <Typography variant="body2" color="textSecondary">
-                © {new Date().getFullYear()} {t('app.title', 'Строительная Помощь')}. {t('common:copyright', 'Все права защищены.')}
+                © {new Date().getFullYear()} {t('header:organization', 'Алатау Строй Инвест')}. {t('common:copyright', 'Все права защищены.')}
               </Typography>
             </Box>
           </CardContent>

@@ -65,7 +65,7 @@ const Breadcrumbs = ({ ticketId, ticketSubject }) => {
     <Box sx={{ mb: 2, mt: 1 }}>
       <MuiBreadcrumbs 
         separator={<ChevronRight size={14} />} 
-        aria-label={t('aria.breadcrumbs', 'навигационная цепочка')}
+        aria-label={t('common:aria.breadcrumbs', 'Navigation')}
       >
         {/* Home link always shown */}
         <MuiLink 

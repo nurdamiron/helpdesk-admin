@@ -9,7 +9,8 @@ import {
 } from '@mui/material';
 import {
   CheckCircle as CheckCircleIcon,
-  WhatsApp as WhatsAppIcon
+  WhatsApp as WhatsAppIcon,
+  Telegram as TelegramIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 const SuccessNotification = ({ 
   open, 
   onClose, 
-  type = 'email', // 'email' or 'whatsapp'
+  type = 'email', // 'email', 'whatsapp' or 'telegram'
   ticketId = null,
   autoRedirect = true,
   redirectDelay = 3000 
@@ -58,6 +59,8 @@ const SuccessNotification = ({
   const getMessage = () => {
     if (type === 'whatsapp') {
       return t('tickets:success.whatsappRedirect');
+    } else if (type === 'telegram') {
+      return t('tickets:success.telegramRedirect', 'Заявка отправлена! Перейдите в Telegram для завершения отправки.');
     }
     return t('tickets:success.emailSuccess');
   };
@@ -65,6 +68,8 @@ const SuccessNotification = ({
   const getIcon = () => {
     if (type === 'whatsapp') {
       return <WhatsAppIcon color="success" />;
+    } else if (type === 'telegram') {
+      return <TelegramIcon color="success" />;
     }
     return <CheckCircleIcon color="success" />;
   };

@@ -164,5 +164,11 @@
   },
   "support": {
     "title": "24/7 Support"
+  },
+  "aria": {
+    "openDrawer": "Open menu",
+    "openMenu": "Open menu",
+    "breadcrumbs": "Navigation",
+    "languageSelector": "Language selector"
   }
 }

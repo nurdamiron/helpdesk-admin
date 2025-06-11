@@ -19,15 +19,20 @@ const PublicLayout = () => {
         component="main"
         sx={{
           flexGrow: 1,
-          bgcolor: '#f5f5f5',
-          py: { xs: 4, md: 6 }
+          ...(location.pathname === '/' ? {} : { bgcolor: '#f5f5f5', py: { xs: 4, md: 6 } })
         }}
       >
-        <Container maxWidth="lg">
+        {location.pathname === '/' ? (
           <PageTransition transitionKey={location.pathname + location.search}>
             <Outlet />
           </PageTransition>
-        </Container>
+        ) : (
+          <Container maxWidth="lg">
+            <PageTransition transitionKey={location.pathname + location.search}>
+              <Outlet />
+            </PageTransition>
+          </Container>
+        )}
       </Box>
       <Footer />
     </Box>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   Box, 
   Typography, 
@@ -15,6 +16,7 @@ import { useAuth } from '../contexts/AuthContext';
 const AccessDeniedPage = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { t } = useTranslation(['pages', 'common']);
 
   // Обработчик возврата на главную страницу
   const handleGoHome = () => {
@@ -44,13 +46,13 @@ const AccessDeniedPage = () => {
           gutterBottom
           sx={{ fontWeight: 600 }}
         >
-          Доступ запрещен
+          {t('pages:accessDenied.title', 'Доступ запрещен')}
         </Typography>
         
         <Typography variant="body1" paragraph sx={{ mb: 3 }}>
-          У вас недостаточно прав для доступа к этой странице.
+          {t('pages:accessDenied.message', 'У вас недостаточно прав для доступа к этой странице.')}
           {user && (
-            <> Ваша текущая роль: <strong>{user.role}</strong>.</>
+            <> {t('pages:accessDenied.currentRole', 'Ваша текущая роль: {{role}}', { role: user.role })}</>
           )}
         </Typography>
         
@@ -60,7 +62,7 @@ const AccessDeniedPage = () => {
             onClick={handleGoHome} 
             sx={{ minWidth: 120 }}
           >
-            На главную
+            {t('pages:accessDenied.buttons.home', 'На главную')}
           </Button>
           <Button 
             variant="contained" 
@@ -68,7 +70,7 @@ const AccessDeniedPage = () => {
             onClick={handleLogout}
             sx={{ minWidth: 120 }}
           >
-            Выйти
+            {t('pages:accessDenied.buttons.logout', 'Выйти')}
           </Button>
         </Box>
       </Paper>

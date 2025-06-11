@@ -164,5 +164,11 @@
   },
   "support": {
     "title": "24/7 Қолдау"
+  },
+  "aria": {
+    "openDrawer": "Мәзірді ашу",
+    "openMenu": "Мәзірді ашу", 
+    "breadcrumbs": "Навигация",
+    "languageSelector": "Тілді таңдау"
   }
 }

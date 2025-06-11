@@ -8,6 +8,12 @@ const getApiUrl = () => {
   // Определяем текущий хост
   const currentHost = window.location.hostname;
   const currentProtocol = window.location.protocol;
+  const currentPort = window.location.port;
+  
+  // Если это localhost на порту 5173 (Vite dev server), используем localhost backend
+  if ((currentHost === 'localhost' || currentHost === '127.0.0.1') && currentPort === '5173') {
+    return 'http://localhost:5002/api';
+  }
   
   // Если это localhost, используем localhost
   if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
@@ -38,7 +44,13 @@ const getWsUrl = () => {
 
   // Определяем текущий хост
   const currentHost = window.location.hostname;
+  const currentPort = window.location.port;
   const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  
+  // Если это localhost на порту 5173 (Vite dev server), используем localhost backend
+  if ((currentHost === 'localhost' || currentHost === '127.0.0.1') && currentPort === '5173') {
+    return 'ws://localhost:5002/ws';
+  }
   
   // Если это localhost, используем localhost
   if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
@@ -66,8 +78,10 @@ export const WS_URL = getWsUrl();
 // Для отладки
 console.log('🔧 API Configuration:', {
   hostname: window.location.hostname,
+  port: window.location.port,
   protocol: window.location.protocol,
   nodeEnv: process.env.NODE_ENV,
+  reactAppEnv: process.env.REACT_APP_ENV,
   envApiUrl: process.env.REACT_APP_API_URL,
   envWsUrl: process.env.REACT_APP_WS_URL,
   calculatedApiUrl: API_URL,

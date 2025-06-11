@@ -1,8 +1,12 @@
 {
-  "helpdesk": "HelpDesk",
+  "helpdesk": "IT Support Service",
   "menu": "Menu",
   "home": "Home",
-  "adminPanel": "Admin Panel",
+  "adminPanel": "Control Panel",
   "login": "Login",
-  "languageSelector": "Language Selection"
+  "languageSelector": "Language Selection",
+  "support": "Technical Support",
+  "organization": "Alatau Stroyinvest",
+  "welcome": "Welcome",
+  "company": "Construction Company"
 }

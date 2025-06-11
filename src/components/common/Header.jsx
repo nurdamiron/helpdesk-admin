@@ -74,7 +74,7 @@ const Header = ({ drawerOpen, setDrawerOpen }) => {
       }}>
         <IconButton
           color="inherit"
-          aria-label="open drawer"
+          aria-label={t('common:aria.openDrawer', 'open drawer')}
           edge="start"
           onClick={() => setDrawerOpen(!drawerOpen)}
           sx={{ 

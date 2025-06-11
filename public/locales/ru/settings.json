@@ -4,24 +4,36 @@
   "profile": {
     "title": "Профиль пользователя",
     "firstName": "Имя",
+    "firstNameRequired": "Имя обязательно для заполнения",
     "lastName": "Фамилия",
+    "lastNameRequired": "Фамилия обязательна для заполнения",
     "email": "Email",
+    "emailRequired": "Email обязателен для заполнения",
+    "emailInvalid": "Введите корректный email адрес",
     "position": "Должность",
     "phone": "Телефон",
+    "phoneOptional": "(необязательно)",
     "saveButton": "Сохранить профиль",
     "updating": "Обновление...",
-    "updateSuccess": "Профиль успешно обновлен"
+    "updateSuccess": "Профиль успешно обновлен",
+    "updateError": "Ошибка при обновлении профиля"
   },
   "security": {
     "title": "Безопасность",
     "changePassword": "Изменение пароля",
     "currentPassword": "Текущий пароль",
+    "currentPasswordRequired": "Введите текущий пароль",
+    "currentPasswordError": "Неверный текущий пароль",
     "newPassword": "Новый пароль",
-    "confirmPassword": "Подтверждение пароля",
+    "newPasswordRequired": "Введите новый пароль",
+    "newPasswordMinLength": "Пароль должен содержать минимум 6 символов",
+    "confirmPassword": "Подтвердите пароль",
+    "confirmPasswordRequired": "Подтвердите новый пароль",
+    "passwordMismatch": "Пароли не совпадают",
     "saveButton": "Сохранить пароль",
     "updating": "Обновление...",
     "updateSuccess": "Пароль успешно обновлен",
-    "currentPasswordError": "Неверный текущий пароль"
+    "updateError": "Ошибка при обновлении пароля"
   },
   "notifications": {
     "title": "Уведомления",
@@ -66,7 +78,7 @@
   },
   "validation": {
     "required": "Это поле обязательно для заполнения",
-    "emailInvalid": "Пожалуйста, введите корректный email адрес",
+    "emailInvalid": "Введите корректный email адрес",
     "passwordMinLength": "Пароль должен содержать минимум 6 символов",
     "passwordMismatch": "Пароли не совпадают"
   }

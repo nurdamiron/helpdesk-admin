@@ -21,11 +21,12 @@ const UserStatusChip = ({ isActive, size = 'small' }) => {
   return isActive ? (
     <Chip
       icon={<ActiveIcon fontSize="small" />}
-      label={isSmallScreen ? '' : t('users:status.active', 'Активный')}
+      label={isSmallScreen ? '' : t('users:active', 'Активный')}
       color="success"
       size={chipSize}
       sx={{ 
         '& .MuiChip-icon': { color: 'inherit' },
+        '& .MuiChip-label': { color: 'white' },
         minWidth: isSmallScreen ? '32px' : 'auto',
         height: isSmallScreen ? '24px' : 'auto'
       }}
@@ -33,11 +34,12 @@ const UserStatusChip = ({ isActive, size = 'small' }) => {
   ) : (
     <Chip
       icon={<InactiveIcon fontSize="small" />}
-      label={isSmallScreen ? '' : t('users:status.inactive', 'Неактивный')}
+      label={isSmallScreen ? '' : t('users:inactive', 'Неактивный')}
       color="error"
       size={chipSize}
       sx={{ 
         '& .MuiChip-icon': { color: 'inherit' },
+        '& .MuiChip-label': { color: 'white' },
         minWidth: isSmallScreen ? '32px' : 'auto',
         height: isSmallScreen ? '24px' : 'auto'
       }}

@@ -4,6 +4,15 @@
     "message": "The page you are looking for does not exist or has been moved.",
     "button": "Return to Home"
   },
+  "accessDenied": {
+    "title": "Access Denied",
+    "message": "You do not have sufficient permissions to access this page.",
+    "currentRole": "Your current role: {{role}}",
+    "buttons": {
+      "home": "Go Home",
+      "logout": "Logout"
+    }
+  },
   "dashboard": {
     "title": "Dashboard",
     "summary": "Summary",
@@ -123,5 +132,112 @@
     "ticketNumber": "Ticket Number",
     "findButton": "Find",
     "invalidTicketId": "Invalid ticket ID"
+  },
+  "landing": {
+    "hero": {
+      "title": "Alatau Stroyinvest IT Support",
+      "subtitle": "Technical support system for construction company employees. Quick assistance in daily work.",
+      "loginButton": "Login to System"
+    },
+    "stats": {
+      "resolvedTickets": "Resolved Tickets",
+      "satisfiedClients": "Satisfied Clients",
+      "responseTime": "Response Time",
+      "support": "Support"
+    },
+    "features": {
+      "title": "IT Solutions for Construction Industry",
+      "subtitle": "Technical support tailored to industry specifics",
+      "speed": {
+        "title": "Construction Processes",
+        "description": "Fast IT issue resolution on construction sites"
+      },
+      "security": {
+        "title": "Project Management",
+        "description": "Specialized IT support for construction projects"
+      },
+      "support24": {
+        "title": "Mobile Support",
+        "description": "Support for field specialists on construction sites"
+      },
+      "analytics": {
+        "title": "Management Tools",
+        "description": "Specialized tools for construction companies"
+      }
+    },
+    "process": {
+      "title": "How It Works",
+      "subtitle": "Simple and clear process for solving your issues",
+      "steps": {
+        "auth": {
+          "title": "Authorization",
+          "description": "Log in with provided credentials"
+        },
+        "create": {
+          "title": "Create Ticket",
+          "description": "Fill out the form describing the problem"
+        },
+        "process": {
+          "title": "Processing",
+          "description": "Specialist takes the ticket for processing"
+        },
+        "solution": {
+          "title": "Solution",
+          "description": "Receive solution and confirm completion"
+        }
+      }
+    },
+    "benefits": {
+      "title": "Why Choose Us",
+      "subtitle": "Comprehensive solution for organizing support service",
+      "centralizedSystem": {
+        "title": "Construction Project Management",
+        "description": "Centralized IT issue management for various construction sites"
+      },
+      "progressTracking": {
+        "title": "Real-time Monitoring",
+        "description": "Real-time tracking of technical issues on construction sites"
+      },
+      "teamwork": {
+        "title": "Engineering Team",
+        "description": "Specialized IT support for construction engineers and architects"
+      },
+      "analytics": {
+        "title": "Project Analytics",
+        "description": "Analysis of IT efficiency in construction projects"
+      },
+      "multiplatform": {
+        "title": "Field Work",
+        "description": "Mobile support for construction site field work"
+      },
+      "multilingual": {
+        "title": "CAD/BIM Integration",
+        "description": "Technical support integrated with construction software"
+      }
+    },
+    "testimonials": {
+      "title": "Client Reviews",
+      "subtitle": "What our users say about us",
+      "testimonial1": {
+        "name": "Aigerim K.",
+        "role": "Sales Manager",
+        "comment": "Excellent system! All tickets are resolved quickly and efficiently."
+      },
+      "testimonial2": {
+        "name": "Daniyar M.",
+        "role": "IT Specialist",
+        "comment": "Convenient interface and fast operation. Recommend!"
+      },
+      "testimonial3": {
+        "name": "Saule B.",
+        "role": "Accountant",
+        "comment": "Professional support, always helps solve problems."
+      }
+    },
+    "cta": {
+      "title": "Ready to optimize your support service?",
+      "subtitle": "Start using the system right now",
+      "button": "Login to System"
+    }
   }
 } 

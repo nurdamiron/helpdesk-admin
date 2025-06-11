@@ -162,5 +162,11 @@
   },
   "support": {
     "title": "24/7 Поддержка"
+  },
+  "aria": {
+    "openDrawer": "Открыть меню",
+    "openMenu": "Открыть меню",
+    "breadcrumbs": "Навигация",
+    "languageSelector": "Выбор языка"
   }
 }

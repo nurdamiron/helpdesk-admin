@@ -84,7 +84,7 @@ const LanguageSwitcher = () => {
         <IconButton
           size="medium"
           color="inherit"
-          aria-label="language"
+          aria-label={t('common:aria.languageSelector', 'language')}
           aria-controls={open ? 'language-menu' : undefined}
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
@@ -93,7 +93,7 @@ const LanguageSwitcher = () => {
             padding: { xs: '6px', sm: '8px' },
             backgroundColor: open ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
             '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.15)'
+              backgroundColor: 'rgba(255, 193, 7, 0.15)'
             }
           }}
         >

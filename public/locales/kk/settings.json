@@ -4,24 +4,36 @@
   "profile": {
     "title": "Пайдаланушы профилі",
     "firstName": "Аты",
+    "firstNameRequired": "Аты міндетті түрде толтырылуы керек",
     "lastName": "Тегі",
+    "lastNameRequired": "Тегі міндетті түрде толтырылуы керек",
     "email": "Email",
+    "emailRequired": "Email міндетті түрде толтырылуы керек",
+    "emailInvalid": "Жарамды email мекенжайын енгізіңіз",
     "position": "Лауазымы",
     "phone": "Телефон",
+    "phoneOptional": "(міндетті емес)",
     "saveButton": "Профильді сақтау",
     "updating": "Жаңартылуда...",
-    "updateSuccess": "Профиль сәтті жаңартылды"
+    "updateSuccess": "Профиль сәтті жаңартылды",
+    "updateError": "Профильді жаңарту кезінде қате орын алды"
   },
   "security": {
     "title": "Қауіпсіздік",
     "changePassword": "Құпия сөзді өзгерту",
-    "currentPassword": "Қымдағы құпия сөз",
+    "currentPassword": "Ағымдағы құпия сөз",
+    "currentPasswordRequired": "Ағымдағы құпия сөзді енгізіңіз",
+    "currentPasswordError": "Ағымдағы құпия сөз дұрыс емес",
     "newPassword": "Жаңа құпия сөз",
-    "confirmPassword": "Құпия сөзді растау",
+    "newPasswordRequired": "Жаңа құпия сөзді енгізіңіз",
+    "newPasswordMinLength": "Құпия сөз кемінде 6 таңбадан тұруы керек",
+    "confirmPassword": "Құпия сөзді растаңыз",
+    "confirmPasswordRequired": "Жаңа құпия сөзді растаңыз",
+    "passwordMismatch": "Құпия сөздер сәйкес келмейді",
     "saveButton": "Құпия сөзді сақтау",
     "updating": "Жаңартылуда...",
     "updateSuccess": "Құпия сөз сәтті жаңартылды",
-    "currentPasswordError": "Қымдағы құпия сөз дұрыс емес"
+    "updateError": "Құпия сөзді жаңарту кезінде қате орын алды"
   },
   "notifications": {
     "title": "Хабарландырулар",

@@ -82,14 +82,14 @@ const PublicHeader = () => {
               textDecoration: 'none',
             }}
           >
-            {t('header:helpdesk', 'HelpDesk')}
+{t('helpdesk', { ns: 'header', defaultValue: 'Қолдау Орталығы' })}
           </Typography>
 
           {/* Mobile menu icon */}
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
-              aria-label={t('header:menu', 'Меню')}
+              aria-label={t('menu', { ns: 'header', defaultValue: 'Меню' })}
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={toggleDrawer(true)}
@@ -112,7 +112,7 @@ const PublicHeader = () => {
               >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, alignItems: 'center' }}>
                   <Typography variant="h6" component="div">
-                    {t('header:menu', 'Меню')}
+                    {t('menu', { ns: 'header', defaultValue: 'Меню' })}
                   </Typography>
                   <IconButton onClick={toggleDrawer(false)}>
                     <CloseIcon />
@@ -127,7 +127,7 @@ const PublicHeader = () => {
                       component={RouterLink} 
                       to="/"
                     >
-                      <ListItemText primary={t('header:home', 'Главная')} />
+                      <ListItemText primary={t('home', { ns: 'header', defaultValue: 'Главная' })} />
                     </ListItemButton>
                   </ListItem>
                   
@@ -135,13 +135,13 @@ const PublicHeader = () => {
                     isAuthenticated ? (
                       <ListItem disablePadding>
                         <ListItemButton onClick={handleAdmin}>
-                          <ListItemText primary={t('header:adminPanel', 'Админ панель')} />
+                          <ListItemText primary={t('adminPanel', { ns: 'header', defaultValue: 'Админ панель' })} />
                         </ListItemButton>
                       </ListItem>
                     ) : (
                       <ListItem disablePadding>
                         <ListItemButton onClick={handleLogin}>
-                          <ListItemText primary={t('header:login', 'Войти')} />
+                          <ListItemText primary={t('login', { ns: 'header', defaultValue: 'Войти' })} />
                         </ListItemButton>
                       </ListItem>
                     )
@@ -151,7 +151,7 @@ const PublicHeader = () => {
                 <Divider />
                 
                 <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
-                  <Tooltip title={t('header:languageSelector', 'Выбор языка')}>
+                  <Tooltip title={t('languageSelector', { ns: 'header', defaultValue: 'Выбор языка' })}>
                     <Box>
                       <LanguageSwitcher />
                     </Box>
@@ -178,7 +178,7 @@ const PublicHeader = () => {
               textDecoration: 'none',
             }}
           >
-            {t('header:helpdesk', '')}
+{t('helpdesk', { ns: 'header', defaultValue: 'Қолдау Орталығы' })}
           </Typography>
 
           {/* Spacer for desktop */}
@@ -188,13 +188,13 @@ const PublicHeader = () => {
               to="/"
               sx={{ my: 2, color: 'inherit', display: 'block' }}
             >
-              {t('header:home', '')}
+{t('home', { ns: 'header', defaultValue: 'Басты бет' })}
             </Button>
           </Box>
 
           {/* Right section - Language switcher & Login button */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Tooltip title={t('header:languageSelector', 'Выбор языка')}>
+            <Tooltip title={t('languageSelector', { ns: 'header', defaultValue: 'Выбор языка' })}>
               <Box sx={{ mr: 2 }}>
                 <LanguageSwitcher />
               </Box>
@@ -211,7 +211,7 @@ const PublicHeader = () => {
                     display: { xs: 'none', sm: 'flex' }
                   }}
                 >
-                  {t('header:adminPanel', 'Админ панель')}
+{t('adminPanel', { ns: 'header', defaultValue: 'Басқару панелі' })}
                 </Button>
               ) : (
                 <Button
@@ -223,7 +223,7 @@ const PublicHeader = () => {
                     display: { xs: 'none', sm: 'flex' }
                   }}
                 >
-                  {t('header:login', 'Войти')}
+{t('login', { ns: 'header', defaultValue: 'Жүйеге кіру' })}
                 </Button>
               )
             )}

@@ -21,10 +21,12 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import userService from '../api/userService';
+import { useTranslation } from 'react-i18next';
 
 const SettingsPage = () => {
   const theme = useTheme();
   const { user, updateProfile } = useAuth();
+  const { t } = useTranslation('settings');
   
   // Loading states
   const [isProfileLoading, setIsProfileLoading] = useState(false);
@@ -114,17 +116,17 @@ const SettingsPage = () => {
     const newErrors = {};
     
     if (!formValues.firstName.trim()) {
-      newErrors.firstName = 'Аты міндетті түрде толтырылуы керек';
+      newErrors.firstName = t('profile.firstNameRequired');
     }
     
     if (!formValues.lastName.trim()) {
-      newErrors.lastName = 'Тегі міндетті түрде толтырылуы керек';
+      newErrors.lastName = t('profile.lastNameRequired');
     }
     
     if (!formValues.email.trim()) {
-      newErrors.email = 'Email міндетті түрде толтырылуы керек';
+      newErrors.email = t('profile.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(formValues.email)) {
-      newErrors.email = 'Жарамды email мекенжайын енгізіңіз';
+      newErrors.email = t('profile.emailInvalid');
     }
     
     setErrors(prev => ({ ...prev, ...newErrors }));
@@ -136,19 +138,19 @@ const SettingsPage = () => {
     const newErrors = {};
     
     if (!passwordForm.currentPassword) {
-      newErrors.currentPassword = 'Ағымдағы құпия сөзді енгізіңіз';
+      newErrors.currentPassword = t('security.currentPasswordRequired');
     }
     
     if (!passwordForm.newPassword) {
-      newErrors.newPassword = 'Жаңа құпия сөзді енгізіңіз';
+      newErrors.newPassword = t('security.newPasswordRequired');
     } else if (passwordForm.newPassword.length < 6) {
-      newErrors.newPassword = 'Құпия сөз кемінде 6 таңбадан тұруы керек';
+      newErrors.newPassword = t('security.newPasswordMinLength');
     }
     
     if (!passwordForm.confirmPassword) {
-      newErrors.confirmPassword = 'Жаңа құпия сөзді растаңыз';
+      newErrors.confirmPassword = t('security.confirmPasswordRequired');
     } else if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      newErrors.confirmPassword = 'Құпия сөздер сәйкес келмейді';
+      newErrors.confirmPassword = t('security.passwordMismatch');
     }
     
     setErrors(prev => ({ ...prev, ...newErrors }));
@@ -180,14 +182,14 @@ const SettingsPage = () => {
       
       setNotification({
         open: true,
-        message: 'Профиль сәтті жаңартылды',
+        message: t('profile.updateSuccess'),
         severity: 'success'
       });
     } catch (error) {
       console.error('Error updating profile:', error);
       setNotification({
         open: true,
-        message: error.response?.data?.error || 'Профильді жаңарту кезінде қате орын алды',
+        message: error.response?.data?.error || t('profile.updateError'),
         severity: 'error'
       });
     } finally {
@@ -219,7 +221,7 @@ const SettingsPage = () => {
       
       setNotification({
         open: true,
-        message: 'Құпия сөз сәтті жаңартылды',
+        message: t('security.updateSuccess'),
         severity: 'success'
       });
     } catch (error) {
@@ -228,13 +230,13 @@ const SettingsPage = () => {
       if (error.response?.status === 401) {
         setErrors(prev => ({
           ...prev,
-          currentPassword: 'Ағымдағы құпия сөз дұрыс емес'
+          currentPassword: t('security.currentPasswordError')
         }));
       }
       
       setNotification({
         open: true,
-        message: error.response?.data?.error || 'Құпия сөзді жаңарту кезінде қате орын алды',
+        message: error.response?.data?.error || t('security.updateError'),
         severity: 'error'
       });
     } finally {
@@ -267,7 +269,7 @@ const SettingsPage = () => {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <User size={20} style={{ marginRight: 10, color: theme.palette.primary.main }} />
-          <Typography variant="h6" fontWeight={600}>Пайдаланушы профілі</Typography>
+          <Typography variant="h6" fontWeight={600}>{t('profile.title')}</Typography>
         </Box>
         <Divider sx={{ mb: 3 }} />
         
@@ -286,7 +288,7 @@ const SettingsPage = () => {
         
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            Аты
+            {t('profile.firstName')}
           </Typography>
           <TextField
             fullWidth
@@ -300,7 +302,7 @@ const SettingsPage = () => {
           />
           
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            Тегі
+            {t('profile.lastName')}
           </Typography>
           <TextField
             fullWidth
@@ -314,7 +316,7 @@ const SettingsPage = () => {
           />
           
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            Email
+            {t('profile.email')}
           </Typography>
           <TextField
             fullWidth
@@ -328,7 +330,7 @@ const SettingsPage = () => {
           />
           
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            Телефон
+            {t('profile.phone')}
           </Typography>
           <TextField
             fullWidth
@@ -350,7 +352,7 @@ const SettingsPage = () => {
                 fontWeight: 500
               }}
             >
-              {isProfileLoading ? 'Жаңартылуда...' : 'Профильді сақтау'}
+              {isProfileLoading ? t('profile.updating') : t('profile.saveButton')}
             </Button>
           </Box>
         </Box>
@@ -370,17 +372,17 @@ const SettingsPage = () => {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <Lock size={20} style={{ marginRight: 10, color: theme.palette.primary.main }} />
-          <Typography variant="h6" fontWeight={600}>Қауіпсіздік</Typography>
+          <Typography variant="h6" fontWeight={600}>{t('security.title')}</Typography>
         </Box>
         <Divider sx={{ mb: 3 }} />
         
         <Typography variant="subtitle1" sx={{ mb: 2 }} fontWeight={500}>
-          Құпия сөзді өзгерту
+          {t('security.changePassword')}
         </Typography>
         
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            Ағымдағы құпия сөз
+            {t('security.currentPassword')}
           </Typography>
           <TextField
             fullWidth
@@ -395,7 +397,7 @@ const SettingsPage = () => {
           />
           
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            Жаңа құпия сөз
+            {t('security.newPassword')}
           </Typography>
           <TextField
             fullWidth
@@ -410,7 +412,7 @@ const SettingsPage = () => {
           />
           
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            Құпия сөзді растаңыз
+            {t('security.confirmPassword')}
           </Typography>
           <TextField
             fullWidth
@@ -436,7 +438,7 @@ const SettingsPage = () => {
                 fontWeight: 500
               }}
             >
-              {isPasswordLoading ? 'Жаңартылуда...' : 'Құпия сөзді сақтау'}
+              {isPasswordLoading ? t('security.updating') : t('security.saveButton')}
             </Button>
           </Box>
         </Box>

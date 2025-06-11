@@ -23,18 +23,32 @@ class WebSocketService {
     // Определяем базовый URL для WebSocket в зависимости от среды
     let websocketUrl;
     
-    if (process.env.NODE_ENV === 'production') {
+    // Получаем конфигурацию из api config
+    const currentHost = window.location.hostname;
+    const currentPort = window.location.port;
+    
+    // Если это localhost на порту 5173 (Vite dev server), используем localhost backend
+    if ((currentHost === 'localhost' || currentHost === '127.0.0.1') && currentPort === '5173') {
+      websocketUrl = 'ws://localhost:5002/ws';
+      this.fallbackUrl = 'wss://helpdesk-backend-ycoo.onrender.com/ws';
+    } else if (process.env.NODE_ENV === 'production') {
       // В production режиме используем WSS для безопасного соединения
       websocketUrl = process.env.REACT_APP_WS_URL || 'wss://helpdesk-backend-ycoo.onrender.com/ws';
+      this.fallbackUrl = null;
     } else {
       // В режиме разработки используем локальный сервер
       websocketUrl = 'ws://localhost:5002/ws';
+      this.fallbackUrl = 'wss://helpdesk-backend-ycoo.onrender.com/ws';
     }
     
     console.log(`WebSocket URL (${process.env.NODE_ENV} mode):`, websocketUrl);
+    if (this.fallbackUrl) {
+      console.log(`WebSocket Fallback URL:`, this.fallbackUrl);
+    }
     
     // Базовый URL для WebSocket соединения
     this.baseUrl = websocketUrl;
+    this.useFallback = false;
     
     // Настраиваем слушатели событий сети
     this.setupNetworkListeners();
@@ -207,11 +221,34 @@ class WebSocketService {
           this.handleOpen(event);
         };
         this.socket.onmessage = this.handleMessage.bind(this);
-        this.socket.onerror = this.handleError.bind(this);
+        this.socket.onerror = (error) => {
+          clearTimeout(connectTimeoutId);
+          
+          // Если это первая попытка и есть fallback URL, пробуем его
+          if (!this.useFallback && this.fallbackUrl && this.reconnectAttempts === 0) {
+            console.log('WebSocket ошибка с локальным сервером, пробуем fallback:', this.fallbackUrl);
+            this.useFallback = true;
+            this.baseUrl = this.fallbackUrl;
+            this.connect();
+            return;
+          }
+          
+          this.handleError(error);
+        };
         this.socket.onclose = this.handleClose.bind(this);
       } catch (socketError) {
         clearTimeout(connectTimeoutId);
         console.error('Error creating WebSocket:', socketError);
+        
+        // Если это первая попытка и есть fallback URL, пробуем его
+        if (!this.useFallback && this.fallbackUrl) {
+          console.log('WebSocket создание не удалось, пробуем fallback:', this.fallbackUrl);
+          this.useFallback = true;
+          this.baseUrl = this.fallbackUrl;
+          this.connect();
+          return;
+        }
+        
         this.notifyConnectionStatus(false, socketError.message);
         this.scheduleReconnect();
       }

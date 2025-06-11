@@ -33,6 +33,22 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../api/authService';
 import MobileWelcomeCard from '../../components/dashboard/MobileWelcomeCard';
+import statisticsService from '../../api/statisticsService';
+import StatCard from '../../components/statistics/StatCard';
+import TicketsChart from '../../components/statistics/TicketsChart';
+import CategoryPieChart from '../../components/statistics/CategoryPieChart';
+import StaffPerformanceTable from '../../components/statistics/StaffPerformanceTable';
+import KPIMetrics from '../../components/statistics/KPIMetrics';
+import { 
+  Assignment as AssignmentIcon,
+  NewReleases as NewReleasesIcon,
+  HourglassEmpty as HourglassEmptyIcon,
+  CheckCircle as CheckCircleIcon,
+  Timer as TimerIcon,
+  People as PeopleIcon,
+  AdminPanelSettings as AdminIcon,
+  Support as SupportIcon
+} from '@mui/icons-material';
 
 /**
  * Компонент дашборда для администратора
@@ -60,44 +76,80 @@ const AdminDashboardPage = () => {
     moderators: 0,
     users: 0
   });
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [timelineData, setTimelineData] = useState([]);
+  const [staffPerformance, setStaffPerformance] = useState([]);
+  const [kpiMetrics, setKpiMetrics] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState('7days');
 
   // Загрузка статистики при монтировании компонента
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Получаем данные аналитики через API
-        const analyticsData = await ticketService.getTicketsAnalytics();
         
-        // Обрабатываем полученные данные
-        setStats({
-          totalTickets: analyticsData.totalTickets || 0,
-          newTickets: analyticsData.byStatus?.new || 0,
-          inProgressTickets: analyticsData.byStatus?.in_progress || 0,
-          resolvedTickets: analyticsData.byStatus?.resolved || 0,
-          pendingTickets: analyticsData.byStatus?.waiting || 0, // Изменено с pending на waiting
-          averageResponseTime: analyticsData.averageResponseTime || 0
-        });
+        // Загружаем расширенную статистику через новый API
+        const [dashboardData, timelineStats, staffStats, kpiData] = await Promise.all([
+          statisticsService.getDashboardStats(),
+          statisticsService.getTimelineStats(selectedPeriod),
+          statisticsService.getStaffPerformance(),
+          statisticsService.getKPIMetrics()
+        ]);
 
-        // Загружаем статистику пользователей
-        try {
-          const users = await authService.getUsers();
-          const admins = users.filter(u => u.role === 'admin').length;
-          const moderators = users.filter(u => ['moderator', 'support', 'manager', 'staff'].includes(u.role)).length;
-          const regularUsers = users.filter(u => u.role === 'user').length;
-          
-          setUserStats({
-            admins,
-            moderators,
-            users: regularUsers
+        // Устанавливаем данные дашборда
+        if (dashboardData?.data) {
+          setDashboardStats(dashboardData.data);
+          setStats({
+            totalTickets: dashboardData.data.tickets?.total || 0,
+            newTickets: dashboardData.data.tickets?.new_tickets || 0,
+            inProgressTickets: dashboardData.data.tickets?.in_progress || 0,
+            resolvedTickets: dashboardData.data.tickets?.resolved || 0,
+            pendingTickets: dashboardData.data.tickets?.pending || 0,
+            averageResponseTime: dashboardData.data.avgResponseTime || 0
           });
-        } catch (userErr) {
-          console.error('Error fetching user stats:', userErr);
+          
+          // Статистика пользователей из нового API
+          if (dashboardData.data.users) {
+            setUserStats({
+              admins: dashboardData.data.users.admin_count || 0,
+              moderators: dashboardData.data.users.moderator_count || 0,
+              users: dashboardData.data.users.user_count || 0
+            });
+          }
+        }
+
+        // Устанавливаем данные временной статистики
+        if (timelineStats?.data) {
+          setTimelineData(timelineStats.data);
+        }
+
+        // Устанавливаем данные производительности сотрудников
+        if (staffStats?.data) {
+          setStaffPerformance(staffStats.data);
+        }
+
+        // Устанавливаем KPI метрики
+        if (kpiData?.data) {
+          setKpiMetrics(kpiData.data);
         }
 
         setLoading(false);
       } catch (err) {
         console.error('Error fetching dashboard stats:', err);
+        // Если новый API не работает, пробуем старый
+        try {
+          const analyticsData = await ticketService.getTicketsAnalytics();
+          setStats({
+            totalTickets: analyticsData.totalTickets || 0,
+            newTickets: analyticsData.byStatus?.new || 0,
+            inProgressTickets: analyticsData.byStatus?.in_progress || 0,
+            resolvedTickets: analyticsData.byStatus?.resolved || 0,
+            pendingTickets: analyticsData.byStatus?.waiting || 0,
+            averageResponseTime: analyticsData.averageResponseTime || 0
+          });
+        } catch (fallbackErr) {
+          console.error('Fallback also failed:', fallbackErr);
+        }
         setError(t('dashboard:error', 'Статистика жүктеу кезінде қате пайда болды'));
         setLoading(false);
       }
@@ -127,7 +179,7 @@ const AdminDashboardPage = () => {
 
     fetchData();
     fetchRecentTickets();
-  }, [t]);
+  }, [t, selectedPeriod]);
 
   // Обработчик перехода к странице заявки
   const handleTicketClick = (id) => {
@@ -234,215 +286,85 @@ const AdminDashboardPage = () => {
       )}
       
       <Grid container spacing={{ xs: 1, sm: 3 }}>
-        {/* Общая статистика */}
-        <Grid item xs={12} md={8}>
-          <Paper elevation={2} sx={{ p: { xs: 1.5, sm: 3 }, borderRadius: 2, height: '100%' }}>
-            <Typography variant="h6" gutterBottom sx={{ 
-              fontWeight: 'bold', 
-              color: theme.palette.text.primary, 
-              mb: { xs: 1, sm: 2 },
-              fontSize: { xs: '1rem', sm: '1.25rem' }
-            }}>
-              {t('dashboard:stats.title', 'Өтініштер статистикасы')}
-            </Typography>
-            <Grid container spacing={{ xs: 1, sm: 2 }} sx={{ mb: { xs: 1, sm: 2 } }}>
-              {/* Карточка всех заявок */}
-              <Grid item xs={6} sm={6} md={3}>
-                <Card sx={{ 
-                  bgcolor: 'primary.main', 
-                  color: 'white', 
-                  borderRadius: { xs: 1, sm: 2 },
-                  boxShadow: theme.shadows[2],
-                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                  '&:hover': {
-                    transform: { xs: 'none', sm: 'translateY(-5px)' },
-                    boxShadow: { xs: theme.shadows[2], sm: theme.shadows[6] }
-                  }
-                }}>
-                  <CardContent sx={{ 
-                    px: { xs: 0.5, sm: 2 }, 
-                    py: { xs: 1, sm: 2 }, 
-                    '&:last-child': { pb: { xs: 1, sm: 2 } }
-                  }}>
-                    <Typography variant="h4" align="center" sx={{ 
-                      fontWeight: 'bold', 
-                      fontSize: { xs: '1.3rem', sm: '2rem', md: '2.125rem' },
-                      lineHeight: { xs: 1.2, sm: 1.4 }
-                    }}>
-                      {stats.totalTickets}
-                    </Typography>
-                    <Typography variant="body2" align="center" sx={{ 
-                      fontSize: { xs: '0.65rem', sm: '0.8rem', md: '0.875rem' }, 
-                      mt: { xs: 0.2, sm: 1 },
-                      px: { xs: 0.5, sm: 0 }
-                    }}>
-                      {t('dashboard:stats.totalTickets', 'Барлық өтініштер')}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              
-              {/* Карточка новых заявок */}
-              <Grid item xs={6} sm={6} md={3}>
-                <Card sx={{ 
-                  bgcolor: 'error.main', 
-                  color: 'white',
-                  borderRadius: { xs: 1, sm: 2 },
-                  boxShadow: theme.shadows[2],
-                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                  '&:hover': {
-                    transform: { xs: 'none', sm: 'translateY(-5px)' },
-                    boxShadow: { xs: theme.shadows[2], sm: theme.shadows[6] }
-                  }
-                }}>
-                  <CardContent sx={{ 
-                    px: { xs: 0.5, sm: 2 }, 
-                    py: { xs: 1, sm: 2 }, 
-                    '&:last-child': { pb: { xs: 1, sm: 2 } }
-                  }}>
-                    <Typography variant="h4" align="center" sx={{ 
-                      fontWeight: 'bold', 
-                      fontSize: { xs: '1.3rem', sm: '2rem', md: '2.125rem' },
-                      lineHeight: { xs: 1.2, sm: 1.4 }
-                    }}>
-                      {stats.newTickets}
-                    </Typography>
-                    <Typography variant="body2" align="center" sx={{ 
-                      fontSize: { xs: '0.65rem', sm: '0.8rem', md: '0.875rem' }, 
-                      mt: { xs: 0.2, sm: 1 },
-                      px: { xs: 0.5, sm: 0 }
-                    }}>
-                      {t('dashboard:stats.newTickets', 'Жаңа өтініштер')}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              
-              {/* Карточка заявок в работе */}
-              <Grid item xs={6} sm={6} md={3}>
-                <Card sx={{ 
-                  bgcolor: 'warning.main', 
-                  color: 'white',
-                  borderRadius: { xs: 1, sm: 2 },
-                  boxShadow: theme.shadows[2],
-                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                  '&:hover': {
-                    transform: { xs: 'none', sm: 'translateY(-5px)' },
-                    boxShadow: { xs: theme.shadows[2], sm: theme.shadows[6] }
-                  }
-                }}>
-                  <CardContent sx={{ 
-                    px: { xs: 0.5, sm: 2 }, 
-                    py: { xs: 1, sm: 2 }, 
-                    '&:last-child': { pb: { xs: 1, sm: 2 } }
-                  }}>
-                    <Typography variant="h4" align="center" sx={{ 
-                      fontWeight: 'bold', 
-                      fontSize: { xs: '1.3rem', sm: '2rem', md: '2.125rem' },
-                      lineHeight: { xs: 1.2, sm: 1.4 }
-                    }}>
-                      {stats.inProgressTickets}
-                    </Typography>
-                    <Typography variant="body2" align="center" sx={{ 
-                      fontSize: { xs: '0.65rem', sm: '0.8rem', md: '0.875rem' }, 
-                      mt: { xs: 0.2, sm: 1 },
-                      px: { xs: 0.5, sm: 0 }
-                    }}>
-                      {t('dashboard:stats.inProgressTickets', 'Жұмыста')}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              
-              {/* Карточка решенных заявок */}
-              <Grid item xs={6} sm={6} md={3}>
-                <Card sx={{ 
-                  bgcolor: 'success.main', 
-                  color: 'white',
-                  borderRadius: { xs: 1, sm: 2 },
-                  boxShadow: theme.shadows[2],
-                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                  '&:hover': {
-                    transform: { xs: 'none', sm: 'translateY(-5px)' },
-                    boxShadow: { xs: theme.shadows[2], sm: theme.shadows[6] }
-                  }
-                }}>
-                  <CardContent sx={{ 
-                    px: { xs: 0.5, sm: 2 }, 
-                    py: { xs: 1, sm: 2 }, 
-                    '&:last-child': { pb: { xs: 1, sm: 2 } }
-                  }}>
-                    <Typography variant="h4" align="center" sx={{ 
-                      fontWeight: 'bold', 
-                      fontSize: { xs: '1.3rem', sm: '2rem', md: '2.125rem' },
-                      lineHeight: { xs: 1.2, sm: 1.4 }
-                    }}>
-                      {stats.resolvedTickets}
-                    </Typography>
-                    <Typography variant="body2" align="center" sx={{ 
-                      fontSize: { xs: '0.65rem', sm: '0.8rem', md: '0.875rem' }, 
-                      mt: { xs: 0.2, sm: 1 },
-                      px: { xs: 0.5, sm: 0 }
-                    }}>
-                      {t('dashboard:stats.resolvedTickets', 'Шешілген')}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-          </Paper>
+        {/* Карточки основной статистики */}
+        <Grid item xs={6} sm={6} md={3}>
+          <StatCard
+            title={t('dashboard:stats.totalTickets', 'Всего заявок')}
+            value={stats.totalTickets}
+            icon={AssignmentIcon}
+            color="primary"
+            loading={loading}
+            subtitle={dashboardStats?.tickets?.last_24h ? 
+              `+${dashboardStats.tickets.last_24h} за 24ч` : null}
+          />
         </Grid>
         
-        {/* Производительность системы */}
+        <Grid item xs={6} sm={6} md={3}>
+          <StatCard
+            title={t('dashboard:stats.newTickets', 'Новые заявки')}
+            value={stats.newTickets}
+            icon={NewReleasesIcon}
+            color="error"
+            loading={loading}
+            trend={dashboardStats?.tickets?.last_7days && stats.totalTickets > 0 ? 
+              Math.round((stats.newTickets / stats.totalTickets) * 100) : null}
+          />
+        </Grid>
+        
+        <Grid item xs={6} sm={6} md={3}>
+          <StatCard
+            title={t('dashboard:stats.inProgressTickets', 'В работе')}
+            value={stats.inProgressTickets}
+            icon={HourglassEmptyIcon}
+            color="warning"
+            loading={loading}
+          />
+        </Grid>
+        
+        <Grid item xs={6} sm={6} md={3}>
+          <StatCard
+            title={t('dashboard:stats.resolvedTickets', 'Решено')}
+            value={stats.resolvedTickets}
+            icon={CheckCircleIcon}
+            color="success"
+            loading={loading}
+            trend={dashboardStats?.tickets?.total > 0 ? 
+              Math.round((stats.resolvedTickets / dashboardStats.tickets.total) * 100) : null}
+            trendLabel={dashboardStats?.tickets?.total > 0 ? 
+              `${Math.round((stats.resolvedTickets / dashboardStats.tickets.total) * 100)}% от всех` : null}
+          />
+        </Grid>
+        
+        {/* График динамики заявок */}
+        <Grid item xs={12} md={8}>
+          <TicketsChart 
+            data={timelineData} 
+            loading={loading}
+          />
+        </Grid>
+        
+        {/* Распределение по категориям */}
         <Grid item xs={12} md={4}>
-          <Paper elevation={2} sx={{ 
-            p: { xs: 1.5, sm: 3 }, 
-            borderRadius: 2, 
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center'
-          }}>
-            <Typography variant="h6" gutterBottom sx={{ 
-              fontWeight: 'bold', 
-              color: theme.palette.text.primary,
-              fontSize: { xs: '1rem', sm: '1.25rem' },
-              mb: { xs: 1, sm: 2 },
-              textAlign: 'center'
-            }}>
-              {t('dashboard:performance.title', 'Өнімділік')}
-            </Typography>
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center', 
-              flexDirection: 'column', 
-              mt: { xs: 0.5, sm: 2 },
-              py: { xs: 1.5, sm: 3 },
-              px: { xs: 1, sm: 3 },
-              mx: { xs: 0.5, sm: 1 },
-              bgcolor: 'rgba(25, 118, 210, 0.08)',
-              borderRadius: 2,
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-              minHeight: { xs: '100px', sm: '150px' }
-            }}>
-              <Typography variant="h3" color="primary" sx={{ 
-                fontWeight: 'bold',
-                fontSize: { xs: '2rem', sm: '3rem' },
-                lineHeight: 1.2
-              }}>
-                {stats.averageResponseTime}h
-              </Typography>
-              <Typography variant="body2" sx={{ 
-                mt: { xs: 0.5, sm: 1.5 }, 
-                fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                textAlign: 'center',
-                maxWidth: { xs: '160px', sm: '200px' }
-              }}>
-                {t('dashboard:performance.avgResponseTime', 'Орташа жауап беру уақыты')}
-              </Typography>
-            </Box>
-          </Paper>
+          <CategoryPieChart 
+            data={dashboardStats?.categories || []}
+            loading={loading}
+          />
+        </Grid>
+        
+        {/* KPI Метрики */}
+        <Grid item xs={12}>
+          <KPIMetrics 
+            data={kpiMetrics}
+            loading={loading}
+          />
+        </Grid>
+        
+        {/* Производительность сотрудников */}
+        <Grid item xs={12}>
+          <StaffPerformanceTable
+            data={staffPerformance}
+            loading={loading}
+          />
         </Grid>
         
         {/* Таблица последних заявок */}

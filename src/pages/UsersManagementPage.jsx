@@ -65,7 +65,8 @@ const UserRoleChip = ({ role }) => {
           icon={<AdminIcon fontSize="small" />} 
           label={t('roles.admin', 'Администратор')} 
           color="error" 
-          size="small" 
+          size="small"
+          sx={{ '& .MuiChip-label': { color: 'white' } }}
         />
       );
     case 'moderator':
@@ -74,7 +75,8 @@ const UserRoleChip = ({ role }) => {
           icon={<ModeratorIcon fontSize="small" />} 
           label={t('roles.moderator', 'Модератор')} 
           color="warning" 
-          size="small" 
+          size="small"
+          sx={{ '& .MuiChip-label': { color: 'white' } }}
         />
       );
     case 'staff':
@@ -83,7 +85,8 @@ const UserRoleChip = ({ role }) => {
           icon={<EngineerIcon fontSize="small" />} 
           label={t('roles.staff', 'Сотрудник')} 
           color="info" 
-          size="small" 
+          size="small"
+          sx={{ '& .MuiChip-label': { color: 'white' } }}
         />
       );
     default:
@@ -92,7 +95,8 @@ const UserRoleChip = ({ role }) => {
           icon={<PersonIcon fontSize="small" />} 
           label={t('roles.user', 'Пользователь')} 
           color="default" 
-          size="small" 
+          size="small"
+          sx={{ '& .MuiChip-label': { color: 'rgba(0, 0, 0, 0.87)' } }}
         />
       );
   }

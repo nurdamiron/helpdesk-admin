@@ -1,4 +1,5 @@
 import api from './index';
+import axios from 'axios';
 // Remove the circular dependency
 // We'll get authService instance from params
 
@@ -10,12 +11,53 @@ export class BaseApiService {
   // Ссылка на обработчик ошибок, которая будет установлена из компонента
   static errorHandler = null;
   
+  // Кэш для проверки доступности локального сервера
+  static localServerAvailable = null;
+  static lastLocalServerCheck = 0;
+  static LOCAL_SERVER_CHECK_INTERVAL = 5000; // Проверяем каждые 5 секунд
+  
   /**
    * Устанавливает обработчик ошибок для всех сервисов API
    * @param {Object} handler - Обработчик ошибок
    */
   static setErrorHandler(handler) {
     BaseApiService.errorHandler = handler;
+  }
+  
+  /**
+   * Проверка доступности локального сервера
+   */
+  static async checkLocalServer() {
+    const now = Date.now();
+    
+    // Используем кэш, если проверка была недавно
+    if (BaseApiService.localServerAvailable !== null && 
+        now - BaseApiService.lastLocalServerCheck < BaseApiService.LOCAL_SERVER_CHECK_INTERVAL) {
+      return BaseApiService.localServerAvailable;
+    }
+    
+    try {
+      console.log('🔍 Checking local server at http://localhost:5002/health');
+      const response = await axios.get('http://localhost:5002/health', { 
+        timeout: 1000,
+        validateStatus: () => true 
+      });
+      BaseApiService.localServerAvailable = response.status === 200;
+      BaseApiService.lastLocalServerCheck = now;
+      
+      if (BaseApiService.localServerAvailable) {
+        console.log('🟢 Local server is available');
+      } else {
+        console.log(`🔴 Local server returned status: ${response.status}`);
+      }
+      
+      return BaseApiService.localServerAvailable;
+    } catch (error) {
+      console.log('🔴 Local server is not available:', error.message);
+      BaseApiService.localServerAvailable = false;
+      BaseApiService.lastLocalServerCheck = now;
+      return false;
+    }
   }
   
   /**
@@ -31,6 +73,7 @@ export class BaseApiService {
    * @returns {Promise} - Результат запроса
    */
   async request({ method, url, data = null, requiredRole = null, retries = 1, errorOptions = {}, authService = null }) {
+    console.log(`🔄 Making API request: ${method.toUpperCase()} ${url}`);
     // Проверяем права доступа, если указана необходимая роль
     if (requiredRole && authService) {
       const user = authService.getCurrentUser();
@@ -46,6 +89,50 @@ export class BaseApiService {
       }
     }
 
+    // Сначала пробуем локальный сервер
+    const localAvailable = await BaseApiService.checkLocalServer();
+    
+    if (localAvailable) {
+      try {
+        const localInstance = axios.create({
+          baseURL: 'http://localhost:5002/api',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': localStorage.getItem('token') ? `Bearer ${localStorage.getItem('token')}` : ''
+          }
+        });
+        
+        let response;
+        
+        switch (method.toLowerCase()) {
+          case 'get':
+            response = await localInstance.get(url);
+            break;
+          case 'post':
+            response = await localInstance.post(url, data);
+            break;
+          case 'put':
+            response = await localInstance.put(url, data);
+            break;
+          case 'delete':
+            response = await localInstance.delete(url);
+            break;
+          default:
+            throw new Error(`Неподдерживаемый метод: ${method}`);
+        }
+        
+        console.log(`✅ Local server response for ${url}`);
+        return response.data;
+      } catch (localError) {
+        console.log(`⚠️ Local server error for ${url}:`, localError.message);
+        console.log('Response status:', localError.response?.status);
+        console.log('Response data:', localError.response?.data);
+        console.log('Trying production server...');
+        // Продолжаем с production сервером
+      }
+    }
+    
+    // Если локальный не работает, используем production
     try {
       let response;
       
@@ -69,6 +156,18 @@ export class BaseApiService {
       
       return response.data;
     } catch (error) {
+      // Логируем ошибку для отладки
+      console.error(`❌ API Error for ${url}:`, {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        config: {
+          method: method,
+          url: url,
+          baseURL: error.config?.baseURL
+        }
+      });
+      
       // Ошибки аутентификации обрабатываются в axios interceptor
       // Здесь просто передаем ошибку дальше
       

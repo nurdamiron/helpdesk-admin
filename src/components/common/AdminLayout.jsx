@@ -38,6 +38,7 @@ import {
   Building,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 // Ширина бокового меню
 const drawerWidth = 240;
@@ -47,6 +48,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
+  const { t } = useTranslation(['common', 'nav']);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   // Состояние для открытия/закрытия бокового меню
@@ -89,8 +91,8 @@ const AdminLayout = () => {
 
   // Пункты меню навигации
   const menuItems = [
-    { path: '/dashboard', icon: <Home size={20} />, text: 'Басты бет' },
-    { path: '/tickets', icon: <TicketCheck size={20} />, text: 'Өтінімдер' },
+    { path: '/dashboard', icon: <Home size={20} />, text: t('nav:dashboard', 'Басты бет') },
+    { path: '/tickets', icon: <TicketCheck size={20} />, text: t('nav:tickets', 'Өтінімдер') },
     // { path: '/messages', icon: <Inbox size={20} />, text: 'Сообщения', count: 3 },
     // { path: '/clients', icon: <Users size={20} />, text: 'Клиенты' },
     // { path: '/objects', icon: <Building size={20} />, text: 'Объекты' },
@@ -99,15 +101,15 @@ const AdminLayout = () => {
 
   // Дополнительные пункты меню
   const secondaryMenuItems = [
-    { path: '/settings', icon: <Settings size={20} />, text: 'Параметрлер' },
-    { path: '/help', icon: <HelpCircle size={20} />, text: 'Көмек' },
+    { path: '/settings', icon: <Settings size={20} />, text: t('nav:settings', 'Параметрлер') },
+    { path: '/help', icon: <HelpCircle size={20} />, text: t('nav:help', 'Көмек') },
   ];
 
   // Имитация уведомлений для демонстрации
   const notifications = [
-    { id: 1, text: 'Жаңа өтінім #234', time: '5 минут бұрын' },
-    { id: 2, text: 'Клиенттен хабарлама', time: '15 минут бұрын' },
-    { id: 3, text: 'Еске салу: 1 сағаттан кейін кездесу', time: '30 минут бұрын' },
+    { id: 1, text: t('common:notifications.example1', 'Жаңа өтінім #234'), time: t('common:time.minutesAgo', '5 минут бұрын', { count: 5 }) },
+    { id: 2, text: t('common:notifications.example2', 'Клиенттен хабарлама'), time: t('common:time.minutesAgo', '15 минут бұрын', { count: 15 }) },
+    { id: 3, text: t('common:notifications.example3', 'Еске салу: 1 сағаттан кейін кездесу'), time: t('common:time.minutesAgo', '30 минут бұрын', { count: 30 }) },
   ];
 
   // Если данные все еще загружаются, показываем индикатор загрузки
@@ -142,7 +144,7 @@ const AdminLayout = () => {
         <Toolbar>
           <IconButton
             color="inherit"
-            aria-label="open drawer"
+            aria-label={t('common:aria.openDrawer', 'open drawer')}
             edge="start"
             onClick={() => setDrawerOpen(!drawerOpen)}
             sx={{ mr: 2 }}
@@ -150,11 +152,11 @@ const AdminLayout = () => {
             {drawerOpen ? <ChevronLeft /> : <MenuIcon />}
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Құрылыс компаниясы — HelpDesk
+            {t('common:app.title', 'HelpDesk Admin')} — {t('common:app.description', 'Әкімші панелі')}
           </Typography>
 
           {/* Иконка уведомлений */}
-          <Tooltip title="Хабарламалар">
+          <Tooltip title={t('common:notifications.title', 'Хабарламалар')}>
             <IconButton 
               color="inherit" 
               onClick={handleNotificationsMenuOpen}
@@ -167,7 +169,7 @@ const AdminLayout = () => {
           </Tooltip>
 
           {/* Аватар пользователя */}
-          <Tooltip title="Профиль">
+          <Tooltip title={t('common:header.profile', 'Профиль')}>
             <IconButton
               edge="end"
               color="inherit"
