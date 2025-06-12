@@ -184,15 +184,52 @@
     "created": "Created",
     "assignedTo": "Assigned To:"
   },
+  "info": {
+    "requester": "Requester",
+    "createdDate": "Created Date",
+    "category": "Category",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "notSpecified": "Not specified",
+    "ticketDescription": "Ticket Description"
+  },
   "tabs": {
     "discussion": "Discussion",
     "history": "History",
     "historyComingSoon": "Change history will be available soon"
   },
+  "history": {
+    "title": "Ticket History",
+    "loadError": "Failed to load ticket history",
+    "noHistory": "No history yet",
+    "noHistoryDescription": "History entries will appear when the ticket is updated, comments are added, or status changes",
+    "events": {
+      "created": "Ticket created",
+      "updated": "Ticket updated: {{fields}}",
+      "updatedGeneral": "Ticket updated",
+      "statusChanged": "Status changed: {{from}} → {{to}}",
+      "commentAdded": "New comment added",
+      "fileUploaded": "File uploaded: {{filename}}",
+      "fileUploadedGeneral": "File uploaded",
+      "assigned": "Assigned to: {{assignee}}",
+      "assignedGeneral": "Assigned to staff",
+      "emailSent": "Email sent to: {{recipient}}",
+      "emailSentGeneral": "Email sent to user",
+      "default": "Ticket updated"
+    },
+    "performedBy": "System",
+    "changes": "changes"
+  },
   "management": {
     "title": "Manage Ticket",
     "status": "Status:",
     "priority": "Priority:"
+  },
+  "assign": {
+    "notAssigned": "Not assigned",
+    "unknownUser": "Unknown user",
+    "loadError": "Failed to load staff list"
   },
   "actions": {
     "saving": "Saving...",
@@ -213,5 +250,49 @@
     "emailSuccess": "Ticket submitted successfully! Information sent to your email.",
     "redirecting": "Redirecting to home page...",
     "openWhatsApp": "Open WhatsApp"
+  },
+  "chat": {
+    "title": "Ticket Discussion #{{ticketId}}",
+    "messageCount": "{{count}} messages",
+    "messagePlaceholder": "Type your message...",
+    "sendButton": "Send",
+    "sending": "Sending...",
+    "notifyByEmail": "Notify client by email",
+    "emailNotSpecified": "email not specified",
+    "messageSentSuccess": "Message sent successfully",
+    "noMessages": "No messages yet",
+    "startDiscussion": "Send a message to start the discussion for this ticket",
+    "clientTyping": "Client is typing...",
+    "addMessageError": "Please add message text",
+    "user": "User",
+    "offlineMode": "Offline mode",
+    "online": "Online",
+    "offline": "Offline",
+    "offlineModeDescription": "Offline mode - messages will be sent when connection is restored",
+    "offlineMessageCount": "({{count}} messages)",
+    "noConnection": "No connection to server",
+    "connectionAttempt": "Connection attempt {{current}} of {{max}}",
+    "nextAttemptIn": "(next in {{seconds}} sec)",
+    "maxAttemptsReached": "Maximum connection attempts reached",
+    "onlineReady": "Online - ready to send {{count}} unsent messages",
+    "sendOfflineMessages": "Send",
+    "reconnect": "Reconnect",
+    "errors": {
+      "websocketConnection": "Failed to connect to real-time messaging service",
+      "loadMessages": "Failed to load messages. Check server connection.",
+      "sendMessage": "Failed to send message. Please try later.",
+      "markAsRead": "Error marking messages as read",
+      "offlineLoad": "Error loading offline messages",
+      "offlineSave": "Error saving offline message"
+    }
+  },
+  "internalNotes": {
+    "noNotes": "No internal notes yet.",
+    "addNoteHint": "Add a note that will only be visible to staff.",
+    "unknownUser": "Unknown user",
+    "placeholder": "Add internal note...",
+    "submitting": "Adding...",
+    "addNote": "Add note",
+    "addError": "Failed to add note"
   }
 }

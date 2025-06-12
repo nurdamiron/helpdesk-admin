@@ -192,6 +192,13 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
+                {/* Профиль пользователя - доступен всем авторизованным */}
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <SettingsPage />
+                  </ProtectedRoute>
+                } />
+                
                 {/* Маршруты для доступа к отчетам */}
                 <Route path="/reports" element={
                   <ProtectedRoute requiredPermission="access_reports" redirectToHome={true}>

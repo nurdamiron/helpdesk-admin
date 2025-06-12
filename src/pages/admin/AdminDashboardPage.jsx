@@ -37,8 +37,6 @@ import statisticsService from '../../api/statisticsService';
 import StatCard from '../../components/statistics/StatCard';
 import TicketsChart from '../../components/statistics/TicketsChart';
 import CategoryPieChart from '../../components/statistics/CategoryPieChart';
-import StaffPerformanceTable from '../../components/statistics/StaffPerformanceTable';
-import KPIMetrics from '../../components/statistics/KPIMetrics';
 import { 
   Assignment as AssignmentIcon,
   NewReleases as NewReleasesIcon,
@@ -78,8 +76,6 @@ const AdminDashboardPage = () => {
   });
   const [dashboardStats, setDashboardStats] = useState(null);
   const [timelineData, setTimelineData] = useState([]);
-  const [staffPerformance, setStaffPerformance] = useState([]);
-  const [kpiMetrics, setKpiMetrics] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState('7days');
 
   // Загрузка статистики при монтировании компонента
@@ -89,11 +85,9 @@ const AdminDashboardPage = () => {
         setLoading(true);
         
         // Загружаем расширенную статистику через новый API
-        const [dashboardData, timelineStats, staffStats, kpiData] = await Promise.all([
+        const [dashboardData, timelineStats, kpiData] = await Promise.all([
           statisticsService.getDashboardStats(),
           statisticsService.getTimelineStats(selectedPeriod),
-          statisticsService.getStaffPerformance(),
-          statisticsService.getKPIMetrics()
         ]);
 
         // Устанавливаем данные дашборда
@@ -123,15 +117,6 @@ const AdminDashboardPage = () => {
           setTimelineData(timelineStats.data);
         }
 
-        // Устанавливаем данные производительности сотрудников
-        if (staffStats?.data) {
-          setStaffPerformance(staffStats.data);
-        }
-
-        // Устанавливаем KPI метрики
-        if (kpiData?.data) {
-          setKpiMetrics(kpiData.data);
-        }
 
         setLoading(false);
       } catch (err) {
@@ -253,7 +238,7 @@ const AdminDashboardPage = () => {
   }
 
   return (
-    <Box sx={{ px: { xs: 1, sm: 2, md: 4 }, py: { xs: 1, sm: 2, md: 3 }, maxWidth: 1600, mx: 'auto' }}>
+    <Box sx={{ px: 0, py: { xs: 1, sm: 2, md: 3 }, maxWidth: 1600, mx: 'auto' }}>
       {/* Вступительный блок / Заголовок страницы */}
       {isMobile ? (
         <MobileWelcomeCard name={user?.first_name || user?.email} />
@@ -343,29 +328,17 @@ const AdminDashboardPage = () => {
           />
         </Grid>
         
-        {/* Распределение по категориям */}
+        {/* Распределение по типам заявок */}
         <Grid item xs={12} md={4}>
           <CategoryPieChart 
-            data={dashboardStats?.categories || []}
+            data={dashboardStats?.types || []}
             loading={loading}
+            title={t('statistics.charts.ticketsByType', 'Заявки по типам')}
           />
         </Grid>
         
         {/* KPI Метрики */}
-        <Grid item xs={12}>
-          <KPIMetrics 
-            data={kpiMetrics}
-            loading={loading}
-          />
-        </Grid>
         
-        {/* Производительность сотрудников */}
-        <Grid item xs={12}>
-          <StaffPerformanceTable
-            data={staffPerformance}
-            loading={loading}
-          />
-        </Grid>
         
         {/* Таблица последних заявок */}
         <Grid item xs={12} md={8}>
@@ -601,70 +574,70 @@ const AdminDashboardPage = () => {
               gap: { xs: 1, sm: 2 }
             }}>
               <Box sx={{ 
-                textAlign: 'center',
-                px: { xs: 1, sm: 2 },
-                py: { xs: 1.5, sm: 3 },
+                display: 'flex',
+                alignItems: 'center',
+                gap: { xs: 1, sm: 2 },
+                px: { xs: 2, sm: 3 },
+                py: { xs: 1.5, sm: 2 },
                 bgcolor: 'rgba(25, 118, 210, 0.05)',
                 borderRadius: 2,
-                width: { xs: '28%', sm: 'auto' },
-                minWidth: { xs: '60px', sm: '80px' }
+                minWidth: { xs: '140px', sm: '180px' }
               }}>
                 <Typography variant="h5" color="primary" sx={{ 
                   fontWeight: 'bold',
-                  fontSize: { xs: '1.1rem', sm: '1.5rem' }
+                  fontSize: { xs: '1.3rem', sm: '1.8rem' }
                 }}>
                   {userStats.admins}
                 </Typography>
-                <Typography variant="body2" sx={{ 
-                  mt: { xs: 0.3, sm: 1 }, 
+                <Typography variant="body1" sx={{ 
                   color: 'text.secondary',
-                  fontSize: { xs: '0.65rem', sm: '0.875rem' }
+                  fontSize: { xs: '0.8rem', sm: '1rem' }
                 }}>
                   {t('dashboard:users.admins', 'Администраторлар')}
                 </Typography>
               </Box>
               <Box sx={{ 
-                textAlign: 'center',
-                px: { xs: 1, sm: 2 },
-                py: { xs: 1.5, sm: 3 },
+                display: 'flex',
+                alignItems: 'center',
+                gap: { xs: 1, sm: 2 },
+                px: { xs: 2, sm: 3 },
+                py: { xs: 1.5, sm: 2 },
                 bgcolor: 'rgba(25, 118, 210, 0.05)',
                 borderRadius: 2,
-                width: { xs: '28%', sm: 'auto' },
-                minWidth: { xs: '60px', sm: '80px' }
+                minWidth: { xs: '140px', sm: '180px' }
               }}>
                 <Typography variant="h5" color="primary" sx={{ 
                   fontWeight: 'bold',
-                  fontSize: { xs: '1.1rem', sm: '1.5rem' }
+                  fontSize: { xs: '1.3rem', sm: '1.8rem' }
                 }}>
                   {userStats.moderators}
                 </Typography>
-                <Typography variant="body2" sx={{ 
-                  mt: { xs: 0.3, sm: 1 }, 
+                <Typography variant="body1" sx={{ 
                   color: 'text.secondary',
-                  fontSize: { xs: '0.65rem', sm: '0.875rem' }
+                  fontSize: { xs: '0.8rem', sm: '1rem' }
                 }}>
                   {t('dashboard:users.moderators', 'Модераторлар')}
                 </Typography>
               </Box>
               <Box sx={{ 
-                textAlign: 'center',
-                px: { xs: 1, sm: 2 },
-                py: { xs: 1.5, sm: 3 },
+                display: 'flex',
+                alignItems: 'center',
+                gap: { xs: 1, sm: 2 },
+                px: { xs: 2, sm: 3 },
+                py: { xs: 1.5, sm: 2 },
                 bgcolor: 'rgba(25, 118, 210, 0.05)',
                 borderRadius: 2,
-                width: { xs: '28%', sm: 'auto' },
-                minWidth: { xs: '60px', sm: '80px' }
+                minWidth: { xs: '140px', sm: '180px' }
               }}>
                 <Typography variant="h5" color="primary" sx={{ 
                   fontWeight: 'bold',
-                  fontSize: { xs: '1.1rem', sm: '1.5rem' }
+                  fontSize: { xs: '1.3rem', sm: '1.8rem' }
                 }}>
                   {userStats.users}
                 </Typography>
-                <Typography variant="body2" sx={{ 
-                  mt: { xs: 0.3, sm: 1 }, 
+                <Typography variant="body1" sx={{ 
                   color: 'text.secondary',
-                  fontSize: { xs: '0.65rem', sm: '0.875rem' }
+                  fontSize: { xs: '0.8rem', sm: '1rem' }
                 }}>
                   {t('dashboard:users.users', 'Пайдаланушылар')}
                 </Typography>

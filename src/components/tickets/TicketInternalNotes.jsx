@@ -16,12 +16,14 @@ import {
   Alert,
 } from '@mui/material';
 import { Send, MessageSquare } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ticketService } from '../../api/ticketService';
 import { formatDate } from '../../utils/dateUtils';
 import { useAuth } from '../../contexts/AuthContext';
 
 const TicketInternalNotes = ({ ticketId, notes = [] }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [newNote, setNewNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -48,7 +50,7 @@ const TicketInternalNotes = ({ ticketId, notes = [] }) => {
       setNewNote('');
     } catch (err) {
       console.error('Error adding note:', err);
-      setError('Не удалось добавить заметку');
+      setError(t('tickets:internalNotes.addError'));
     } finally {
       setSubmitting(false);
     }
@@ -81,9 +83,9 @@ const TicketInternalNotes = ({ ticketId, notes = [] }) => {
           >
             <MessageSquare size={40} color="#9e9e9e" />
             <Typography color="textSecondary" align="center" sx={{ mt: 1 }}>
-              Внутренних заметок пока нет.
+              {t('tickets:internalNotes.noNotes')}
               <br />
-              Добавьте заметку, которая будет видна только сотрудникам.
+              {t('tickets:internalNotes.addNoteHint')}
             </Typography>
           </Box>
         ) : (
@@ -103,7 +105,7 @@ const TicketInternalNotes = ({ ticketId, notes = [] }) => {
                     primary={
                       <Box display="flex" justifyContent="space-between">
                         <Typography variant="subtitle2">
-                          {note.user?.name || 'Неизвестный пользователь'}
+                          {note.user?.name || t('tickets:internalNotes.unknownUser')}
                         </Typography>
                         <Typography variant="caption" color="textSecondary">
                           {formatDate(note.createdAt)}
@@ -133,7 +135,7 @@ const TicketInternalNotes = ({ ticketId, notes = [] }) => {
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Добавьте внутреннюю заметку..."
+          placeholder={t('tickets:internalNotes.placeholder')}
           multiline
           rows={3}
           value={newNote}
@@ -149,7 +151,7 @@ const TicketInternalNotes = ({ ticketId, notes = [] }) => {
           disabled={submitting || !newNote.trim()}
           startIcon={submitting ? <CircularProgress size={20} /> : <Send />}
         >
-          {submitting ? 'Добавление...' : 'Добавить заметку'}
+          {submitting ? t('tickets:internalNotes.submitting') : t('tickets:internalNotes.addNote')}
         </Button>
       </form>
     </Box>

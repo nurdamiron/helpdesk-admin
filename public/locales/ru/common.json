@@ -120,7 +120,6 @@
   "roles": {
     "admin": "Администратор",
     "moderator": "Модератор",
-    "staff": "Сотрудник",
     "user": "Пользователь"
   },
   "header": {
@@ -168,5 +167,9 @@
     "openMenu": "Открыть меню",
     "breadcrumbs": "Навигация",
     "languageSelector": "Выбор языка"
-  }
+  },
+  "count": "Количество",
+  "percentage": "Процент",
+  "backToDashboard": "Вернуться в панель",
+  "backToHome": "Вернуться на главную"
 }

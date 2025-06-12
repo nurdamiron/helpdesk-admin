@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { FormControl, Select, MenuItem, Box, Avatar, CircularProgress, Typography } from '@mui/material';
 import { User } from 'lucide-react';
 import { authService } from '../../api/authService';
+import { useTranslation } from 'react-i18next';
 
 const TicketAssignSelect = ({ value, onChange }) => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,14 +16,14 @@ const TicketAssignSelect = ({ value, onChange }) => {
       try {
         setLoading(true);
         const data = await authService.getUsers();
-        // Фильтруем только пользователей с ролью 'support' или 'admin'
+        // Фильтруем только пользователей с ролью 'moderator' или 'admin'
         const supportUsers = data.filter(user => 
-          user.role === 'support' || user.role === 'admin'
+          user.role === 'moderator' || user.role === 'admin'
         );
         setUsers(supportUsers);
       } catch (err) {
         console.error('Error fetching users:', err);
-        setError('Не удалось загрузить список сотрудников');
+        setError(t('tickets:assign.loadError'));
       } finally {
         setLoading(false);
       }
@@ -51,7 +53,7 @@ const TicketAssignSelect = ({ value, onChange }) => {
           if (!selected) {
             return <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
               <User size={20} />
-              <Box sx={{ ml: 1 }}>Не назначено</Box>
+              <Box sx={{ ml: 1 }}>{t('tickets:assign.notAssigned')}</Box>
             </Box>;
           }
           
@@ -65,7 +67,7 @@ const TicketAssignSelect = ({ value, onChange }) => {
                   {user?.name?.charAt(0) || 'U'}
                 </Avatar>
               )}
-              <Box sx={{ ml: 1 }}>{user?.name || 'Неизвестный пользователь'}</Box>
+              <Box sx={{ ml: 1 }}>{user?.name || t('tickets:assign.unknownUser')}</Box>
             </Box>
           );
         }}

@@ -98,9 +98,9 @@ export const AuthProvider = ({ children }) => {
     // Админ имеет доступ ко всему
     if (user.role === 'admin') return true;
     
-    // Support, Manager, Staff имеют доступ как модераторы
-    if (['support', 'manager', 'moderator', 'staff'].includes(user.role)) {
-      return requiredRole === 'moderator' || requiredRole === 'staff';
+    // Модератор имеет доступ к функциям модератора
+    if (user.role === 'moderator') {
+      return requiredRole === 'moderator';
     }
     
     // Обычный пользователь имеет доступ только к роли пользователя
@@ -118,19 +118,19 @@ export const AuthProvider = ({ children }) => {
     // Разные права в зависимости от типа действия
     switch(permission) {
       case 'view_all_tickets':
-        return ['admin', 'support', 'manager', 'moderator', 'staff'].includes(user.role);
+        return ['admin', 'moderator'].includes(user.role);
         
       case 'edit_any_ticket':
-        return ['admin', 'support', 'manager', 'moderator'].includes(user.role);
+        return ['admin', 'moderator'].includes(user.role);
         
       case 'assign_tickets':
-        return ['admin', 'support', 'manager', 'moderator'].includes(user.role);
+        return ['admin', 'moderator'].includes(user.role);
         
       case 'manage_users':
         return user.role === 'admin';
         
       case 'access_reports':
-        return ['admin', 'manager'].includes(user.role);
+        return user.role === 'admin';
         
       default:
         return false;
@@ -151,7 +151,7 @@ export const AuthProvider = ({ children }) => {
     hasSpecificPermission,
     isAuthenticated: !!user && initialized,
     isAdmin: user?.role === 'admin',
-    isModerator: ['moderator', 'admin', 'support', 'manager', 'staff'].includes(user?.role),
+    isModerator: ['moderator', 'admin'].includes(user?.role),
     isUser: user?.role === 'user',
   };
 

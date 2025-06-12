@@ -253,7 +253,7 @@ const SettingsPage = () => {
   };
   
   return (
-    <Container maxWidth="lg" sx={{ py: 3 }}>
+    <Box sx={{ py: 3, px: { xs: 2, sm: 3 } }}>
       {/* User Profile Card */}
       <Paper 
         sx={{ 
@@ -460,7 +460,7 @@ const SettingsPage = () => {
           {notification.message}
         </Alert>
       </Snackbar>
-    </Container>
+    </Box>
   );
 };
 

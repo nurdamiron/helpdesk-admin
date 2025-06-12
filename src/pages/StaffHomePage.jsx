@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Box,
-  Container,
   Typography,
   Paper,
   Grid,
@@ -176,7 +175,7 @@ const StaffHomePage = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Box sx={{ px: { xs: 2, sm: 3, md: 4 }, py: 4, maxWidth: 1200, mx: 'auto' }}>
       <Typography variant="h4" component="h1" gutterBottom>
         {t('staff:title', 'Рабочее пространство')}
       </Typography>
@@ -204,11 +203,11 @@ const StaffHomePage = () => {
         {/* Всего заявок */}
         <Grid item xs={6} sm={3}>
           <Card sx={{ bgcolor: 'primary.light', color: 'white', height: '100%' }}>
-            <CardContent>
-              <Typography variant="h4" align="center">
+            <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'center' }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                 {ticketStats.total}
               </Typography>
-              <Typography variant="body2" align="center">
+              <Typography variant="body1">
                 {t('staff:stats.totalTickets', 'Всего заявок')}
               </Typography>
             </CardContent>
@@ -218,11 +217,11 @@ const StaffHomePage = () => {
         {/* Новые заявки */}
         <Grid item xs={6} sm={3}>
           <Card sx={{ bgcolor: 'info.light', color: 'white', height: '100%' }}>
-            <CardContent>
-              <Typography variant="h4" align="center">
+            <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'center' }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                 {ticketStats.new}
               </Typography>
-              <Typography variant="body2" align="center">
+              <Typography variant="body1">
                 {t('staff:stats.newTickets', 'Новые')}
               </Typography>
             </CardContent>
@@ -232,11 +231,11 @@ const StaffHomePage = () => {
         {/* В работе */}
         <Grid item xs={6} sm={3}>
           <Card sx={{ bgcolor: 'warning.light', color: 'white', height: '100%' }}>
-            <CardContent>
-              <Typography variant="h4" align="center">
+            <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'center' }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                 {ticketStats.inProgress}
               </Typography>
-              <Typography variant="body2" align="center">
+              <Typography variant="body1">
                 {t('staff:stats.inProgressTickets', 'В работе')}
               </Typography>
             </CardContent>
@@ -246,11 +245,11 @@ const StaffHomePage = () => {
         {/* Решенные */}
         <Grid item xs={6} sm={3}>
           <Card sx={{ bgcolor: 'success.light', color: 'white', height: '100%' }}>
-            <CardContent>
-              <Typography variant="h4" align="center">
+            <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'center' }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                 {ticketStats.resolved}
               </Typography>
-              <Typography variant="body2" align="center">
+              <Typography variant="body1">
                 {t('staff:stats.resolvedTickets', 'Решенные')}
               </Typography>
             </CardContent>
@@ -410,7 +409,7 @@ const StaffHomePage = () => {
           </Box>
         )}
       </Paper>
-    </Container>
+    </Box>
   );
 };
 

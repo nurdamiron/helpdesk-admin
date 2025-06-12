@@ -17,10 +17,12 @@ import {
   Legend,
   Tooltip
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
 
-const CategoryPieChart = ({ data, title = "Распределение по категориям", loading = false }) => {
+const CategoryPieChart = ({ data, title, loading = false }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { t } = useTranslation(['dashboard']);
 
   // Цвета для категорий
   const COLORS = [
@@ -38,21 +40,16 @@ const CategoryPieChart = ({ data, title = "Распределение по ка�
     '#d084d0'
   ];
 
-  const CATEGORY_LABELS = {
-    'technical': 'Техническая поддержка',
-    'account': 'Учетная запись',
-    'billing': 'Биллинг',
-    'general': 'Общие вопросы',
-    'bug_report': 'Сообщение об ошибке',
-    'feature_request': 'Запрос функции',
-    'documentation': 'Документация',
-    'api': 'API',
-    'integration': 'Интеграция',
-    'security': 'Безопасность',
-    'performance': 'Производительность',
-    'data': 'Данные',
-    'mobile': 'Мобильное приложение',
-    'other': 'Другое'
+  const TYPE_LABELS = {
+    'complaint': t('types.complaint', 'Жалоба'),
+    'suggestion': t('types.suggestion', 'Предложение'),
+    'request': t('types.request', 'Запрос'),
+    'other': t('types.other', 'Другое'),
+    'support_request': t('types.support_request', 'Запрос поддержки'),
+    'incident': t('types.incident', 'Инцидент'),
+    'access_request': t('types.access_request', 'Запрос доступа'),
+    'information_request': t('types.information_request', 'Запрос информации'),
+    'emergency': t('types.emergency', 'Экстренный')
   };
 
   if (loading) {
@@ -69,10 +66,10 @@ const CategoryPieChart = ({ data, title = "Распределение по ка�
   if (!data || data.length === 0) {
     return (
       <Card>
-        <CardHeader title={title} />
+        <CardHeader title={title || t('statistics.charts.ticketsByType', 'Заявки по типам')} />
         <CardContent>
           <Typography variant="body2" color="text.secondary" align="center">
-            Нет данных для отображения
+            {t('statistics.noData')}
           </Typography>
         </CardContent>
       </Card>
@@ -82,8 +79,9 @@ const CategoryPieChart = ({ data, title = "Распределение по ка�
   // Форматируем данные для отображения
   const formattedData = data.map(item => ({
     ...item,
-    name: CATEGORY_LABELS[item.category] || item.category,
-    value: parseInt(item.count)
+    name: TYPE_LABELS[item.type] || TYPE_LABELS[item.category] || item.type || item.category || item.name,
+    value: parseInt(item.count || item.value || 0),
+    percentage: parseFloat(item.percentage || 0)
   }));
 
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
@@ -127,10 +125,10 @@ const CategoryPieChart = ({ data, title = "Распределение по ка�
             {data.name}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Количество: {data.value}
+            {t('dashboard:common.count')}: {data.value}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Процент: {data.payload.percentage}%
+            {t('dashboard:common.percentage')}: {data.payload.percentage}%
           </Typography>
         </Box>
       );

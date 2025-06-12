@@ -92,8 +92,11 @@ api.interceptors.response.use(
     
     // Если ошибка авторизации (401) или истек токен (403), перенаправляем на страницу входа
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      // Не считаем ошибки создания пользователей как истечение сессии
+      const isUserCreationError = error.config?.url?.includes('/users') && error.config?.method === 'post';
+      
       // Проверяем, не на странице ли логина мы уже находимся
-      if (window.location.pathname !== '/login') {
+      if (window.location.pathname !== '/login' && !isUserCreationError) {
         // Очищаем localStorage
         localStorage.removeItem('token');
         localStorage.removeItem('user');

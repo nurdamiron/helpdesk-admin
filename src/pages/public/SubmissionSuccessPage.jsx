@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   Container,
   Paper,
@@ -26,9 +27,32 @@ const SubmissionSuccessPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation(['common', 'tickets']);
+  const { isAuthenticated, user } = useAuth();
   
   // Получаем данные из state, если они есть
   const { ticket, authorized, emailSent } = location.state || {};
+  
+  const getRedirectPath = () => {
+    if (!isAuthenticated || !user) {
+      return '/';
+    }
+    
+    // Перенаправляем на соответствующий дашборд в зависимости от роли
+    switch (user.role) {
+      case 'admin':
+        return '/admin';
+      case 'moderator':
+        return '/moderator';
+      case 'staff':
+      case 'support':
+      case 'manager':
+        return '/staff';
+      case 'user':
+        return '/dashboard';
+      default:
+        return '/dashboard';
+    }
+  };
   
   const handleCopyTicketId = () => {
     navigator.clipboard.writeText(id);
@@ -40,7 +64,7 @@ const SubmissionSuccessPage = () => {
   };
   
   const handleBackHome = () => {
-    navigate('/');
+    navigate(getRedirectPath());
   };
   
   return (
@@ -206,7 +230,7 @@ const SubmissionSuccessPage = () => {
             startIcon={<HomeIcon />}
             onClick={handleBackHome}
           >
-            {t('common:backToHome', 'Вернуться на главную')}
+            {isAuthenticated ? t('common:backToDashboard', 'Вернуться в панель') : t('common:backToHome', 'Вернуться на главную')}
           </Button>
           
           <Button 

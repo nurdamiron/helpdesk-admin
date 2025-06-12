@@ -212,58 +212,7 @@ const LoginPage = () => {
                 {loading || authLoading ? <CircularProgress size={24} /> : t('auth:loginButton', 'Войти')}
               </Button>
             </form>
-<<<<<<< HEAD
-=======
             
-            {/* Тестовые данные для входа */}
-            <Box sx={{ mt: 3, bgcolor: 'background.paper', p: 2, borderRadius: 1, border: '1px dashed #ccc' }}>
-              <Typography variant="subtitle2" gutterBottom>
-                {t('auth:demo.title', 'Тестовые данные для входа:')}
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Button 
-                    size="small" 
-                    variant="outlined" 
-                    sx={{ minWidth: 100, mr: 1 }}
-                    onClick={() => quickLogin('admin@localhost', 'admin')}
-                    disabled={loading || authLoading}
-                  >
-                    {t('auth:demo.adminButton', 'Админ')}
-                  </Button>
-                  <Typography variant="caption">admin@localhost / admin</Typography>
-                </Box>
-                
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Button 
-                    size="small" 
-                    variant="outlined" 
-                    sx={{ minWidth: 100, mr: 1 }}
-                    onClick={() => quickLogin('manager@localhost', 'manager')}
-                    disabled={loading || authLoading}
-                  >
-                    {t('auth:demo.managerButton', 'Менеджер')}
-                  </Button>
-                  <Typography variant="caption">manager@localhost / manager</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Button 
-                    size="small" 
-                    variant="outlined" 
-                    sx={{ minWidth: 100, mr: 1 }}
-                    onClick={() => quickLogin('user@localhost', 'user')}
-                    disabled={loading || authLoading}
-                  >
-                    {t('auth:demo.userButton', 'Пользователь')}
-                  </Button>
-                  <Typography variant="caption">user@localhost / user</Typography>
-                </Box>
-              </Box>
-              <Typography variant="caption" sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
-                {t('auth:demo.instruction', 'Нажмите на кнопку, чтобы автоматически заполнить поля для соответствующей роли.')}
-              </Typography>
-            </Box>
->>>>>>> 801ce2854997a6d5c7a6484a2dd78f66db5a6d62
 
             <Box mt={3} textAlign="center">
               <Link href="/" variant="body2" sx={{ textDecoration: 'none', display: 'block', mb: 2 }}>

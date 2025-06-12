@@ -4,7 +4,6 @@ import { useAuth } from '../contexts/AuthContext';
 import AdminDashboardPage from './admin/AdminDashboardPage';
 import ModeratorDashboardPage from './moderator/ModeratorDashboardPage';
 import UserDashboardPage from './user/UserDashboardPage';
-import StaffDashboardPage from './StaffDashboardPage';
 import { Box, CircularProgress } from '@mui/material';
 
 /**
@@ -28,13 +27,8 @@ const DashboardPage = () => {
     return <AdminDashboardPage />;
   }
 
-  // Для роли staff используем специальный дашборд
-  if (user?.role === 'staff') {
-    return <StaffDashboardPage />;
-  }
-
-  // Для модераторов, менеджеров и других ролей поддержки
-  if (isModerator && user?.role !== 'staff') {
+  // Для модераторов используем модератор дашборд
+  if (user?.role === 'moderator') {
     return <ModeratorDashboardPage />;
   }
 

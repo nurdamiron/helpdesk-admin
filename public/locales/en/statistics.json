@@ -1,0 +1,35 @@
+{
+  "performance": {
+    "title": "Staff Performance",
+    "tooltip": "Statistics on assigned and resolved tickets",
+    "employee": "Employee",
+    "assigned": "Assigned",
+    "active": "Active",
+    "resolved": "Resolved",
+    "avgTime": "Avg. Time",
+    "efficiency": "Efficiency",
+    "hours": "{{count}}h",
+    "rowsPerPage": "Rows per page:",
+    "displayedRows": "{{from}}-{{to}} of {{count}}"
+  },
+  "chart": {
+    "title": "Ticket Dynamics",
+    "created": "Created",
+    "resolved": "Resolved",
+    "closed": "Closed",
+    "total": "Total Tickets",
+    "noData": "No data to display",
+    "lastDays": "Last {{count}} days",
+    "area": "Area",
+    "line": "Lines"
+  },
+  "card": {
+    "total": "Total",
+    "trend": {
+      "up": "Up {{value}}%",
+      "down": "Down {{value}}%",
+      "neutral": "No change"
+    },
+    "comparedTo": "compared to previous period"
+  }
+}

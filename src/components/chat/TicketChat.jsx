@@ -28,6 +28,7 @@ import {
   RefreshCw,
   Clock
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // Импортируем api вместо кастомного сервиса
 import api from '../../api/index';
@@ -113,6 +114,7 @@ const MessageStatus = ({ status }) => {
 };
 
 const TicketChat = ({ ticketId, requesterEmail }) => {
+  const { t } = useTranslation(['tickets', 'common']);
   const { user } = useAuth();
   const theme = useTheme();
   const [messages, setMessages] = useState([]);
@@ -209,7 +211,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
       };
     } catch (err) {
       console.error('Ошибка инициализации WebSocket:', err);
-      setError('Не удалось подключиться к сервису сообщений в реальном времени');
+      setError(t('tickets:chat.errors.websocketConnection'));
     }
   }, [ticketId, user]);
 
@@ -239,14 +241,14 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
       try {
         await api.put(`/tickets/${ticketId}/messages/read`);
       } catch (readError) {
-        console.error('Ошибка при отметке сообщений как прочитанные:', readError);
+        console.error(t('tickets:chat.errors.markAsRead'), readError);
         // Не прерываем работу из-за этой ошибки
       }
       
       setError(null);
     } catch (err) {
       console.error('Ошибка при загрузке сообщений:', err);
-      setError('Не удалось загрузить сообщения. Проверьте подключение к серверу.');
+      setError(t('tickets:chat.errors.loadMessages'));
     } finally {
       setLoading(false);
     }
@@ -289,7 +291,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
         }
       }
     } catch (error) {
-      console.error('Ошибка при загрузке офлайн сообщений:', error);
+      console.error(t('tickets:chat.errors.offlineLoad'), error);
     }
   }, [ticketId]);
   
@@ -300,7 +302,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
     try {
       localStorage.setItem(`offlineMessages_${ticketId}`, JSON.stringify(offlineMessages));
     } catch (error) {
-      console.error('Ошибка при сохранении офлайн сообщений:', error);
+      console.error(t('tickets:chat.errors.offlineSave'), error);
     }
   }, [offlineMessages, ticketId]);
   
@@ -315,7 +317,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
     try {
       localStorage.removeItem(`offlineMessages_${ticketId}`);
     } catch (error) {
-      console.error('Ошибка при очистке localStorage:', error);
+      console.error(t('tickets:chat.errors.offlineSave'), error);
     }
     
     for (const message of messagesToSend) {
@@ -326,7 +328,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
           notify_requester: message.notifyRequester
         });
       } catch (err) {
-        console.error('Ошибка при отправке офлайн сообщения:', err);
+        console.error(t('tickets:chat.errors.sendMessage'), err);
         // Добавляем обратно в офлайн очередь
         setOfflineMessages(prev => [...prev, message]);
       }
@@ -379,7 +381,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
     
     // Проверяем, есть ли текст сообщения
     if (!newMessage.trim()) {
-      setError('Добавьте текст сообщения');
+      setError(t('tickets:chat.addMessageError'));
       return;
     }
     
@@ -424,7 +426,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
           try {
             localStorage.setItem(`offlineMessages_${ticketId}`, JSON.stringify(newMessages));
           } catch (error) {
-            console.error('Ошибка при сохранении офлайн сообщения в localStorage:', error);
+            console.error(t('tickets:chat.errors.offlineSave'), error);
           }
           
           return newMessages;
@@ -465,7 +467,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
       }
     } catch (err) {
       console.error('Ошибка при отправке сообщения:', err);
-      setError('Не удалось отправить сообщение. Попробуйте позже.');
+      setError(t('tickets:chat.errors.sendMessage'));
     } finally {
       setSending(false);
     }
@@ -520,7 +522,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
         }}>
           <WifiOffIcon size={16} style={{ marginRight: 8 }} />
           <Typography variant="body2" fontWeight={500}>
-            Офлайн режим - байланыс қалпына келгенде хабарламалар жіберіледі ({offlineMessages.length} сообщений)
+            {t('tickets:chat.offlineModeDescription')} {t('tickets:chat.offlineMessageCount', { count: offlineMessages.length })}
           </Typography>
         </Box>
       );
@@ -528,16 +530,16 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
     
     if (!wsConnected) {
       // Показываем разные сообщения в зависимости от статуса подключения
-      let statusMessage = 'Сервермен байланыс жоқ';
+      let statusMessage = t('tickets:chat.noConnection');
       let statusColor = 'error.light';
       let showReconnectButton = true;
       
       if (reconnectInfo.attempts >= reconnectInfo.maxAttempts) {
-        statusMessage = 'Максимальное количество попыток подключения исчерпано';
+        statusMessage = t('tickets:chat.maxAttemptsReached');
         statusColor = 'error.dark';
       } else if (reconnectInfo.attempts > 0) {
         const nextAttemptIn = reconnectInfo.nextAttemptTime ? Math.ceil((reconnectInfo.nextAttemptTime - Date.now()) / 1000) : 0;
-        statusMessage = `Попытка подключения ${reconnectInfo.attempts} из ${reconnectInfo.maxAttempts}${nextAttemptIn > 0 ? ` (следующая через ${nextAttemptIn} сек)` : ''}`;
+        statusMessage = t('tickets:chat.connectionAttempt', { current: reconnectInfo.attempts, max: reconnectInfo.maxAttempts }) + (nextAttemptIn > 0 ? ' ' + t('tickets:chat.nextAttemptIn', { seconds: nextAttemptIn }) : '');
         statusColor = 'warning.dark';
       }
       
@@ -579,7 +581,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
                 sx={{ ml: 1, minWidth: 0, px: 1, bgcolor: 'white', color: 'text.primary' }}
                 onClick={toggleOfflineMode}
               >
-                Офлайн режим
+                {t('tickets:chat.offlineMode')}
               </Button>
             </Badge>
           )}
@@ -601,7 +603,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
         }}>
           <WifiIcon size={16} style={{ marginRight: 8 }} />
           <Typography variant="body2" fontWeight={500}>
-            Онлайн - готовы отправить {offlineMessages.length} неотправленных сообщений
+            {t('tickets:chat.onlineReady', { count: offlineMessages.length })}
           </Typography>
           <Button 
             size="small" 
@@ -609,7 +611,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
             sx={{ ml: 2, minWidth: 0, px: 1 }}
             onClick={sendOfflineMessages}
           >
-            Отправить
+            {t('tickets:chat.sendOfflineMessages')}
           </Button>
         </Box>
       );
@@ -631,7 +633,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
         height: 24
       }}>
         <Typography variant="caption" color="text.secondary" fontStyle="italic">
-          Клиент жазып жатыр...
+          {t('tickets:chat.clientTyping')}
         </Typography>
       </Box>
     );
@@ -668,7 +670,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
           fontSize: { xs: '1rem', sm: '1.25rem' },
           mb: { xs: 1, sm: 0 }
         }}>
-          Өтінішті талқылау #{ticketId}
+          {t('tickets:chat.title', { ticketId })}
         </Typography>
         
         <Box sx={{ 
@@ -679,7 +681,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
           justifyContent: { xs: 'center', sm: 'flex-end' }
         }}>
           <Chip 
-            label={offlineMode ? "Офлайн" : "Онлайн"} 
+            label={offlineMode ? t('tickets:chat.offline') : t('tickets:chat.online')} 
             color={offlineMode ? "warning" : "success"}
             size="small"
             icon={offlineMode ? <WifiOffIcon size={14} /> : <WifiIcon size={14} />}
@@ -692,7 +694,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
             invisible={offlineMessages.length === 0}
           >
             <Chip 
-              label={`${messages.length} хабарлама`} 
+              label={t('tickets:chat.messageCount', { count: messages.length })} 
               variant="outlined" 
               size="small"
               sx={{ fontWeight: 500 }}
@@ -730,10 +732,10 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
             }}
           >
             <Typography variant="body1" fontWeight={500}>
-              Әзірге хабарламалар жоқ
+              {t('tickets:chat.noMessages')}
             </Typography>
             <Typography variant="body2">
-              Бұл өтінім бойынша талқылауды бастау үшін хабарлама жіберіңіз
+              {t('tickets:chat.startDiscussion')}
             </Typography>
           </Box>
         ) : (
@@ -816,7 +818,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
                           fontWeight: 500,
                           fontSize: { xs: '0.65rem', sm: '0.75rem' }
                         }}>
-                          {message.sender?.name || 'Пользователь'}
+                          {message.sender?.name || t('tickets:chat.user')}
                         </Typography>
                       )}
                       
@@ -873,7 +875,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
       <Box sx={{ height: 24 }}>
         {isTyping && typingUserId && (
           <Typography variant="caption" color="text.secondary" sx={{ pl: 2 }}>
-            Клиент печатает...
+            {t('tickets:chat.clientTyping')}
           </Typography>
         )}
       </Box>
@@ -893,7 +895,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
         <Box sx={{ display: 'flex', gap: { xs: 1, sm: 2 } }}>
           <TextField
             fullWidth
-            placeholder="Хабарламаңызды жазыңыз..."
+            placeholder={t('tickets:chat.messagePlaceholder')}
             variant="outlined"
             size="small"
             value={newMessage}
@@ -946,7 +948,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
             }
             label={
               <Typography variant="body2" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
-                Клиентке email арқылы хабарлау ({requesterEmail || 'email көрсетілмеген'})
+                {t('tickets:chat.notifyByEmail')} ({requesterEmail || t('tickets:chat.emailNotSpecified')})
               </Typography>
             }
           />
@@ -958,7 +960,7 @@ const TicketChat = ({ ticketId, requesterEmail }) => {
         open={sendSuccess}
         autoHideDuration={3000}
         onClose={handleCloseSuccess}
-        message="Хабарлама сәтті жіберілді"
+        message={t('tickets:chat.messageSentSuccess')}
       />
     </Box>
   );

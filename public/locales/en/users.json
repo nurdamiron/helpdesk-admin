@@ -19,7 +19,6 @@
   "roles": {
     "admin": "Administrator",
     "moderator": "Moderator",
-    "staff": "Staff",
     "user": "User"
   },
   "errors": {

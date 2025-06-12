@@ -83,7 +83,6 @@ const LanguageSwitcher = () => {
       <Tooltip title={t('common:language.select', 'Тілді таңдау')}>
         <IconButton
           size="medium"
-          color="inherit"
           aria-label={t('common:aria.languageSelector', 'language')}
           aria-controls={open ? 'language-menu' : undefined}
           aria-haspopup="true"
@@ -91,9 +90,13 @@ const LanguageSwitcher = () => {
           onClick={handleClick}
           sx={{ 
             padding: { xs: '6px', sm: '8px' },
-            backgroundColor: open ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+            color: 'primary.main',
+            backgroundColor: open ? 'rgba(25, 118, 210, 0.08)' : 'transparent',
+            border: '1px solid',
+            borderColor: 'rgba(25, 118, 210, 0.2)',
             '&:hover': {
-              backgroundColor: 'rgba(255, 193, 7, 0.15)'
+              backgroundColor: 'rgba(25, 118, 210, 0.12)',
+              borderColor: 'primary.main',
             }
           }}
         >
@@ -110,7 +113,13 @@ const LanguageSwitcher = () => {
                 fontSize: { xs: '9px', sm: '10px' },
                 height: { xs: '16px', sm: '18px' },
                 minWidth: { xs: '16px', sm: '18px' },
-                padding: { xs: '0 4px', sm: '0 5px' }
+                padding: { xs: '0 4px', sm: '0 5px' },
+                backgroundColor: 'primary.main',
+                color: 'white',
+                fontWeight: 600
+              },
+              '& svg': {
+                color: 'primary.main'
               }
             }}
           >

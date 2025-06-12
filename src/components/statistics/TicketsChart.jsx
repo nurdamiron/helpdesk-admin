@@ -23,9 +23,11 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 const TicketsChart = ({ data, loading = false }) => {
   const theme = useTheme();
+  const { t } = useTranslation('statistics');
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [chartType, setChartType] = useState('area');
 
@@ -60,7 +62,7 @@ const TicketsChart = ({ data, loading = false }) => {
   return (
     <Card>
       <CardHeader
-        title="Динамика заявок"
+        title={t('chart.title')}
         action={
           <ToggleButtonGroup
             value={chartType}
@@ -68,8 +70,8 @@ const TicketsChart = ({ data, loading = false }) => {
             onChange={handleChartTypeChange}
             size="small"
           >
-            <ToggleButton value="area">Область</ToggleButton>
-            <ToggleButton value="line">Линии</ToggleButton>
+            <ToggleButton value="area">{t('chart.area')}</ToggleButton>
+            <ToggleButton value="line">{t('chart.line')}</ToggleButton>
           </ToggleButtonGroup>
         }
       />
@@ -110,7 +112,7 @@ const TicketsChart = ({ data, loading = false }) => {
                 fill={theme.palette.primary.main}
                 fillOpacity={0.3}
                 strokeWidth={2}
-                name="Всего заявок"
+                name={t('chart.total')}
               />
               <DataComponent
                 type="monotone"
@@ -119,7 +121,7 @@ const TicketsChart = ({ data, loading = false }) => {
                 fill={theme.palette.success.main}
                 fillOpacity={0.3}
                 strokeWidth={2}
-                name="Решено"
+                name={t('chart.resolved')}
               />
               <DataComponent
                 type="monotone"
@@ -128,7 +130,7 @@ const TicketsChart = ({ data, loading = false }) => {
                 fill={theme.palette.info.main}
                 fillOpacity={0.3}
                 strokeWidth={2}
-                name="Закрыто"
+                name={t('chart.closed')}
               />
             </ChartComponent>
           </ResponsiveContainer>

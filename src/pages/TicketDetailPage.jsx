@@ -357,14 +357,7 @@ const TicketDetailPage = ({ editMode = false }) => {
                   {t(`tickets:type.${ticket.type}`, ticket.type)}
                 </Typography>
               </Grid>
-              <Grid item xs={6} sm={3}>
-                <Typography variant="body2" color="text.secondary">
-                  {t('tickets:details.category', 'Категория:')}
-                </Typography>
-                <Typography variant="body1">
-                  {t(`tickets:category.${ticket.category}`, ticket.category)}
-                </Typography>
-              </Grid>
+ 
               <Grid item xs={6} sm={3}>
                 <Typography variant="body2" color="text.secondary">
                   {t('tickets:details.priority', 'Приоритет:')}

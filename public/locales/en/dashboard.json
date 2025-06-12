@@ -90,5 +90,79 @@
     "calculatedStats": "Calculated statistics",
     "noData": "No ticket data, displaying empty list",
     "loadingError": "Error loading dashboard data"
+  },
+  "statistics": {
+    "title": "Statistics and Analytics",
+    "overview": "Overview",
+    "performance": "Performance",
+    "tickets": "Tickets",
+    "staff": "Staff",
+    "categories": "Categories",
+    "kpi": {
+      "title": "Key Performance Indicators",
+      "totalTickets": "Total Tickets",
+      "avgResponseTime": "Average Response Time",
+      "avgResolutionTime": "Average Resolution Time",
+      "satisfactionRate": "Customer Satisfaction",
+      "firstContactResolution": "First Contact Resolution",
+      "slaCompliance": "SLA Compliance",
+      "hours": "hours",
+      "minutes": "minutes",
+      "days": "days"
+    },
+    "metrics": {
+      "ticketVolume": "Ticket Volume",
+      "responseTime": "Response Time",
+      "resolutionTime": "Resolution Time",
+      "customerSatisfaction": "Customer Satisfaction",
+      "staffPerformance": "Staff Performance",
+      "categoryDistribution": "Category Distribution"
+    },
+    "charts": {
+      "ticketsByStatus": "Tickets by Status",
+      "ticketsByPriority": "Tickets by Priority",
+      "ticketsByCategory": "Tickets by Category",
+      "ticketsTrend": "Tickets Trend",
+      "performanceTrend": "Performance Trend",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "table": {
+      "employee": "Employee",
+      "totalTickets": "Total Tickets",
+      "resolved": "Resolved",
+      "avgResponseTime": "Avg Response Time",
+      "avgResolutionTime": "Avg Resolution Time",
+      "satisfaction": "Satisfaction",
+      "performance": "Performance"
+    },
+    "filters": {
+      "period": "Period",
+      "category": "Category",
+      "priority": "Priority",
+      "employee": "Employee",
+      "dateRange": "Date Range",
+      "from": "From",
+      "to": "To",
+      "apply": "Apply",
+      "reset": "Reset",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "last90Days": "Last 90 Days",
+      "custom": "Custom"
+    },
+    "export": {
+      "button": "Export",
+      "pdf": "Export as PDF",
+      "excel": "Export as Excel",
+      "csv": "Export as CSV"
+    },
+    "noData": "No data available for the selected period"
   }
 }

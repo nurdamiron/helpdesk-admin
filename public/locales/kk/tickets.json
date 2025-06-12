@@ -184,15 +184,52 @@
     "created": "Құрылған",
     "assignedTo": "Тағайындалған:"
   },
+  "info": {
+    "requester": "Өтініш беруші",
+    "createdDate": "Құрылған күні",
+    "category": "Санат",
+    "email": "Email",
+    "phone": "Телефон",
+    "address": "Мекенжай",
+    "notSpecified": "Көрсетілмеген",
+    "ticketDescription": "Өтініш сипаттамасы"
+  },
   "tabs": {
     "discussion": "Талқылау",
     "history": "Тарих",
     "historyComingSoon": "Өзгерістер тарихы жақын арада қол жетімді болады"
   },
+  "history": {
+    "title": "Өтінім тарихы",
+    "loadError": "Өтінім тарихын жүктеу мүмкін болмады",
+    "noHistory": "Әзірге тарих жоқ",
+    "noHistoryDescription": "Өтінімді жаңарту, пікір қосу немесе күйін өзгерту кезінде тарих жазбалары пайда болады",
+    "events": {
+      "created": "Өтінім жасалды",
+      "updated": "Өтінім жаңартылды: {{fields}}",
+      "updatedGeneral": "Өтінім жаңартылды",
+      "statusChanged": "Күйі өзгертілді: {{from}} → {{to}}",
+      "commentAdded": "Жаңа пікір қосылды",
+      "fileUploaded": "Файл жүктелді: {{filename}}",
+      "fileUploadedGeneral": "Файл жүктелді",
+      "assigned": "Тағайындалды: {{assignee}}",
+      "assignedGeneral": "Қызметкерге тағайындалды",
+      "emailSent": "Email жіберілді: {{recipient}}",
+      "emailSentGeneral": "Пайдаланушыға email жіберілді",
+      "default": "Өтінім жаңартылды"
+    },
+    "performedBy": "Жүйе",
+    "changes": "өзгерістер"
+  },
   "management": {
     "title": "Өтінішті басқару",
     "status": "Күйі:",
     "priority": "Басымдылығы:"
+  },
+  "assign": {
+    "notAssigned": "Тағайындалмаған",
+    "unknownUser": "Белгісіз пайдаланушы",
+    "loadError": "Қызметкерлер тізімін жүктеу мүмкін болмады"
   },
   "actions": {
     "saving": "Сақталуда...",
@@ -213,5 +250,49 @@
     "emailSuccess": "Өтініш сәтті жіберілді! Ақпарат сіздің электрондық поштаңызға жіберілді.",
     "redirecting": "Басты бетке қайта бағыттау...",
     "openWhatsApp": "WhatsApp ашу"
+  },
+  "chat": {
+    "title": "Өтінішті талқылау #{{ticketId}}",
+    "messageCount": "{{count}} хабарлама",
+    "messagePlaceholder": "Хабарламаңызды жазыңыз...",
+    "sendButton": "Жіберу",
+    "sending": "Жіберілуде...",
+    "notifyByEmail": "Клиентке email арқылы хабарлау",
+    "emailNotSpecified": "email көрсетілмеген",
+    "messageSentSuccess": "Хабарлама сәтті жіберілді",
+    "noMessages": "Әзірге хабарламалар жоқ",
+    "startDiscussion": "Бұл өтініш бойынша талқылауды бастау үшін хабарлама жіберіңіз",
+    "clientTyping": "Клиент жазып жатыр...",
+    "addMessageError": "Хабарлама мәтінін қосыңыз",
+    "user": "Пайдаланушы",
+    "offlineMode": "Офлайн режимі",
+    "online": "Онлайн",
+    "offline": "Офлайн",
+    "offlineModeDescription": "Офлайн режим - байланыс қалпына келгенде хабарламалар жіберіледі",
+    "offlineMessageCount": "({{count}} хабарлама)",
+    "noConnection": "Сервермен байланыс жоқ",
+    "connectionAttempt": "Қосылу әрекеті {{current}} / {{max}}",
+    "nextAttemptIn": "(келесі {{seconds}} сек кейін)",
+    "maxAttemptsReached": "Қосылу әрекеттерінің максималды саны таусылды",
+    "onlineReady": "Онлайн - {{count}} жіберілмеген хабарламаны жіберуге дайын",
+    "sendOfflineMessages": "Жіберу",
+    "reconnect": "Қайта қосылу",
+    "errors": {
+      "websocketConnection": "Нақты уақыттағы хабарламалар қызметіне қосылу мүмкін болмады",
+      "loadMessages": "Хабарламаларды жүктеу мүмкін болмады. Серверге қосылымды тексеріңіз.",
+      "sendMessage": "Хабарламаны жіберу мүмкін болмады. Кейінірек қайталаңыз.",
+      "markAsRead": "Хабарламаларды оқылған деп белгілеу кезінде қате",
+      "offlineLoad": "Офлайн хабарламаларды жүктеу кезінде қате",
+      "offlineSave": "Офлайн хабарламаны сақтау кезінде қате"
+    }
+  },
+  "internalNotes": {
+    "noNotes": "Ішкі ескертпелер әзірге жоқ.",
+    "addNoteHint": "Тек қызметкерлерге көрінетін ескертпе қосыңыз.",
+    "unknownUser": "Белгісіз пайдаланушы",
+    "placeholder": "Ішкі ескертпе қосыңыз...",
+    "submitting": "Қосылуда...",
+    "addNote": "Ескертпе қосу",
+    "addError": "Ескертпені қосу мүмкін болмады"
   }
 }

@@ -166,7 +166,7 @@ const UserDashboardPage = () => {
   }
 
   return (
-    <Box sx={{ px: { xs: 2, sm: 3, md: 4 }, py: { xs: 2, sm: 3 }, maxWidth: 1600, mx: 'auto' }}>
+    <Box sx={{ px: 0, py: { xs: 2, sm: 3 }, maxWidth: 1600, mx: 'auto' }}>
       {/* Заголовок страницы */}
       <Box
         sx={{
@@ -235,11 +235,11 @@ const UserDashboardPage = () => {
                     boxShadow: theme.shadows[6]
                   }
                 }}>
-                  <CardContent>
-                    <Typography variant="h4" align="center" sx={{ fontWeight: 'bold' }}>
+                  <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'center' }}>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                       {Array.isArray(tickets) ? tickets.length : 0}
                     </Typography>
-                    <Typography variant="body2" align="center">
+                    <Typography variant="body1">
                       {t('user:dashboard.totalTickets', 'Барлық өтініштер')}
                     </Typography>
                   </CardContent>
@@ -259,11 +259,11 @@ const UserDashboardPage = () => {
                     boxShadow: theme.shadows[6]
                   }
                 }}>
-                  <CardContent>
-                    <Typography variant="h4" align="center" sx={{ fontWeight: 'bold' }}>
+                  <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'center' }}>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                       {safeFilter(t => t.status === 'in_progress' || t.status === 'new')}
                     </Typography>
-                    <Typography variant="body2" align="center">
+                    <Typography variant="body1">
                       {t('user:dashboard.activeTickets', 'Актив өтініштер')}
                     </Typography>
                   </CardContent>
@@ -283,11 +283,11 @@ const UserDashboardPage = () => {
                     boxShadow: theme.shadows[6]
                   }
                 }}>
-                  <CardContent>
-                    <Typography variant="h4" align="center" sx={{ fontWeight: 'bold' }}>
+                  <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'center' }}>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                       {safeFilter(t => t.status === 'resolved')}
                     </Typography>
-                    <Typography variant="body2" align="center">
+                    <Typography variant="body1">
                       {t('user:dashboard.resolvedTickets', 'Шешілген өтініштер')}
                     </Typography>
                   </CardContent>

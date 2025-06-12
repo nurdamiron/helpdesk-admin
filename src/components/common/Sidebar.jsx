@@ -21,6 +21,7 @@ import {
   Settings,
   ExternalLink,
   User,
+  UserCircle,
   Users
 } from 'lucide-react';
 import HelpDeskLogo from '../../assets/images/logo.jsx';
@@ -51,12 +52,7 @@ const Sidebar = () => {
         icon: <TicketCheck size={isMobile ? 22 : 24} />,
         visible: true
       },
-      { 
-        path: '/settings', 
-        label: t('nav.settings', 'Параметрлер'), 
-        icon: <Settings size={isMobile ? 22 : 24} />,
-        visible: isAdmin || isModerator
-      }
+
     ];
 
     // Add user management for admins
@@ -132,7 +128,7 @@ const Sidebar = () => {
       square 
       elevation={0}
       sx={{ 
-        width: isMobile ? '100%' : '260px',
+        width: isMobile ? '100%' : '240px',
         height: isMobile ? 'auto' : '100vh',
         borderRight: `1px solid ${theme.palette.divider}`,
         display: 'flex',
@@ -140,7 +136,7 @@ const Sidebar = () => {
         position: isMobile ? 'relative' : 'fixed',
         top: 0,
         left: 0,
-        zIndex: 100,
+        zIndex: theme.zIndex.drawer,
         bgcolor: '#f8f9fa',
         overflow: 'auto'
       }}

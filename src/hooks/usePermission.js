@@ -29,13 +29,8 @@ export const usePermission = () => {
     // Админ может редактировать любую заявку
     if (user.role === 'admin') return true;
     
-    // Модератор/поддержка/менеджер может редактировать любую заявку
-    if (['moderator', 'support', 'manager'].includes(user.role)) return true;
-    
-    // Сотрудник может редактировать только назначенные ему заявки
-    if (user.role === 'staff') {
-      return ticket.assigned_to === user.id || !ticket.assigned_to;
-    }
+    // Модератор может редактировать любую заявку
+    if (user.role === 'moderator') return true;
     
     // Пользователь может редактировать только свои заявки
     if (user.role === 'user') {
@@ -59,9 +54,9 @@ export const usePermission = () => {
     // Админ может управлять всеми пользователями
     if (user.role === 'admin') return true;
     
-    // Модератор может управлять только сотрудниками
-    if (['moderator', 'support', 'manager'].includes(user.role)) {
-      return targetUser.role === 'staff' || targetUser.role === 'user';
+    // Модератор может управлять только обычными пользователями
+    if (user.role === 'moderator') {
+      return targetUser.role === 'user';
     }
     
     return false;
@@ -73,7 +68,7 @@ export const usePermission = () => {
    */
   const canAssignTickets = useCallback(() => {
     if (!user) return false;
-    return ['admin', 'moderator', 'support', 'manager'].includes(user.role);
+    return ['admin', 'moderator'].includes(user.role);
   }, [user]);
   
   /**
@@ -82,7 +77,7 @@ export const usePermission = () => {
    */
   const canViewAnalytics = useCallback(() => {
     if (!user) return false;
-    return ['admin', 'manager'].includes(user.role);
+    return user.role === 'admin';
   }, [user]);
   
   /**
@@ -91,7 +86,7 @@ export const usePermission = () => {
    */
   const canExportData = useCallback(() => {
     if (!user) return false;
-    return ['admin', 'manager'].includes(user.role);
+    return user.role === 'admin';
   }, [user]);
   
   /**

@@ -22,9 +22,11 @@ import {
   Tooltip
 } from '@mui/material';
 import { Info as InfoIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 const StaffPerformanceTable = ({ data, loading = false }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -64,9 +66,9 @@ const StaffPerformanceTable = ({ data, loading = false }) => {
   return (
     <Card>
       <CardHeader 
-        title="Производительность сотрудников"
+        title={t('statistics:performance.title')}
         action={
-          <Tooltip title="Статистика по назначенным и решенным заявкам">
+          <Tooltip title={t('statistics:performance.tooltip')}>
             <IconButton size="small">
               <InfoIcon />
             </IconButton>
@@ -78,12 +80,12 @@ const StaffPerformanceTable = ({ data, loading = false }) => {
           <Table size={isMobile ? 'small' : 'medium'}>
             <TableHead>
               <TableRow>
-                <TableCell>Сотрудник</TableCell>
-                {!isMobile && <TableCell align="center">Назначено</TableCell>}
-                <TableCell align="center">Активные</TableCell>
-                <TableCell align="center">Решено</TableCell>
-                {!isMobile && <TableCell align="center">Ср. время</TableCell>}
-                <TableCell align="center">Эффективность</TableCell>
+                <TableCell>{t('statistics:performance.employee')}</TableCell>
+                {!isMobile && <TableCell align="center">{t('statistics:performance.assigned')}</TableCell>}
+                <TableCell align="center">{t('statistics:performance.active')}</TableCell>
+                <TableCell align="center">{t('statistics:performance.resolved')}</TableCell>
+                {!isMobile && <TableCell align="center">{t('statistics:performance.avgTime')}</TableCell>}
+                <TableCell align="center">{t('statistics:performance.efficiency')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -140,7 +142,7 @@ const StaffPerformanceTable = ({ data, loading = false }) => {
                   {!isMobile && (
                     <TableCell align="center">
                       <Typography variant="body2">
-                        {staff.avg_resolution_time ? `${staff.avg_resolution_time}ч` : '-'}
+                        {staff.avg_resolution_time ? t('statistics:performance.hours', { count: staff.avg_resolution_time }) : '-'}
                       </Typography>
                     </TableCell>
                   )}
@@ -179,8 +181,8 @@ const StaffPerformanceTable = ({ data, loading = false }) => {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Строк на странице:"
-          labelDisplayedRows={({ from, to, count }) => `${from}-${to} из ${count}`}
+          labelRowsPerPage={t('statistics:performance.rowsPerPage')}
+          labelDisplayedRows={({ from, to, count }) => t('statistics:performance.displayedRows', { from, to, count })}
         />
       </CardContent>
     </Card>

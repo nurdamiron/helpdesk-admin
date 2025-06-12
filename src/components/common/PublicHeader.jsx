@@ -26,7 +26,7 @@ import {
   Menu as MenuIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
-import { LogIn } from 'lucide-react';
+import { LogIn, Info, Building2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import HelpDeskLogo from '../../assets/images/logo.jsx';
@@ -62,24 +62,40 @@ const PublicHeader = () => {
   const showAuthButtons = initialized && !loading;
 
   return (
-    <AppBar position="sticky" color="default" elevation={1}>
+    <AppBar 
+      position="sticky" 
+      elevation={0}
+      sx={{
+        background: 'rgba(255, 255, 255, 0.98)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+      }}
+    >
       <Container maxWidth="xl">
-        <Toolbar disableGutters>
+        <Toolbar disableGutters sx={{ py: 1 }}>
           {/* Logo - desktop */}
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, alignItems: 'center' }}>
-            <HelpDeskLogo width={70} height={70} />
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 2, alignItems: 'center' }}>
+            <HelpDeskLogo width={50} height={50} />
           </Box>
           <Typography
-            variant="h6"
+            variant="h5"
             noWrap
             component={RouterLink}
             to="/"
             sx={{
-              mr: 2,
+              mr: 4,
               display: { xs: 'none', md: 'flex' },
-              fontWeight: 700,
-              color: 'inherit',
+              fontWeight: 600,
+              background: 'linear-gradient(135deg, #1976d2 0%, #2196f3 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
               textDecoration: 'none',
+              letterSpacing: '-0.5px',
+              '&:hover': {
+                opacity: 0.8,
+              }
             }}
           >
 {t('helpdesk', { ns: 'header', defaultValue: 'Қолдау Орталығы' })}
@@ -93,7 +109,7 @@ const PublicHeader = () => {
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={toggleDrawer(true)}
-              color="inherit"
+              sx={{ color: 'text.primary' }}
             >
               <MenuIcon />
             </IconButton>
@@ -103,59 +119,140 @@ const PublicHeader = () => {
               anchor="left"
               open={drawerOpen}
               onClose={toggleDrawer(false)}
+              PaperProps={{
+                sx: {
+                  width: 280,
+                  bgcolor: 'background.paper',
+                }
+              }}
             >
               <Box
-                sx={{ width: 250 }}
                 role="presentation"
                 onClick={toggleDrawer(false)}
                 onKeyDown={toggleDrawer(false)}
               >
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, alignItems: 'center' }}>
-                  <Typography variant="h6" component="div">
-                    {t('menu', { ns: 'header', defaultValue: 'Меню' })}
-                  </Typography>
-                  <IconButton onClick={toggleDrawer(false)}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  p: 2, 
+                  alignItems: 'center',
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <HelpDeskLogo width={35} height={35} />
+                    <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+                      {t('menu', { ns: 'header', defaultValue: 'Меню' })}
+                    </Typography>
+                  </Box>
+                  <IconButton 
+                    onClick={toggleDrawer(false)}
+                    sx={{ 
+                      color: 'text.secondary',
+                      '&:hover': { bgcolor: 'action.hover' }
+                    }}
+                  >
                     <CloseIcon />
                   </IconButton>
                 </Box>
                 
                 <Divider />
                 
-                <List>
-                  <ListItem disablePadding>
+                <List sx={{ px: 1 }}>
+                  <ListItem disablePadding sx={{ mb: 0.5 }}>
                     <ListItemButton 
                       component={RouterLink} 
                       to="/"
+                      sx={{ 
+                        py: 1.5,
+                        px: 2,
+                        borderRadius: 2,
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          bgcolor: 'action.hover',
+                        }
+                      }}
                     >
-                      <ListItemText primary={t('home', { ns: 'header', defaultValue: 'Главная' })} />
+                      <ListItemText 
+                        primary={t('home', { ns: 'header', defaultValue: 'Басты бет' })} 
+                        primaryTypographyProps={{ fontSize: '1rem', fontWeight: 500 }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                  
+                  <ListItem disablePadding sx={{ mb: 0.5 }}>
+                    <ListItemButton 
+                      component="a"
+                      href="https://alataustroyinvest.tilda.ws/"
+                      target="_blank"
+                      sx={{ 
+                        py: 1.5,
+                        px: 2,
+                        borderRadius: 2,
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          bgcolor: 'action.hover',
+                        }
+                      }}
+                    >
+                      <Building2 size={18} style={{ marginRight: 12, color: '#666' }} />
+                      <ListItemText 
+                        primary={t('nav.aboutUs', { ns: 'header', defaultValue: 'О нас' })} 
+                        primaryTypographyProps={{ fontSize: '1rem', fontWeight: 500 }}
+                      />
                     </ListItemButton>
                   </ListItem>
                   
                   {showAuthButtons && (
                     isAuthenticated ? (
-                      <ListItem disablePadding>
-                        <ListItemButton onClick={handleAdmin}>
-                          <ListItemText primary={t('adminPanel', { ns: 'header', defaultValue: 'Админ панель' })} />
+                      <ListItem disablePadding sx={{ mt: 2 }}>
+                        <ListItemButton 
+                          onClick={handleAdmin}
+                          sx={{ 
+                            py: 1.5,
+                            px: 2,
+                            borderRadius: 2,
+                            bgcolor: 'primary.main',
+                            color: 'white',
+                            '&:hover': {
+                              bgcolor: 'primary.dark',
+                            }
+                          }}
+                        >
+                          <LogIn size={18} style={{ marginRight: 12 }} />
+                          <ListItemText primary={t('adminPanel', { ns: 'header', defaultValue: 'Басқару панелі' })} />
                         </ListItemButton>
                       </ListItem>
                     ) : (
-                      <ListItem disablePadding>
-                        <ListItemButton onClick={handleLogin}>
-                          <ListItemText primary={t('login', { ns: 'header', defaultValue: 'Войти' })} />
+                      <ListItem disablePadding sx={{ mt: 2 }}>
+                        <ListItemButton 
+                          onClick={handleLogin}
+                          sx={{ 
+                            py: 1.5,
+                            px: 2,
+                            borderRadius: 2,
+                            bgcolor: 'primary.main',
+                            color: 'white',
+                            '&:hover': {
+                              bgcolor: 'primary.dark',
+                            }
+                          }}
+                        >
+                          <LogIn size={18} style={{ marginRight: 12 }} />
+                          <ListItemText primary={t('login', { ns: 'header', defaultValue: 'Жүйеге кіру' })} />
                         </ListItemButton>
                       </ListItem>
                     )
                   )}
                 </List>
                 
-                <Divider />
+                <Divider sx={{ my: 2 }} />
                 
-                <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
-                  <Tooltip title={t('languageSelector', { ns: 'header', defaultValue: 'Выбор языка' })}>
-                    <Box>
-                      <LanguageSwitcher />
-                    </Box>
-                  </Tooltip>
+                <Box sx={{ px: 3, pb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('languageSelector', { ns: 'header', defaultValue: 'Тіл таңдау' })}
+                  </Typography>
+                  <LanguageSwitcher />
                 </Box>
               </Box>
             </Drawer>
@@ -163,7 +260,7 @@ const PublicHeader = () => {
 
           {/* Logo - mobile */}
           <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1, alignItems: 'center' }}>
-            <HelpDeskLogo width={60} height={60} />
+            <HelpDeskLogo width={40} height={40} />
           </Box>
           <Typography
             variant="h6"
@@ -173,8 +270,11 @@ const PublicHeader = () => {
             sx={{
               flexGrow: 1,
               display: { xs: 'flex', md: 'none' },
-              fontWeight: 700,
-              color: 'inherit',
+              fontWeight: 600,
+              background: 'linear-gradient(135deg, #1976d2 0%, #2196f3 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
               textDecoration: 'none',
             }}
           >
@@ -182,33 +282,109 @@ const PublicHeader = () => {
           </Typography>
 
           {/* Spacer for desktop */}
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, alignItems: 'center', justifyContent: 'center', gap: 3 }}>
             <Button
               component={RouterLink}
               to="/"
-              sx={{ my: 2, color: 'inherit', display: 'block' }}
+              sx={{ 
+                px: 3,
+                py: 1,
+                color: 'text.primary', 
+                fontSize: '0.95rem',
+                fontWeight: 500,
+                borderRadius: 2,
+                transition: 'all 0.2s ease',
+                position: 'relative',
+                '&:hover': {
+                  bgcolor: 'rgba(25, 118, 210, 0.08)',
+                  color: 'primary.main',
+                },
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: 0,
+                  left: '50%',
+                  width: 0,
+                  height: '2px',
+                  backgroundColor: 'primary.main',
+                  transition: 'all 0.3s ease',
+                  transform: 'translateX(-50%)',
+                },
+                '&:hover::after': {
+                  width: '80%',
+                }
+              }}
             >
 {t('home', { ns: 'header', defaultValue: 'Басты бет' })}
+            </Button>
+            
+            <Button
+              component="a"
+              href="https://alataustroyinvest.tilda.ws/"
+              target="_blank"
+              startIcon={<Building2 size={18} />}
+              sx={{ 
+                px: 3,
+                py: 1,
+                color: 'text.primary',
+                fontSize: '0.95rem',
+                fontWeight: 500,
+                borderRadius: 2,
+                transition: 'all 0.2s ease',
+                position: 'relative',
+                '&:hover': {
+                  bgcolor: 'rgba(25, 118, 210, 0.08)',
+                  color: 'primary.main',
+                },
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: 0,
+                  left: '50%',
+                  width: 0,
+                  height: '2px',
+                  backgroundColor: 'primary.main',
+                  transition: 'all 0.3s ease',
+                  transform: 'translateX(-50%)',
+                },
+                '&:hover::after': {
+                  width: '80%',
+                }
+              }}
+            >
+{t('nav.aboutUs', { ns: 'header', defaultValue: 'О нас' })}
             </Button>
           </Box>
 
           {/* Right section - Language switcher & Login button */}
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Tooltip title={t('languageSelector', { ns: 'header', defaultValue: 'Выбор языка' })}>
-              <Box sx={{ mr: 2 }}>
-                <LanguageSwitcher />
-              </Box>
-            </Tooltip>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+              <LanguageSwitcher />
+            </Box>
             
             {showAuthButtons && (
               isAuthenticated ? (
                 <Button
                   variant="contained"
-                  color="primary"
                   startIcon={<LogIn size={18} />}
                   onClick={handleAdmin}
                   sx={{ 
-                    display: { xs: 'none', sm: 'flex' }
+                    display: { xs: 'none', sm: 'flex' },
+                    px: 3,
+                    py: 1,
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    fontSize: '0.95rem',
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    boxShadow: '0 2px 8px rgba(25, 118, 210, 0.25)',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      bgcolor: 'primary.dark',
+                      boxShadow: '0 4px 12px rgba(25, 118, 210, 0.35)',
+                      transform: 'translateY(-1px)',
+                    }
                   }}
                 >
 {t('adminPanel', { ns: 'header', defaultValue: 'Басқару панелі' })}
@@ -216,11 +392,25 @@ const PublicHeader = () => {
               ) : (
                 <Button
                   variant="contained"
-                  color="primary"
                   startIcon={<LogIn size={18} />}
                   onClick={handleLogin}
                   sx={{ 
-                    display: { xs: 'none', sm: 'flex' }
+                    display: { xs: 'none', sm: 'flex' },
+                    px: 3,
+                    py: 1,
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    fontSize: '0.95rem',
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    boxShadow: '0 2px 8px rgba(25, 118, 210, 0.25)',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      bgcolor: 'primary.dark',
+                      boxShadow: '0 4px 12px rgba(25, 118, 210, 0.35)',
+                      transform: 'translateY(-1px)',
+                    }
                   }}
                 >
 {t('login', { ns: 'header', defaultValue: 'Жүйеге кіру' })}

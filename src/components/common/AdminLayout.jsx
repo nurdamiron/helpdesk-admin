@@ -132,13 +132,16 @@ const AdminLayout = () => {
       <AppBar
         position="fixed"
         sx={{
-          width: { md: drawerOpen ? `calc(100% - ${drawerWidth}px)` : '100%' },
-          ml: { md: drawerOpen ? `${drawerWidth}px` : 0 },
+          width: '100%',
           transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
-          bgcolor: '#2b3a47', // Тёмно-синий оттенок для строительной тематики
+          background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+          boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          zIndex: theme.zIndex.drawer - 1,
         }}
       >
         <Toolbar>
@@ -254,8 +257,7 @@ const AdminLayout = () => {
         sx={{
           flexGrow: 1,
           p: 0,
-          width: { md: drawerOpen ? `calc(100% - ${drawerWidth}px)` : '100%' },
-          ml: { md: drawerOpen ? `${drawerWidth}px` : 0 },
+          width: '100%',
           transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,

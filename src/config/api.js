@@ -1,14 +1,31 @@
-// Автоматическое определение URL бэкенда
+// Автоматическое определение URL бэкенда с fallback
 const getApiUrl = () => {
-  // Если указан явный URL в переменных окружения, используем его
-  if (process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL;
-  }
-
   // Определяем текущий хост
   const currentHost = window.location.hostname;
   const currentProtocol = window.location.protocol;
   const currentPort = window.location.port;
+  const isDevelopment = process.env.NODE_ENV === 'development' || 
+                       process.env.REACT_APP_ENV === 'development' ||
+                       process.env.VITE_APP_ENV === 'development' ||
+                       import.meta.env?.MODE === 'development';
+  
+  // Если это development и localhost, возвращаем локальный URL
+  // Но fallback будет обрабатываться в apiClient
+  if (isDevelopment && (currentHost === 'localhost' || currentHost === '127.0.0.1')) {
+    return 'http://localhost:5002/api';
+  }
+  
+  // Проверяем переменные окружения Vite
+  const viteApiUrl = import.meta.env?.VITE_APP_API_URL;
+  const reactApiUrl = process.env.REACT_APP_API_URL;
+  
+  // Если указан явный URL в переменных окружения (не localhost), используем его
+  if (viteApiUrl && !viteApiUrl.includes('localhost')) {
+    return viteApiUrl;
+  }
+  if (reactApiUrl && !reactApiUrl.includes('localhost')) {
+    return reactApiUrl;
+  }
   
   // Если это localhost на порту 5173 (Vite dev server), используем localhost backend
   if ((currentHost === 'localhost' || currentHost === '127.0.0.1') && currentPort === '5173') {

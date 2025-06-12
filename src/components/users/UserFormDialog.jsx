@@ -29,7 +29,7 @@ const UserFormDialog = ({ open, handleClose, handleSubmit, editUser, loading, er
     last_name: '',
     email: '',
     password: '',
-    role: 'staff',
+    role: 'user',
     is_active: true,
   });
   
@@ -48,7 +48,7 @@ const UserFormDialog = ({ open, handleClose, handleSubmit, editUser, loading, er
         last_name: '',
         email: '',
         password: '',
-        role: 'staff',
+        role: 'user',
         is_active: true,
       });
     }
@@ -150,7 +150,6 @@ const UserFormDialog = ({ open, handleClose, handleSubmit, editUser, loading, er
                 >
                   <MenuItem value="admin">{t('users:roles.admin', 'Администратор')}</MenuItem>
                   <MenuItem value="moderator">{t('users:roles.moderator', 'Модератор')}</MenuItem>
-                  <MenuItem value="staff">{t('users:roles.staff', 'Сотрудник')}</MenuItem>
                   <MenuItem value="user">{t('users:roles.user', 'Пользователь')}</MenuItem>
                 </Select>
               </FormControl>

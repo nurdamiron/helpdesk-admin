@@ -17,11 +17,13 @@ import {
   Mail,
   Phone
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { formatDate } from '../../utils/dateUtils';
 
 const TicketInfo = ({ ticket, isMobile }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   if (!ticket) return null;
 
@@ -56,11 +58,11 @@ const TicketInfo = ({ ticket, isMobile }) => {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
               <User size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
               <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                Өтініш беруші: {' '}
+                {t('tickets:info.requester')}: {' '}
                 <Typography component="span">
                   {ticket.requester?.name || 
                    ticket.metadata?.requester?.full_name || 
-                   'Көрсетілмеген'}
+                   t('tickets:info.notSpecified')}
                 </Typography>
               </Typography>
             </Box>
@@ -68,7 +70,7 @@ const TicketInfo = ({ ticket, isMobile }) => {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
               <Calendar size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
               <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                Құрылған күні: {' '}
+                {t('tickets:info.createdDate')}: {' '}
                 <Typography component="span">
                   {formatDate(ticket.created_at)}
                 </Typography>
@@ -78,7 +80,7 @@ const TicketInfo = ({ ticket, isMobile }) => {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
               <Tag size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
               <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                Санат: {' '}
+                {t('tickets:info.category')}: {' '}
                 <Typography component="span">
                   {ticket.category}
                 </Typography>
@@ -90,11 +92,11 @@ const TicketInfo = ({ ticket, isMobile }) => {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
               <Mail size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
               <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                Email: {' '}
+                {t('tickets:info.email')}: {' '}
                 <Typography component="span">
                   {ticket.requester?.email || 
                    ticket.metadata?.requester?.email || 
-                   'Көрсетілмеген'}
+                   t('tickets:info.notSpecified')}
                 </Typography>
               </Typography>
             </Box>
@@ -102,11 +104,11 @@ const TicketInfo = ({ ticket, isMobile }) => {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
               <Phone size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
               <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                Телефон: {' '}
+                {t('tickets:info.phone')}: {' '}
                 <Typography component="span">
                   {ticket.requester?.phone || 
                    ticket.metadata?.requester?.phone || 
-                   'Көрсетілмеген'}
+                   t('tickets:info.notSpecified')}
                 </Typography>
               </Typography>
             </Box>
@@ -114,11 +116,11 @@ const TicketInfo = ({ ticket, isMobile }) => {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
               <Building size={16} style={{ marginRight: '8px', opacity: 0.7 }} />
               <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                Мекенжай: {' '}
+                {t('tickets:info.address')}: {' '}
                 <Typography component="span">
                   {ticket.property_address || 
                    ticket.metadata?.property_address || 
-                   'Көрсетілмеген'}
+                   t('tickets:info.notSpecified')}
                 </Typography>
               </Typography>
             </Box>
@@ -129,7 +131,7 @@ const TicketInfo = ({ ticket, isMobile }) => {
       <Divider sx={{ mb: 2 }} />
 
       <Typography variant="subtitle2" gutterBottom fontWeight={600}>
-        Өтініш сипаттамасы
+        {t('tickets:info.ticketDescription')}
       </Typography>
       <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', mb: 2 }}>
         {ticket.description}

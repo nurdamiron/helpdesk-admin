@@ -122,7 +122,6 @@
   "roles": {
     "admin": "Administrator",
     "moderator": "Moderator",
-    "staff": "Staff",
     "user": "User"
   },
   "header": {
@@ -170,5 +169,9 @@
     "openMenu": "Open menu",
     "breadcrumbs": "Navigation",
     "languageSelector": "Language selector"
-  }
+  },
+  "count": "Count",
+  "percentage": "Percentage",
+  "backToDashboard": "Back to Dashboard",
+  "backToHome": "Back to Home"
 }

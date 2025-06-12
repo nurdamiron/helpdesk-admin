@@ -25,6 +25,7 @@ import {
   Users,
   AlertCircle
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import api from '../../api/index';
 import { formatDate } from '../../utils/dateUtils';
@@ -52,29 +53,43 @@ const getEventIcon = (eventType) => {
 };
 
 // Функция для форматирования текста события
-const getEventText = (event) => {
+const getEventText = (event, t) => {
   switch (event.type) {
     case 'created':
-      return 'Өтінім жасалды';
+      return t('tickets:history.events.created');
     case 'updated':
-      return `Өтінім жаңартылды: ${event.details?.fields?.join(', ') || 'өзгерістер'}`;
+      return event.details?.fields?.length > 0 
+        ? t('tickets:history.events.updated', { fields: event.details.fields.join(', ') })
+        : t('tickets:history.events.updatedGeneral');
     case 'status_change':
-      return `Күйі өзгертілді: ${event.details?.from} → ${event.details?.to}`;
+      return t('tickets:history.events.statusChanged', { 
+        from: event.details?.from || '',
+        to: event.details?.to || ''
+      });
     case 'comment_added':
-      return 'Жаңа пікір қосылды';
+      return t('tickets:history.events.commentAdded');
     case 'file_uploaded':
-      return `Файл жүктелді: ${event.details?.filename || 'файл'}`;
+      return event.details?.filename 
+        ? t('tickets:history.events.fileUploaded', { filename: event.details.filename })
+        : t('tickets:history.events.fileUploadedGeneral');
     case 'assigned':
-      return `Тағайындалды: ${event.details?.assignee_name || event.details?.assignee || 'қызметкер'}`;
+      return event.details?.assignee_name || event.details?.assignee
+        ? t('tickets:history.events.assigned', { 
+            assignee: event.details.assignee_name || event.details.assignee 
+          })
+        : t('tickets:history.events.assignedGeneral');
     case 'email_sent':
-      return `Email жіберілді: ${event.details?.recipient || 'пайдаланушы'}`;
+      return event.details?.recipient
+        ? t('tickets:history.events.emailSent', { recipient: event.details.recipient })
+        : t('tickets:history.events.emailSentGeneral');
     default:
-      return 'Өтінім жаңартылды';
+      return t('tickets:history.events.default');
   }
 };
 
 const TicketHistory = ({ ticketId }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -86,7 +101,7 @@ const TicketHistory = ({ ticketId }) => {
       try {
         setLoading(true);
         const response = await api.get(`/tickets/${ticketId}/history`);
-        console.log('История заявки:', response.data);
+        console.log('Ticket history:', response.data);
         
         if (response.data && response.data.history) {
           setHistory(response.data.history);
@@ -98,8 +113,8 @@ const TicketHistory = ({ ticketId }) => {
         
         setError(null);
       } catch (err) {
-        console.error('Ошибка при загрузке истории:', err);
-        setError('Не удалось загрузить историю заявки');
+        console.error('Error loading history:', err);
+        setError(t('tickets:history.loadError'));
         setHistory([]);
       } finally {
         setLoading(false);
@@ -138,10 +153,10 @@ const TicketHistory = ({ ticketId }) => {
         }}
       >
         <Typography variant="body1" color="text.secondary" fontWeight={500}>
-          Әзірге тарих жоқ
+          {t('tickets:history.noHistory')}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Өтінімді жаңарту, пікір қосу немесе күйін өзгерту кезінде тарих жазбалары пайда болады
+          {t('tickets:history.noHistoryDescription')}
         </Typography>
       </Box>
     );
@@ -168,7 +183,7 @@ const TicketHistory = ({ ticketId }) => {
           }
         }}
       >
-        Өтінім тарихы
+        {t('tickets:history.title')}
       </Typography>
 
       <Box sx={{ 
@@ -222,7 +237,7 @@ const TicketHistory = ({ ticketId }) => {
             >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body2" fontWeight={600}>
-                  {getEventText(event)}
+                  {getEventText(event, t)}
                 </Typography>
                 <Chip 
                   label={formatDate(event.timestamp || event.created_at)} 
@@ -235,7 +250,7 @@ const TicketHistory = ({ ticketId }) => {
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <User size={14} style={{ marginRight: 4, opacity: 0.7 }} />
                 <Typography variant="caption" color="text.secondary">
-                  {event.performed_by?.name || event.performed_by?.email || 'Система'}
+                  {event.performed_by?.name || event.performed_by?.email || t('tickets:history.performedBy')}
                 </Typography>
               </Box>
               

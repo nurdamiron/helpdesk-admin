@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
-  Container,
   Typography,
   Paper,
   Button,
@@ -75,16 +74,6 @@ const UserRoleChip = ({ role }) => {
           icon={<ModeratorIcon fontSize="small" />} 
           label={t('roles.moderator', 'Модератор')} 
           color="warning" 
-          size="small"
-          sx={{ '& .MuiChip-label': { color: 'white' } }}
-        />
-      );
-    case 'staff':
-      return (
-        <Chip 
-          icon={<EngineerIcon fontSize="small" />} 
-          label={t('roles.staff', 'Сотрудник')} 
-          color="info" 
           size="small"
           sx={{ '& .MuiChip-label': { color: 'white' } }}
         />
@@ -400,7 +389,7 @@ const UsersManagementPage = () => {
         ));
       } else {
         // Создание нового пользователя
-        const newUser = await authService.register(data);
+        const newUser = await authService.createUser(data);
         setUsers(prev => [...prev, newUser]);
       }
       

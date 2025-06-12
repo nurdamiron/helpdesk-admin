@@ -41,7 +41,7 @@ const HelpPage = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Box sx={{ py: 4, px: { xs: 2, sm: 3 } }}>
       <Paper sx={{ p: { xs: 2, md: 4 } }}>
         <Typography variant="h4" component="h1" gutterBottom>
           {t('help:title', 'Справка и руководство')}
@@ -211,7 +211,7 @@ const HelpPage = () => {
           </Box>
         </Box>
       </Paper>
-    </Container>
+    </Box>
   );
 };
 

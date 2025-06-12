@@ -14,6 +14,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const SuccessNotification = ({ 
   open, 
@@ -25,14 +26,37 @@ const SuccessNotification = ({
 }) => {
   const { t } = useTranslation(['tickets']);
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
   const [countdown, setCountdown] = useState(Math.floor(redirectDelay / 1000));
+
+  const getRedirectPath = () => {
+    if (!isAuthenticated || !user) {
+      return '/';
+    }
+    
+    // Перенаправляем на соответствующий дашборд в зависимости от роли
+    switch (user.role) {
+      case 'admin':
+        return '/admin';
+      case 'moderator':
+        return '/moderator';
+      case 'staff':
+      case 'support':
+      case 'manager':
+        return '/staff';
+      case 'user':
+        return '/dashboard';
+      default:
+        return '/dashboard';
+    }
+  };
 
   useEffect(() => {
     if (!open || !autoRedirect) return;
 
     const timer = setTimeout(() => {
       onClose();
-      navigate('/');
+      navigate(getRedirectPath());
     }, redirectDelay);
 
     const countdownTimer = setInterval(() => {
@@ -53,7 +77,7 @@ const SuccessNotification = ({
 
   const handleClose = () => {
     onClose();
-    navigate('/');
+    navigate(getRedirectPath());
   };
 
   const getMessage = () => {

@@ -178,7 +178,7 @@ const ModeratorDashboardPage = () => {
   }
 
   return (
-    <Box sx={{ px: 4, py: 3, maxWidth: 1600, mx: 'auto' }}>
+    <Box sx={{ px: 0, py: { xs: 2, sm: 3 }, maxWidth: 1600, mx: 'auto' }}>
       {/* Вступительный блок / Заголовок страницы */}
       <Box
         sx={{

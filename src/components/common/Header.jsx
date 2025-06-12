@@ -17,6 +17,9 @@ import {
 import {
   Menu as MenuIcon,
   ChevronLeft,
+  Info,
+  Home,
+  Phone,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -57,16 +60,18 @@ const Header = ({ drawerOpen, setDrawerOpen }) => {
     <AppBar
       position="fixed"
       sx={{
-        width: { sm: `calc(100% - ${drawerWidth}px)` },
-        ml: { sm: `${drawerWidth}px` },
+        width: '100%',
         transition: theme.transitions.create(['margin', 'width'], {
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.leavingScreen,
         }),
-        bgcolor: '#2b3a47', // Тёмно-синий оттенок для строительной тематики
-        zIndex: theme.zIndex.drawer + 1, // Ensure header stays on top
+        background: 'linear-gradient(135deg,rgb(18, 96, 240) 0%,rgb(255, 255, 255) 100%)', // Новый градиентный стиль
+        boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid rgba(255,255,255,0.1)',
+        zIndex: theme.zIndex.drawer - 1,
       }}
-      elevation={2}
+      elevation={0}
     >
       <Toolbar sx={{ 
         minHeight: { xs: '56px', sm: '64px' },
@@ -102,6 +107,28 @@ const Header = ({ drawerOpen, setDrawerOpen }) => {
           {menuItems.find(item => location.pathname.startsWith(item.path))?.text || t('app.title')}
         </Typography>
         
+        {/* About Us Button */}
+        <Tooltip title={t('nav.aboutUs', 'О нас')}>
+          <IconButton
+            color="inherit"
+            aria-label="about us"
+            component="a"
+            href="https://alataustroyinvest.tilda.ws/"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              mr: { xs: 1, sm: 2 },
+              color: 'rgba(255,255,255,0.9)',
+              '&:hover': {
+                bgcolor: 'rgba(255,255,255,0.1)',
+                color: '#fff',
+              }
+            }}
+          >
+            <Info size={isMobile ? 20 : 24} />
+          </IconButton>
+        </Tooltip>
+
         {/* Language switcher - more visible on mobile */}
         <Box sx={{ 
           mr: { xs: 1, sm: 2 }, 
@@ -158,7 +185,7 @@ const Header = ({ drawerOpen, setDrawerOpen }) => {
             }
           }}
         >
-          <MenuItem onClick={handleCloseUserMenu} component={RouterLink} to="/settings/profile">
+          <MenuItem onClick={handleCloseUserMenu} component={RouterLink} to="/profile">
             <Typography textAlign="center" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
               {t('auth.profile', 'Профиль')}
             </Typography>

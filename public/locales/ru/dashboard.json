@@ -90,5 +90,56 @@
     "calculatedStats": "Рассчитанная статистика",
     "noData": "Нет данных об обращениях, отображается пустой список",
     "loadingError": "Ошибка при загрузке данных дашборда"
+  },
+  "statistics": {
+    "ticketsByType": "Заявки по типам",
+    "ticketVolume": "Объем заявок",
+    "staffPerformance": "Эффективность сотрудников",
+    "kpiMetrics": "Ключевые показатели",
+    "newTickets": "Новые",
+    "inProgress": "В работе",
+    "resolved": "Решены",
+    "closed": "Закрыты",
+    "urgent": "Срочные",
+    "high": "Высокий",
+    "last24h": "За 24 часа",
+    "last7days": "За 7 дней",
+    "ticketsOverTime": "Динамика заявок",
+    "ticketsTrend": "Тренд заявок",
+    "created": "Создано",
+    "noData": "Нет данных",
+    "loading": "Загрузка...",
+    "error": "Ошибка загрузки",
+    "retry": "Повторить",
+    "export": "Экспорт",
+    "period": {
+      "24hours": "24 часа",
+      "7days": "7 дней",
+      "30days": "30 дней",
+      "90days": "90 дней"
+    },
+    "staff": {
+      "name": "Имя",
+      "assignedTickets": "Назначено",
+      "resolvedTickets": "Решено",
+      "activeTickets": "Активные",
+      "avgResolutionTime": "Среднее время решения",
+      "resolutionRate": "Процент решения",
+      "noStaff": "Нет данных о сотрудниках",
+      "hours": "ч",
+      "performance": "Производительность"
+    },
+    "kpi": {
+      "slaCompliance": "Соблюдение SLA",
+      "within24h": "В течение 24 часов",
+      "customerSatisfaction": "Удовлетворенность клиентов",
+      "avgRating": "Средний рейтинг",
+      "responseTime": "Время отклика",
+      "firstResponse": "Первый ответ",
+      "repeatTickets": "Повторные обращения",
+      "withinWeek": "В течение недели",
+      "peakHours": "Пиковые часы",
+      "hourlyDistribution": "Распределение по часам"
+    }
   }
 }

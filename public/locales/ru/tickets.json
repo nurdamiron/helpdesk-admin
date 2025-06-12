@@ -146,9 +146,24 @@
     },
     "communicationChannel": "Способ подачи заявки",
     "whatsappHint": "Заявка будет отправлена через WhatsApp на номер службы поддержки +7 777 013 1838. Дальнейшая работа ведется по email.",
+    "telegramHint": "Заявка будет отправлена через Telegram бот @HelpdeskKZBot. Дальнейшая работа ведется по email.",
     "emailHint": "Заявка будет зарегистрирована в системе поддержки и вы получите уведомление на email",
     "whatsappSuccess": "Заявка создана! Пожалуйста, отправьте сообщение в WhatsApp для завершения процесса.",
-    "unknownStep": "Неизвестный шаг"
+    "unknownStep": "Неизвестный шаг",
+    "contactOptions": "Выберите способ обращения",
+    "contactDescription": "Вы можете обратиться к нам напрямую через Telegram бот для быстрой помощи или заполнить форму ниже",
+    "telegramBot": "Telegram бот",
+    "telegramBotDescription": "Быстрая поддержка 24/7",
+    "formBelow": "Форма заявки ниже",
+    "formDescription": "Email или WhatsApp",
+    "orFillForm": "или заполните форму",
+    "chooseMethod": "Выберите удобный способ обращения",
+    "telegramBotFullDescription": "Мгновенная поддержка через Telegram. Отправьте сообщение боту и получите быстрый ответ 24/7",
+    "openTelegram": "Открыть Telegram",
+    "formMethod": "Форма заявки",
+    "formMethodDescription": "Заполните подробную форму и выберите способ отправки: Email или WhatsApp",
+    "fillForm": "Заполнить форму",
+    "helpText": "Выберите наиболее удобный для вас способ связи. Мы готовы помочь вам в любое время."
   },
   "files": {
     "title": "Прикрепленные файлы",
@@ -184,15 +199,52 @@
     "created": "Создано",
     "assignedTo": "Назначено:"
   },
+  "info": {
+    "requester": "Заявитель",
+    "createdDate": "Дата создания",
+    "category": "Категория",
+    "email": "Email",
+    "phone": "Телефон",
+    "address": "Адрес",
+    "notSpecified": "Не указано",
+    "ticketDescription": "Описание заявки"
+  },
   "tabs": {
     "discussion": "Обсуждение",
     "history": "История",
     "historyComingSoon": "История изменений будет доступна в ближайшее время"
   },
+  "history": {
+    "title": "История заявки",
+    "loadError": "Не удалось загрузить историю заявки",
+    "noHistory": "Пока нет истории",
+    "noHistoryDescription": "При обновлении заявки, добавлении комментария или изменении статуса появятся записи истории",
+    "events": {
+      "created": "Заявка создана",
+      "updated": "Заявка обновлена: {{fields}}",
+      "updatedGeneral": "Заявка обновлена",
+      "statusChanged": "Статус изменен: {{from}} → {{to}}",
+      "commentAdded": "Новый комментарий добавлен",
+      "fileUploaded": "Файл загружен: {{filename}}",
+      "fileUploadedGeneral": "Файл загружен",
+      "assigned": "Назначено: {{assignee}}",
+      "assignedGeneral": "Назначено сотруднику",
+      "emailSent": "Email отправлен: {{recipient}}",
+      "emailSentGeneral": "Email отправлен пользователю",
+      "default": "Заявка обновлена"
+    },
+    "performedBy": "Система",
+    "changes": "изменения"
+  },
   "management": {
     "title": "Управление заявкой",
     "status": "Статус:",
     "priority": "Приоритет:"
+  },
+  "assign": {
+    "notAssigned": "Не назначено",
+    "unknownUser": "Неизвестный пользователь",
+    "loadError": "Не удалось загрузить список сотрудников"
   },
   "actions": {
     "saving": "Сохранение...",
@@ -213,5 +265,49 @@
     "emailSuccess": "Заявка успешно отправлена! Информация отправлена на ваш email.",
     "redirecting": "Перенаправление на главную страницу...",
     "openWhatsApp": "Открыть WhatsApp"
+  },
+  "chat": {
+    "title": "Обсуждение заявки #{{ticketId}}",
+    "messageCount": "{{count}} сообщений",
+    "messagePlaceholder": "Напишите ваше сообщение...",
+    "sendButton": "Отправить",
+    "sending": "Отправка...",
+    "notifyByEmail": "Уведомить клиента по email",
+    "emailNotSpecified": "email не указан",
+    "messageSentSuccess": "Сообщение успешно отправлено",
+    "noMessages": "Пока нет сообщений",
+    "startDiscussion": "Отправьте сообщение, чтобы начать обсуждение по этой заявке",
+    "clientTyping": "Клиент печатает...",
+    "addMessageError": "Добавьте текст сообщения",
+    "user": "Пользователь",
+    "offlineMode": "Офлайн режим",
+    "online": "Онлайн",
+    "offline": "Офлайн",
+    "offlineModeDescription": "Офлайн режим - сообщения будут отправлены при восстановлении связи",
+    "offlineMessageCount": "({{count}} сообщений)",
+    "noConnection": "Нет связи с сервером",
+    "connectionAttempt": "Попытка подключения {{current}} из {{max}}",
+    "nextAttemptIn": "(следующая через {{seconds}} сек)",
+    "maxAttemptsReached": "Максимальное количество попыток подключения исчерпано",
+    "onlineReady": "Онлайн - готовы отправить {{count}} неотправленных сообщений",
+    "sendOfflineMessages": "Отправить",
+    "reconnect": "Переподключить",
+    "errors": {
+      "websocketConnection": "Не удалось подключиться к сервису сообщений в реальном времени",
+      "loadMessages": "Не удалось загрузить сообщения. Проверьте подключение к серверу.",
+      "sendMessage": "Не удалось отправить сообщение. Попробуйте позже.",
+      "markAsRead": "Ошибка при отметке сообщений как прочитанные",
+      "offlineLoad": "Ошибка при загрузке офлайн сообщений",
+      "offlineSave": "Ошибка при сохранении офлайн сообщения"
+    }
+  },
+  "internalNotes": {
+    "noNotes": "Внутренних заметок пока нет.",
+    "addNoteHint": "Добавьте заметку, которая будет видна только сотрудникам.",
+    "unknownUser": "Неизвестный пользователь",
+    "placeholder": "Добавьте внутреннюю заметку...",
+    "submitting": "Добавление...",
+    "addNote": "Добавить заметку",
+    "addError": "Не удалось добавить заметку"
   }
 }

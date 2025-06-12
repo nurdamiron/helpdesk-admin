@@ -4,11 +4,6 @@ import { Outlet, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  Avatar,
   Menu,
   MenuItem,
   Drawer,
@@ -18,16 +13,14 @@ import {
   Container
 } from '@mui/material';
 import {
-  Menu as MenuIcon,
   User,
   LogOut
 } from 'lucide-react';
 import Sidebar from './Sidebar';
+import Header from './Header';
 import Breadcrumbs from './Breadcrumbs';
 import { useAuth } from '../../contexts/AuthContext';
 import { ticketService } from '../../api/ticketService';
-import LanguageSwitcher from './LanguageSwitcher.jsx';
-import HelpDeskLogo from '../../assets/images/logo.jsx';
 import PageTransition from './PageTransition';
 
 const AppLayout = () => {
@@ -39,12 +32,8 @@ const AppLayout = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation(['common']);
   
-  // State for mobile sidebar
-  const [mobileOpen, setMobileOpen] = useState(false);
-  
-  // State for user menu
-  const [anchorEl, setAnchorEl] = useState(null);
-  const openUserMenu = Boolean(anchorEl);
+  // State for sidebar
+  const [drawerOpen, setDrawerOpen] = useState(!isMobile);
   
   // State for ticket information (for breadcrumbs)
   const [ticketInfo, setTicketInfo] = useState(null);
@@ -75,28 +64,6 @@ const AppLayout = () => {
       setTicketInfo(null);
     }
   }, [location, isTicketDetail]);
-  
-  // Handle mobile drawer toggle
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-  
-  // Handle user menu open
-  const handleUserMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  
-  // Handle user menu close
-  const handleUserMenuClose = () => {
-    setAnchorEl(null);
-  };
-  
-  
-  // Handle logout
-  const handleLogout = () => {
-    logout();
-    handleUserMenuClose();
-  };
 
   // Sidebar component (responsive)
   const sidebarContent = <Sidebar />;
@@ -104,90 +71,15 @@ const AppLayout = () => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      {/* App Bar */}
-      <AppBar 
-        position="fixed" 
-        color="default"
-        elevation={1}
-        sx={{
-          width: { sm: `calc(100% - ${isMobile ? 0 : 220}px)` },
-          ml: { sm: `${isMobile ? 0 : 220}px` },
-          zIndex: theme.zIndex.drawer + 1,
-          bgcolor: '#fff'
-        }}
-      >
-        <Toolbar>
-          {/* Mobile menu button */}
-          {isMobile && (
-            <IconButton
-              color="inherit"
-              aria-label={t('aria.openMenu', 'Открыть меню')}
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ 
-                mr: 2, 
-                p: 1.2,
-                '&:active': {
-                  bgcolor: 'rgba(25, 118, 210, 0.12)',
-                } 
-              }}
-            >
-              <MenuIcon size={26} />
-            </IconButton>
-          )}
-          
-          {/* App title */}
-          <Box 
-            sx={{ 
-              flexGrow: 1,
-              display: 'flex',
-              alignItems: 'center',
-              color: theme.palette.text.primary 
-            }}
-          >
-            <HelpDeskLogo width={isMobile ? 120 : 140} height={40} />
-          </Box>
-          
-          {/* Language switcher */}
-          <Box sx={{ mr: 2 }}>
-            <LanguageSwitcher />
-          </Box>
-          
-          
-          {/* User avatar & menu */}
-          <IconButton
-            onClick={handleUserMenuOpen}
-            aria-controls={openUserMenu ? 'user-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={openUserMenu ? 'true' : undefined}
-            aria-label={t('auth.profile', 'Профиль')}
-            sx={{ 
-              ml: 1, 
-              p: isMobile ? 1 : 0.5,
-              '&:active': {
-                bgcolor: 'rgba(25, 118, 210, 0.12)',
-              } 
-            }}
-          >
-            <Avatar 
-              sx={{ 
-                bgcolor: theme.palette.primary.main,
-                width: 32,
-                height: 32
-              }}
-            >
-              {user?.first_name?.charAt(0) || 'U'}
-            </Avatar>
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+      {/* Header */}
+      <Header drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
       
       {/* Sidebar - responsive behavior */}
       {isMobile ? (
         <Drawer
           variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
           ModalProps={{
             keepMounted: true, // Better mobile performance
           }}
@@ -206,7 +98,7 @@ const AppLayout = () => {
       ) : (
         <Box
           component="nav"
-          sx={{ width: { sm: 220 }, flexShrink: { sm: 0 } }}
+          sx={{ width: { sm: 240 }, flexShrink: { sm: 0 } }}
         >
           {sidebarContent}
         </Box>
@@ -217,8 +109,7 @@ const AppLayout = () => {
         component="main"
         sx={{
           flexGrow: 1,
-          width: { sm: `calc(100% - ${isMobile ? 0 : 220}px)` },
-          ml: { sm: `${isMobile ? 0 : 220}px` },
+          width: '100%',
           mt: '64px', // Toolbar height
           bgcolor: '#f5f5f5',
           minHeight: 'calc(100vh - 64px)',
@@ -226,7 +117,7 @@ const AppLayout = () => {
         }}
       >
         {/* Breadcrumbs */}
-        <Container maxWidth={false} sx={{ px: { xs: 1.5, sm: 3 }, py: 0 }}>
+        <Container maxWidth={false} sx={{ px: 0, py: 0 }}>
           <Breadcrumbs 
             ticketId={ticketId} 
             ticketSubject={ticketInfo?.subject} 
@@ -235,35 +126,11 @@ const AppLayout = () => {
         
         {/* Page content with animation */}
         <PageTransition transitionKey={location.pathname + location.search}>
-          <Box sx={{ px: { xs: 1, sm: 0 } }}>
+          <Box sx={{ px: 0 }}>
             <Outlet />
           </Box>
         </PageTransition>
       </Box>
-      
-      {/* User Menu */}
-      <Menu
-        id="user-menu"
-        anchorEl={anchorEl}
-        open={openUserMenu}
-        onClose={handleUserMenuClose}
-        MenuListProps={{
-          'aria-labelledby': 'user-button',
-        }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-      >
-        <MenuItem onClick={handleUserMenuClose}>
-          <User size={16} style={{ marginRight: 8 }} />
-          {t('auth.profile', 'Профиль')}
-        </MenuItem>
-        <Divider />
-        <MenuItem onClick={handleLogout}>
-          <LogOut size={16} style={{ marginRight: 8 }} />
-          {t('auth.logout', 'Выход')}
-        </MenuItem>
-      </Menu>
-      
     </Box>
   );
 };

@@ -18,7 +18,7 @@ import {
   Divider,
   Paper
 } from '@mui/material';
-import { Send as SendIcon, Login as LoginIcon, Email as EmailIcon, Telegram as TelegramIcon } from '@mui/icons-material';
+import { Send as SendIcon, Login as LoginIcon, Email as EmailIcon } from '@mui/icons-material';
 import { ticketService } from '../../api/ticketService';
 import { useAuth } from '../../contexts/AuthContext';
 import SuccessNotification from '../common/SuccessNotification';
@@ -42,9 +42,9 @@ const TicketForm = ({ onSubmitSuccess }) => {
   
   // Типы заявок для службы поддержки сотрудников
   const ticketTypes = [
-    { id: 'incident', name: t('tickets:type.incident', 'Инцидент') },
     { id: 'support_request', name: t('tickets:type.support_request', 'Запрос') },
-    { id: 'complaint', name: t('tickets:type.complaint', 'Жалоба') }
+    { id: 'complaint', name: t('tickets:type.complaint', 'Жалоба') },
+    { id: 'incident', name: t('tickets:type.incident', 'Инцидент') }
   ];
   
   const [formErrors, setFormErrors] = useState({});
@@ -133,47 +133,35 @@ const TicketForm = ({ onSubmitSuccess }) => {
     setLoading(true);
     
     try {
-      // Если выбран WhatsApp или Telegram, обрабатываем особым образом
-      if (formData.communicationChannel === 'whatsapp' || formData.communicationChannel === 'telegram') {
+      // Если выбран WhatsApp, обрабатываем особым образом
+      if (formData.communicationChannel === 'whatsapp') {
         // Подготовка текста сообщения для WhatsApp
-        const message = `🎫 *НОВАЯ ЗАЯВКА В СЛУЖБУ ПОДДЕРЖКИ*\n\n` +
-          `👤 *Сотрудник:* ${formData.name}\n` +
-          `📧 *Email:* ${formData.email}\n` +
-          `📱 *Телефон:* ${formData.phone || 'Не указан'}\n\n` +
-          `📋 *Тема обращения:* ${formData.subject}\n` +
-          `🏷️ *Тип заявки:* ${ticketTypes.find(t => t.id === formData.type)?.name || formData.type}\n` +
-          `⚡ *Приоритет:* ${formData.priority === 'low' ? 'Низкий' : formData.priority === 'medium' ? 'Средний' : formData.priority === 'high' ? 'Высокий' : 'Срочный'}\n\n` +
-          `📝 *Описание проблемы:*\n${formData.message}\n\n` +
+        const message = `🎫 *НОВАЯ ЗАЯВКА В СЛУЖБУ ПОДДЕРЖКИ*\\n\\n` +
+          `👤 *Сотрудник:* ${formData.name}\\n` +
+          `📧 *Email:* ${formData.email}\\n` +
+          `📱 *Телефон:* ${formData.phone || 'Не указан'}\\n\\n` +
+          `📋 *Тема обращения:* ${formData.subject}\\n` +
+          `🏷️ *Тип заявки:* ${ticketTypes.find(t => t.id === formData.type)?.name || formData.type}\\n` +
+          `⚡ *Приоритет:* ${formData.priority === 'low' ? 'Низкий' : formData.priority === 'medium' ? 'Средний' : formData.priority === 'high' ? 'Высокий' : 'Срочный'}\\n\\n` +
+          `📝 *Описание проблемы:*\\n${formData.message}\\n\\n` +
           `#поддержка #helpdesk #сотрудник`;
         
-        // Создаем URL для WhatsApp или Telegram
-        let messengerUrl;
-        let communicationChannel;
+        // Создаем URL для WhatsApp
+        const whatsappNumber = '77770131838'; // Номер без + и пробелов
+        const encodedMessage = encodeURIComponent(message);
+        const messengerUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
         
-        if (formData.communicationChannel === 'whatsapp') {
-          const whatsappNumber = '77770131838'; // Номер без + и пробелов
-          const encodedMessage = encodeURIComponent(message);
-          messengerUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-          communicationChannel = 'whatsapp';
-        } else {
-          // Telegram
-          const telegramBotUsername = 'HelpdeskKZBot'; // Ваш реальный бот
-          const encodedMessage = encodeURIComponent(message);
-          messengerUrl = `https://t.me/${telegramBotUsername}?start=${encodedMessage}`;
-          communicationChannel = 'telegram';
-        }
-        
-        // Сохраняем заявку в системе со статусом 'messenger_pending'
+        // Сохраняем заявку в системе со статусом 'whatsapp_pending'
         const ticketData = {
           subject: formData.subject,
           description: formData.message,
           type: formData.type,
           priority: formData.priority,
-          status: communicationChannel === 'whatsapp' ? 'whatsapp_pending' : 'telegram_pending',
+          status: 'whatsapp_pending',
           user_id: isAuthenticated && user ? user.id : null,
           metadata: {
             contactPreference: 'email',
-            communicationChannel: communicationChannel,
+            communicationChannel: 'whatsapp',
             messengerSent: false
           },
           requester_metadata: {
@@ -188,29 +176,24 @@ const TicketForm = ({ onSubmitSuccess }) => {
         const response = await ticketService.createTicket(ticketData, !isAuthenticated);
         const newTicket = response.ticket || response;
         
-<<<<<<< HEAD
-        // Открываем мессенджер в новом окне
-        window.open(messengerUrl, '_blank');
-=======
-        // Открываем WhatsApp (оптимизировано для мобильных)
+        // Открываем WhatsApp в новом окне (оптимизировано для мобильных)
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         
         if (isMobile) {
           // На мобильных устройствах используем прямой переход
-          window.location.href = whatsappUrl;
+          window.location.href = messengerUrl;
         } else {
           // На десктопе открываем в новом окне
-          const newWindow = window.open(whatsappUrl, '_blank');
+          const newWindow = window.open(messengerUrl, '_blank');
           if (!newWindow) {
             // Если заблокировано всплывающее окно, используем прямой переход
-            window.location.href = whatsappUrl;
+            window.location.href = messengerUrl;
           }
         }
->>>>>>> 801ce2854997a6d5c7a6484a2dd78f66db5a6d62
         
         // Показываем уведомление об успехе
         setError(null);
-        setSuccessType(communicationChannel);
+        setSuccessType('whatsapp');
         setCreatedTicketId(newTicket.id);
         setShowSuccessNotification(true);
         
@@ -392,7 +375,6 @@ const TicketForm = ({ onSubmitSuccess }) => {
         </Grid>
         <Grid item xs={12}>
           <TextField
-          required
             fullWidth
             id="phone"
             name="phone"
@@ -535,37 +517,10 @@ const TicketForm = ({ onSubmitSuccess }) => {
               >
                 WhatsApp
               </Button>
-              <Button
-                variant={formData.communicationChannel === 'telegram' ? 'contained' : 'outlined'}
-                onClick={() => setFormData(prev => ({ ...prev, communicationChannel: 'telegram' }))}
-                startIcon={<TelegramIcon />}
-                sx={{ 
-                  flex: 1, 
-                  minWidth: '200px',
-                  py: 1.5,
-                  ...(formData.communicationChannel === 'telegram' ? {
-                    bgcolor: '#0088cc',
-                    color: 'white',
-                    '&:hover': { bgcolor: '#006bb3' }
-                  } : {
-                    borderColor: '#0088cc',
-                    color: '#0088cc',
-                    '&:hover': { 
-                      borderColor: '#006bb3',
-                      bgcolor: 'rgba(0, 136, 204, 0.04)'
-                    }
-                  })
-                }}
-                disabled={loading}
-              >
-                Telegram
-              </Button>
             </Box>
             <Typography variant="caption" sx={{ mt: 1, color: 'text.secondary' }}>
               {formData.communicationChannel === 'whatsapp' 
                 ? t('tickets:create.whatsappHint', 'Заявка будет отправлена через WhatsApp на номер службы поддержки +7 777 013 1838. Дальнейшая работа ведется по email.')
-                : formData.communicationChannel === 'telegram'
-                ? t('tickets:create.telegramHint', 'Заявка будет отправлена через Telegram бот @HelpdeskKZBot. Дальнейшая работа ведется по email.')
                 : t('tickets:create.emailHint', 'Заявка будет зарегистрирована в системе поддержки и вы получите уведомление на email')
               }
             </Typography>

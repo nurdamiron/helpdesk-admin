@@ -61,6 +61,15 @@ export class BaseApiService {
   }
   
   /**
+   * Проверяем, находимся ли мы в режиме разработки
+   */
+  static isDevelopmentMode() {
+    const hostname = window.location.hostname;
+    const port = window.location.port;
+    return (hostname === 'localhost' || hostname === '127.0.0.1') && port === '5173';
+  }
+
+  /**
    * Выполняет запрос с обработкой ошибок и проверкой прав
    * @param {Object} options - Параметры запроса
    * @param {string} options.method - HTTP метод (get, post, put, delete)
@@ -74,6 +83,7 @@ export class BaseApiService {
    */
   async request({ method, url, data = null, requiredRole = null, retries = 1, errorOptions = {}, authService = null }) {
     console.log(`🔄 Making API request: ${method.toUpperCase()} ${url}`);
+    
     // Проверяем права доступа, если указана необходимая роль
     if (requiredRole && authService) {
       const user = authService.getCurrentUser();
@@ -89,50 +99,65 @@ export class BaseApiService {
       }
     }
 
-    // Сначала пробуем локальный сервер
-    const localAvailable = await BaseApiService.checkLocalServer();
+    const isDev = BaseApiService.isDevelopmentMode();
     
-    if (localAvailable) {
-      try {
-        const localInstance = axios.create({
-          baseURL: 'http://localhost:5002/api',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': localStorage.getItem('token') ? `Bearer ${localStorage.getItem('token')}` : ''
+    // В режиме разработки всегда пробуем локальный сервер первым
+    if (isDev) {
+      const localAvailable = await BaseApiService.checkLocalServer();
+      
+      if (localAvailable) {
+        try {
+          const localInstance = axios.create({
+            baseURL: 'http://localhost:5002/api',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': localStorage.getItem('token') ? `Bearer ${localStorage.getItem('token')}` : ''
+            }
+          });
+          
+          let response;
+          
+          switch (method.toLowerCase()) {
+            case 'get':
+              response = await localInstance.get(url);
+              break;
+            case 'post':
+              response = await localInstance.post(url, data);
+              break;
+            case 'put':
+              response = await localInstance.put(url, data);
+              break;
+            case 'delete':
+              response = await localInstance.delete(url);
+              break;
+            default:
+              throw new Error(`Неподдерживаемый метод: ${method}`);
           }
-        });
-        
-        let response;
-        
-        switch (method.toLowerCase()) {
-          case 'get':
-            response = await localInstance.get(url);
-            break;
-          case 'post':
-            response = await localInstance.post(url, data);
-            break;
-          case 'put':
-            response = await localInstance.put(url, data);
-            break;
-          case 'delete':
-            response = await localInstance.delete(url);
-            break;
-          default:
-            throw new Error(`Неподдерживаемый метод: ${method}`);
+          
+          console.log(`✅ Local server response for ${url}`);
+          return response.data;
+        } catch (localError) {
+          console.log(`⚠️ Local server error for ${url}:`, localError.message);
+          console.log('Response status:', localError.response?.status);
+          console.log('Response data:', localError.response?.data);
+          
+          // В режиме разработки НЕ переключаемся на production при ошибках сервера
+          // Только при недоступности сервера (сетевые ошибки)
+          if (localError.response) {
+            // Это ошибка сервера (4xx, 5xx), не сетевая ошибка
+            console.log('💡 Server error detected, staying on local server in dev mode');
+            throw localError; // Пробрасываем ошибку как есть
+          }
+          
+          console.log('🔄 Network error detected, trying production server as fallback...');
+          // Продолжаем с production сервером только при сетевых ошибках
         }
-        
-        console.log(`✅ Local server response for ${url}`);
-        return response.data;
-      } catch (localError) {
-        console.log(`⚠️ Local server error for ${url}:`, localError.message);
-        console.log('Response status:', localError.response?.status);
-        console.log('Response data:', localError.response?.data);
-        console.log('Trying production server...');
-        // Продолжаем с production сервером
+      } else {
+        console.log('🔄 Local server unavailable in dev mode, using production fallback...');
       }
     }
     
-    // Если локальный не работает, используем production
+    // Используем production сервер (или в production режиме, или как fallback в dev)
     try {
       let response;
       

@@ -8,5 +8,8 @@
   "support": "Technical Support",
   "organization": "Alatau Stroyinvest",
   "welcome": "Welcome",
-  "company": "Construction Company"
+  "company": "Construction Company",
+  "nav": {
+    "aboutUs": "About Us"
+  }
 }

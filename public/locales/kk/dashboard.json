@@ -90,5 +90,56 @@
     "calculatedStats": "Есептелген статистика",
     "noData": "Өтінімдер туралы деректер жоқ, бос тізім көрсетіледі",
     "loadingError": "Дашборд деректерін жүктеу кезінде қате"
+  },
+  "statistics": {
+    "ticketsByType": "Өтініштер түрлері бойынша",
+    "ticketVolume": "Өтініштер көлемі",
+    "staffPerformance": "Қызметкерлердің тиімділігі",
+    "kpiMetrics": "Негізгі көрсеткіштер",
+    "newTickets": "Жаңа",
+    "inProgress": "Жұмыста",
+    "resolved": "Шешілді",
+    "closed": "Жабылды",
+    "urgent": "Шұғыл",
+    "high": "Жоғары",
+    "last24h": "Соңғы 24 сағат",
+    "last7days": "Соңғы 7 күн",
+    "ticketsOverTime": "Өтініштер динамикасы",
+    "ticketsTrend": "Өтініштер тренді",
+    "created": "Құрылды",
+    "noData": "Деректер жоқ",
+    "loading": "Жүктелуде...",
+    "error": "Жүктеу қатесі",
+    "retry": "Қайталау",
+    "export": "Экспорт",
+    "period": {
+      "24hours": "24 сағат",
+      "7days": "7 күн",
+      "30days": "30 күн",
+      "90days": "90 күн"
+    },
+    "staff": {
+      "name": "Аты",
+      "assignedTickets": "Тағайындалды",
+      "resolvedTickets": "Шешілді",
+      "activeTickets": "Белсенді",
+      "avgResolutionTime": "Орташа шешу уақыты",
+      "resolutionRate": "Шешу пайызы",
+      "noStaff": "Қызметкерлер туралы деректер жоқ",
+      "hours": "сағ",
+      "performance": "Өнімділік"
+    },
+    "kpi": {
+      "slaCompliance": "SLA сақтау",
+      "within24h": "24 сағат ішінде",
+      "customerSatisfaction": "Клиенттердің қанағаттануы",
+      "avgRating": "Орташа рейтинг",
+      "responseTime": "Жауап беру уақыты",
+      "firstResponse": "Алғашқы жауап",
+      "repeatTickets": "Қайталанған өтініштер",
+      "withinWeek": "Апта ішінде",
+      "peakHours": "Шыңдық сағаттар",
+      "hourlyDistribution": "Сағаттық бөлінім"
+    }
   }
 }

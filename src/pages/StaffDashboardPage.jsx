@@ -13,8 +13,7 @@ import {
   Divider,
   Chip,
   CircularProgress,
-  Alert,
-  Container
+  Alert
 } from '@mui/material';
 import { AddCircleOutline } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -39,44 +38,39 @@ const StaffDashboardPage = () => {
   const [error, setError] = useState(null);
   const { t, i18n } = useTranslation(['dashboard', 'common']);
 
-  // Загрузка заявок сотрудника при монтировании компонента
+  // Загрузка заявок для сотрудника при монтировании компонента
   useEffect(() => {
     const fetchStaffTickets = async () => {
       try {
         setLoading(true);
-        // Используем сервис для получения заявок, созданных сотрудником
+        // Получаем все заявки без фильтрации по user_id
+        // Backend автоматически определит, какие заявки показывать в зависимости от роли
         const response = await ticketService.getTickets({
-          // Фильтруем только заявки, созданные текущим сотрудником
-          submitted_by: user?.id,  // Используем submitted_by вместо created_by
-          employee_id: user?.id    // Также проверяем по employee_id, если API его поддерживает
+          // Не передаем никаких фильтров по пользователю
+          // Сотрудник должен видеть все заявки
+          sort: 'created_at',
+          order: 'desc',
+          limit: 100 // Получаем больше заявок для статистики
         });
         
         // Обработка ответа API, который может иметь разную структуру
         const ticketsData = Array.isArray(response) ? response : 
                           (response?.data || response?.tickets || []);
-                          
-        // Дополнительная фильтрация на клиенте, чтобы гарантировать, что показываем только заявки этого сотрудника
-        const filteredTickets = ticketsData.filter(ticket => 
-          ticket.submitted_by === user?.id || 
-          ticket.employee_id === user?.id || 
-          ticket.created_by === user?.id ||
-          ticket.user_id === user?.id
-        );
         
-        // Рассчет статистики по заявкам
+        // Рассчет статистики по всем заявкам
         const stats = {
-          total: filteredTickets.length,
-          new: filteredTickets.filter(t => t.status === 'new').length,
-          inProgress: filteredTickets.filter(t => t.status === 'in_progress').length,
-          resolved: filteredTickets.filter(t => t.status === 'resolved').length
+          total: ticketsData.length,
+          new: ticketsData.filter(t => t.status === 'new').length,
+          inProgress: ticketsData.filter(t => t.status === 'in_progress').length,
+          resolved: ticketsData.filter(t => t.status === 'resolved').length
         };
         
-        setTickets(filteredTickets);
+        setTickets(ticketsData);
         setTicketStats(stats);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching staff tickets:', err);
-        setError(t('common:errors.loadFailed', 'Не удалось загрузить ваши заявки'));
+        setError(t('common:errors.loadFailed', 'Не удалось загрузить заявки'));
         setLoading(false);
       }
     };
@@ -154,9 +148,8 @@ const StaffDashboardPage = () => {
   }
 
   return (
-    <Container maxWidth="lg" disableGutters sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
-      <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>
-        <Grid container spacing={3}>
+    <Box sx={{ px: 0, py: { xs: 2, sm: 3 }, maxWidth: 1200, mx: 'auto' }}>
+      <Grid container spacing={3}>
           {/* Шапка */}
           <Grid item xs={12}>
             <Box 
@@ -368,15 +361,14 @@ const StaffDashboardPage = () => {
                     onClick={() => navigate('/tickets')}
                     sx={{ px: 3 }}
                   >
-                    {t('dashboard:recentTickets.viewAll', 'Смотреть все мои заявки')}
+                    {t('dashboard:recentTickets.viewAll', 'Смотреть все заявки')}
                   </Button>
                 </Box>
               )}
             </Paper>
           </Grid>
         </Grid>
-      </Box>
-    </Container>
+    </Box>
   );
 };
 

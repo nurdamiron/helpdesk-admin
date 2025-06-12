@@ -12,15 +12,10 @@ export class UserService extends BaseApiService {
    */
   async getProfile() {
     try {
-      const currentUser = authService.getCurrentUser();
-      if (!currentUser) {
-        throw new Error('Пользователь не авторизован');
-      }
-      
       // Получаем актуальные данные с сервера
       const response = await this.request({
         method: 'get',
-        url: `/users/${currentUser.id}`,
+        url: '/users/me',
         authService
       });
       
@@ -37,20 +32,22 @@ export class UserService extends BaseApiService {
    */
   async updateProfile(userData) {
     try {
-      const currentUser = authService.getCurrentUser();
-      if (!currentUser) {
-        throw new Error('Пользователь не авторизован');
+      // Сначала получаем текущего пользователя
+      const profile = await this.getProfile();
+      if (!profile) {
+        throw new Error('Не удалось получить профиль пользователя');
       }
       
       const response = await this.request({
         method: 'put',
-        url: `/users/${currentUser.id}`,
+        url: `/users/${profile.id}`,
         data: userData,
         authService
       });
       
       // Обновляем данные в localStorage
       if (response.user) {
+        const currentUser = authService.getCurrentUser();
         const updatedUser = { ...currentUser, ...response.user };
         localStorage.setItem('user', JSON.stringify(updatedUser));
       }
@@ -69,14 +66,15 @@ export class UserService extends BaseApiService {
    */
   async updatePassword(currentPassword, newPassword) {
     try {
-      const currentUser = authService.getCurrentUser();
-      if (!currentUser) {
-        throw new Error('Пользователь не авторизован');
+      // Сначала получаем текущего пользователя
+      const profile = await this.getProfile();
+      if (!profile) {
+        throw new Error('Не удалось получить профиль пользователя');
       }
       
       const response = await this.request({
         method: 'put',
-        url: `/users/${currentUser.id}/password`,
+        url: `/users/${profile.id}/password`,
         data: {
           currentPassword,
           newPassword
@@ -97,14 +95,15 @@ export class UserService extends BaseApiService {
    */
   async updateSettings(settings) {
     try {
-      const currentUser = authService.getCurrentUser();
-      if (!currentUser) {
-        throw new Error('Пользователь не авторизован');
+      // Сначала получаем текущего пользователя
+      const profile = await this.getProfile();
+      if (!profile) {
+        throw new Error('Не удалось получить профиль пользователя');
       }
       
       const response = await this.request({
         method: 'put',
-        url: `/users/${currentUser.id}/settings`,
+        url: `/users/${profile.id}/settings`,
         data: settings,
         authService
       });

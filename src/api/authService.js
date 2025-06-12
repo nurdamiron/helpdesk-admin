@@ -55,15 +55,21 @@ export const authService = {
     return !!localStorage.getItem('token');
   },
 
-  // Регистрация нового пользователя (создание пользователя администратором)
-  register: async (userData) => {
+  // Создание нового пользователя администратором
+  createUser: async (userData) => {
     try {
-      const response = await api.post('/auth/register', userData);
+      const response = await api.post('/users', userData);
       return response.data;
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('Create user error:', error);
       throw error;
     }
+  },
+
+  // Регистрация нового пользователя (создание пользователя администратором) - DEPRECATED
+  register: async (userData) => {
+    // Используем новый метод createUser
+    return authService.createUser(userData);
   },
 
   // Получение списка пользователей
@@ -127,9 +133,9 @@ export const authService = {
     // Админ имеет доступ ко всему
     if (user.role === 'admin') return true;
     
-    // Support и Manager имеют доступ как модераторы
-    if (user.role === 'support' || user.role === 'manager' || user.role === 'moderator') {
-      return requiredRole === 'moderator' || requiredRole === 'staff';
+    // Модератор имеет доступ к функциям модератора
+    if (user.role === 'moderator') {
+      return requiredRole === 'moderator';
     }
     
     // Пользователь имеет доступ только к роли пользователя
